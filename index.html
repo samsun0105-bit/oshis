@@ -58,33 +58,73 @@
     display: block;
 }
 
-        @media print {
-            nav, footer, .user-only, .admin-only, #drop-zone .upload-prompt, #reselect-btn, #analyze-btn, .bg-blue-50, #print-report-btn, #save-report-btn, #history-btn {
-                display: none !important;
-            }
-            body { background-color: white !important; padding: 0 !important; }
-            main { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            .grid { display: block !important; }
-            .bg-white { border: none !important; box-shadow: none !important; padding: 0 !important; }
-            #results-container { opacity: 1 !important; pointer-events: auto !important; margin-top: 20px; }
-#canvas-container {
-    display: inline-block !important;
-    width: auto !important;
-    max-width: 100% !important;
-    text-align: center;
-    margin-bottom: 20px;
-}
+@media print {
+    nav, footer, .user-only, .admin-only, #drop-zone .upload-prompt, #reselect-btn, #analyze-btn, .bg-blue-50, #print-report-btn, #save-report-btn, #history-btn {
+        display: none !important;
+    }
 
-#preview-img {
-    display: block !important;
-    max-height: none !important;
-    max-width: 100% !important;
-    width: auto !important;
-    object-fit: contain;
+    body {
+        background-color: white !important;
+        padding: 0 !important;
+    }
+
+    main {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .grid {
+        display: block !important;
+    }
+
+    .bg-white {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    #results-container {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        margin-top: 20px;
+    }
+
+    #canvas-container {
+        display: inline-block !important;
+        width: auto !important;
+        max-width: 100% !important;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    #hazard-canvas {
+        display: none !important;
+    }
+
+    #preview-img {
+        display: block !important;
+        max-height: none !important;
+        max-width: 100% !important;
+        width: auto !important;
+        object-fit: contain;
+    }
+
+    h2 {
+        font-size: 1.25rem !important;
+        margin-bottom: 10px !important;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 5px;
+    }
+
+    .hazard-card {
+        break-inside: avoid;
+        border: 1px solid #ddd !important;
+        border-left: 6px solid #ef4444 !important;
+        margin-bottom: 10px !important;
+    }
 }
-            h2 { font-size: 1.25rem !important; margin-bottom: 10px !important; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-            .hazard-card { break-inside: avoid; border: 1px solid #ddd !important; border-left: 6px solid #ef4444 !important; margin-bottom: 10px !important; }
-        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col">
@@ -817,7 +857,45 @@ const displayHeight = img.offsetHeight;
         ctx.fillText(`#${index + 1}`, left + 6, Math.max(top - 7, 17));
     });
 }
+function createAnnotatedImageForPrint() {
+    const img = elements.previewImg;
 
+    if (!img.complete || img.naturalWidth === 0) return;
+
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = img.naturalWidth;
+    tempCanvas.height = img.naturalHeight;
+
+    const ctx = tempCanvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    (currentReportData.hazards || []).forEach((h, index) => {
+        if (!h.box_2d) return;
+
+        const [ymin, xmin, ymax, xmax] = h.box_2d;
+
+        const left = (xmin / 1000) * tempCanvas.width;
+        const top = (ymin / 1000) * tempCanvas.height;
+        const width = ((xmax - xmin) / 1000) * tempCanvas.width;
+        const height = ((ymax - ymin) / 1000) * tempCanvas.height;
+
+        ctx.strokeStyle = "#ef4444";
+        ctx.lineWidth = Math.max(6, tempCanvas.width * 0.006);
+        ctx.strokeRect(left, top, width, height);
+
+        const labelW = tempCanvas.width * 0.08;
+        const labelH = tempCanvas.height * 0.05;
+
+        ctx.fillStyle = "#ef4444";
+        ctx.fillRect(left, Math.max(top - labelH, 0), labelW, labelH);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${Math.max(24, tempCanvas.width * 0.025)}px sans-serif`;
+        ctx.fillText(`#${index + 1}`, left + 8, Math.max(top - 10, labelH - 10));
+    });
+
+    return tempCanvas.toDataURL("image/png");
+}
         function setLoading(l) {
             elements.analyzeBtn.disabled = l;
             elements.btnText.innerText = l ? "正在識別與檢索法規..." : "開始 AI 自動識別";
@@ -949,12 +1027,32 @@ const displayHeight = img.offsetHeight;
         };
 
 elements.printReportBtn.onclick = () => {
-    elements.printDate.innerText = `報告生成時間：${new Date().toLocaleString('zh-TW')} | 分類：${elements.categorySelect.value}`;
+    elements.printDate.innerText =
+        `報告生成時間：${new Date().toLocaleString('zh-TW')} | 分類：${elements.categorySelect.value}`;
 
-    setTimeout(() => {
-        drawHazardsOnImage();
-        window.print();
-    }, 300);
+    const originalSrc = elements.previewImg.src;
+    const annotatedSrc = createAnnotatedImageForPrint();
+
+    if (!annotatedSrc) return;
+
+    const img = new Image();
+
+    img.onload = () => {
+        elements.previewImg.src = annotatedSrc;
+        elements.canvas.style.display = "none";
+
+        requestAnimationFrame(() => {
+            window.print();
+
+            setTimeout(() => {
+                elements.previewImg.src = originalSrc;
+                elements.canvas.style.display = "block";
+                drawHazardsOnImage();
+            }, 300);
+        });
+    };
+
+    img.src = annotatedSrc;
 };
 
         elements.analyzeBtn.onclick = analyzeImage;
@@ -1017,19 +1115,6 @@ window.addEventListener("resize", () => {
     drawHazardsOnImage();
 });
 
-window.addEventListener("beforeprint", () => {
-    elements.printDate.innerText = `報告生成時間：${new Date().toLocaleString('zh-TW')} | 分類：${elements.categorySelect.value}`;
-
-    setTimeout(() => {
-        drawHazardsOnImage();
-    }, 300);
-});
-
-window.addEventListener("afterprint", () => {
-    setTimeout(() => {
-        drawHazardsOnImage();
-    }, 300);
-});
         initDB();
 
     </script>
