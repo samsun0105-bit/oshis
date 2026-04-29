@@ -46,12 +46,17 @@
             display: inline-block;
             max-width: 100%;
         }
-        #hazard-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
+#hazard-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#preview-img {
+    display: block;
+}
 
         @media print {
             nav, footer, .user-only, .admin-only, #drop-zone .upload-prompt, #reselect-btn, #analyze-btn, .bg-blue-50, #print-report-btn, #save-report-btn, #history-btn {
@@ -62,8 +67,21 @@
             .grid { display: block !important; }
             .bg-white { border: none !important; box-shadow: none !important; padding: 0 !important; }
             #results-container { opacity: 1 !important; pointer-events: auto !important; margin-top: 20px; }
-            #canvas-container { width: 100% !important; text-align: center; margin-bottom: 20px; }
-            #preview-img { max-height: none !important; width: 100% !important; object-fit: contain; }
+#canvas-container {
+    display: inline-block !important;
+    width: auto !important;
+    max-width: 100% !important;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#preview-img {
+    display: block !important;
+    max-height: none !important;
+    max-width: 100% !important;
+    width: auto !important;
+    object-fit: contain;
+}
             h2 { font-size: 1.25rem !important; margin-bottom: 10px !important; border-bottom: 2px solid #eee; padding-bottom: 5px; }
             .hazard-card { break-inside: avoid; border: 1px solid #ddd !important; border-left: 6px solid #ef4444 !important; margin-bottom: 10px !important; }
         }
@@ -760,27 +778,45 @@ currentReportData = JSON.parse(text);
             }
         };
 
-        function drawHazardsOnImage() {
-            const img = elements.previewImg;
-            const canvas = elements.canvas;
-            if (!img.complete || img.naturalWidth === 0) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = img.clientWidth;
-            canvas.height = img.clientHeight;
-            (currentReportData.hazards || []).forEach((h, index) => {
-                if (!h.box_2d) return;
-                const [ymin, xmin, ymax, xmax] = h.box_2d;
-                const left = (xmin / 1000) * canvas.width;
-                const top = (ymin / 1000) * canvas.height;
-                const width = ((xmax - xmin) / 1000) * canvas.width;
-                const height = ((ymax - ymin) / 1000) * canvas.height;
-                ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
-                ctx.strokeRect(left, top, width, height);
-                ctx.fillStyle = '#ef4444'; ctx.fillRect(left, top - 20, 30, 20);
-                ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
-                ctx.fillText(`#${index + 1}`, left + 5, top - 5);
-            });
-        }
+function drawHazardsOnImage() {
+    const img = elements.previewImg;
+    const canvas = elements.canvas;
+
+    if (!img.complete || img.naturalWidth === 0) return;
+
+const displayWidth = img.offsetWidth;
+const displayHeight = img.offsetHeight;
+
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+    canvas.style.width = displayWidth + "px";
+    canvas.style.height = displayHeight + "px";
+
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    (currentReportData.hazards || []).forEach((h, index) => {
+        if (!h.box_2d) return;
+
+        const [ymin, xmin, ymax, xmax] = h.box_2d;
+
+        const left = (xmin / 1000) * displayWidth;
+        const top = (ymin / 1000) * displayHeight;
+        const width = ((xmax - xmin) / 1000) * displayWidth;
+        const height = ((ymax - ymin) / 1000) * displayHeight;
+
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(left, top, width, height);
+
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(left, Math.max(top - 24, 0), 36, 24);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText(`#${index + 1}`, left + 6, Math.max(top - 7, 17));
+    });
+}
 
         function setLoading(l) {
             elements.analyzeBtn.disabled = l;
@@ -912,10 +948,14 @@ currentReportData = JSON.parse(text);
             renderSuggestions(); closeModals();
         };
 
-        elements.printReportBtn.onclick = () => {
-            elements.printDate.innerText = `報告生成時間：${new Date().toLocaleString('zh-TW')} | 分類：${elements.categorySelect.value}`;
-            window.print();
-        };
+elements.printReportBtn.onclick = () => {
+    elements.printDate.innerText = `報告生成時間：${new Date().toLocaleString('zh-TW')} | 分類：${elements.categorySelect.value}`;
+
+    setTimeout(() => {
+        drawHazardsOnImage();
+        window.print();
+    }, 300);
+};
 
         elements.analyzeBtn.onclick = analyzeImage;
         
@@ -973,7 +1013,23 @@ currentReportData = JSON.parse(text);
             };
             reader.readAsText(file);
         };
+window.addEventListener("resize", () => {
+    drawHazardsOnImage();
+});
 
+window.addEventListener("beforeprint", () => {
+    elements.printDate.innerText = `報告生成時間：${new Date().toLocaleString('zh-TW')} | 分類：${elements.categorySelect.value}`;
+
+    setTimeout(() => {
+        drawHazardsOnImage();
+    }, 300);
+});
+
+window.addEventListener("afterprint", () => {
+    setTimeout(() => {
+        drawHazardsOnImage();
+    }, 300);
+});
         initDB();
 
     </script>
