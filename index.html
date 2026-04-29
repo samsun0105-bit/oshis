@@ -153,7 +153,7 @@
                     <ul class="text-blue-700 text-xs space-y-1 list-disc list-inside">
                         <li>請上傳光線充足、涵蓋作業環境全景的照片。</li>
                         <li>AI 將分析環境中的不安全狀態（設施）與不安全行為。</li>
-                        <li><b>本系統將自動對照《職業安全衛生設施規則》等相關法源。</b></li>
+                        <li><b>本系統將自動對照《職業安全衛生法》等相關法規依據。</b></li>
                         <li>辨識結果僅供參考，仍需由專業安全管理人員複核。</li>
                     </ul>
                 </div>
@@ -189,7 +189,7 @@
                             <i class="fas fa-check-circle mr-2 text-green-500"></i> 改善建議
                         </h2>
                         <div class="admin-only">
-                            <button id="add-suggestion-manual" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold hover:bg-green-200 transition">+ 新增建議</button>
+                            <button id="add-suggestion-manual-btn" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold hover:bg-green-200 transition">+ 新增建議</button>
                         </div>
                     </div>
                     <div id="suggestions-output" class="grid grid-cols-1 gap-2"></div>
@@ -378,7 +378,12 @@
             historyBtn: document.getElementById('history-btn'),
             historyModal: document.getElementById('history-modal'),
             historyList: document.getElementById('history-list'),
-            historyCatFilter: document.getElementById('history-cat-filter')
+            historyCatFilter: document.getElementById('history-cat-filter'),
+            showPwdModalBtn: document.getElementById('show-pwd-modal-btn'),
+            pwdModal: document.getElementById('pwd-modal'),
+            backToLogin: document.getElementById('back-to-login'),
+            doChangePwd: document.getElementById('do-change-pwd'),
+            clearHistoryBtn: document.getElementById('clear-history-btn')
         };
 
         function closeModals() {
@@ -419,6 +424,33 @@
         }
         document.getElementById('do-login').onclick = verifyLogin;
         elements.pwdInput.onkeydown = (e) => { if (e.key === 'Enter') verifyLogin(); };
+
+        // 恢復修改密碼功能
+        elements.showPwdModalBtn.onclick = () => {
+            elements.loginModal.classList.add('hidden');
+            elements.pwdModal.classList.remove('hidden');
+        };
+        elements.backToLogin.onclick = () => {
+            elements.pwdModal.classList.add('hidden');
+            elements.loginModal.classList.remove('hidden');
+        };
+        elements.doChangePwd.onclick = async () => {
+            const oldPwd = document.getElementById('old-pwd').value;
+            const newPwd = document.getElementById('new-pwd').value;
+            const tx = db.transaction(["settings"], "readwrite");
+            const store = tx.objectStore("settings");
+            const currentPwd = await new Promise(r => {
+                const req = store.get("adminPwd");
+                req.onsuccess = () => r(req.result);
+            });
+            if (oldPwd === currentPwd) {
+                store.put(newPwd, "adminPwd");
+                alert("密碼修改成功！");
+                document.getElementById('old-pwd').value = "";
+                document.getElementById('new-pwd').value = "";
+                elements.backToLogin.click();
+            } else { alert("舊密碼錯誤"); }
+        };
 
         function updateUIVisibility() {
             if (isAdmin && currentReportData.hazards?.length > 0) {
@@ -560,25 +592,23 @@
             語言: 繁體中文。座標必須精準對應到該物件。`;
             
             try {
-const response = await fetch("/api/analyze-oshis", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    imageBase64: base64Image,
-    mimeType: "image/png"
-  })
-});
+                const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: sysPrompt },
+                                { inlineData: { mimeType: "image/png", data: rawBase64 } }
+                            ]
+                        }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
 
-const result = await response.json();
-
-if (!response.ok) {
-  throw new Error(result.error?.message || result.error || "AI 識別失敗");
-}
-
-const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-currentReportData = JSON.parse(text);
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                currentReportData = JSON.parse(text);
                 
                 renderHazards();
                 renderSuggestions();
@@ -656,7 +686,7 @@ currentReportData = JSON.parse(text);
                                 <span class="text-[10px] text-slate-400">${date}</span>
                             </div>
                             <div class="flex items-center mt-1">
-                                <h4 class="font-bold text-slate-700 line-clamp-1 flex-grow">${displayTitle}</h4>
+                                <h4 id="report-title-${report.id}" class="font-bold text-slate-700 line-clamp-1 flex-grow">${displayTitle}</h4>
                                 ${isAdmin ? `<button onclick="editHistoryTitle(${report.id})" class="text-blue-500 hover:text-blue-700 ml-2 text-xs opacity-0 group-hover:opacity-100 transition"><i class="fas fa-edit"></i></button>` : ''}
                             </div>
                             <div class="flex mt-3 space-x-2">
@@ -669,6 +699,39 @@ currentReportData = JSON.parse(text);
                 elements.historyList.appendChild(card);
             });
         }
+
+        // 歷史紀錄編輯功能
+        window.editHistoryTitle = async (id) => {
+            const currentTitle = document.getElementById(`report-title-${id}`).innerText;
+            const newTitle = prompt("請輸入新的報告名稱：", currentTitle);
+            if (newTitle && newTitle.trim() !== currentTitle) {
+                const tx = db.transaction(["reports"], "readwrite");
+                const store = tx.objectStore("reports");
+                const report = await new Promise(r => {
+                    const req = store.get(id);
+                    req.onsuccess = () => r(req.result);
+                });
+                report.title = newTitle.trim();
+                store.put(report);
+                tx.oncomplete = loadHistory;
+            }
+        };
+
+        window.deleteHistory = async (id) => {
+            if (confirm("確定刪除此筆報告紀錄？")) {
+                const tx = db.transaction(["reports"], "readwrite");
+                tx.objectStore("reports").delete(id);
+                tx.oncomplete = loadHistory;
+            }
+        };
+
+        elements.clearHistoryBtn.onclick = async () => {
+            if (confirm("確定要清空所有報告紀錄嗎？此動作無法還原！")) {
+                const tx = db.transaction(["reports"], "readwrite");
+                tx.objectStore("reports").clear();
+                tx.oncomplete = loadHistory;
+            }
+        };
 
         window.previewHistory = async (id) => {
             const tx = db.transaction(["reports"], "readonly");
@@ -764,7 +827,12 @@ currentReportData = JSON.parse(text);
                             <i class="fas fa-check text-green-500 mt-1"></i>
                             <span>${s}</span>
                         </div>
-                        ${isAdmin ? `<button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 px-1 opacity-0 group-hover:opacity-100 transition"><i class="fas fa-xmark"></i></button>` : ''}
+                        ${isAdmin ? `
+                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
+                                <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 px-1"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 px-1"><i class="fas fa-xmark"></i></button>
+                            </div>
+                        ` : ''}
                     `;
                     elements.suggestionsOutput.appendChild(item);
                 });
@@ -779,6 +847,13 @@ currentReportData = JSON.parse(text);
             document.getElementById('edit-h-risk').value = h.risk;
             document.getElementById('edit-h-severity').value = h.severity;
             showModal('edit-hazard-modal');
+        };
+
+        window.deleteHazard = (idx) => {
+            if (confirm("確定刪除此危害項目？")) {
+                currentReportData.hazards.splice(idx, 1);
+                renderHazards(); drawHazardsOnImage(); updateUIVisibility();
+            }
         };
 
         document.getElementById('save-hazard-btn').onclick = () => {
@@ -802,8 +877,29 @@ currentReportData = JSON.parse(text);
             showModal('edit-hazard-modal');
         };
 
+        // 恢復/新增建議功能
+        document.getElementById('add-suggestion-manual-btn').onclick = () => {
+            editingSuggestionIndex = -1;
+            document.getElementById('edit-s-text').value = "";
+            showModal('edit-suggestion-modal');
+        };
+
+        window.editSuggestion = (idx) => {
+            editingSuggestionIndex = idx;
+            document.getElementById('edit-s-text').value = currentReportData.suggestions[idx];
+            showModal('edit-suggestion-modal');
+        };
+
+        window.deleteSuggestion = (idx) => {
+            if (confirm("確定刪除此改善建議？")) {
+                currentReportData.suggestions.splice(idx, 1);
+                renderSuggestions();
+            }
+        };
+
         document.getElementById('save-suggestion-btn').onclick = () => {
             const text = document.getElementById('edit-s-text').value.trim();
+            if (!text) return;
             if (editingSuggestionIndex === -1) currentReportData.suggestions.push(text);
             else currentReportData.suggestions[editingSuggestionIndex] = text;
             renderSuggestions(); closeModals();
@@ -815,6 +911,62 @@ currentReportData = JSON.parse(text);
         };
 
         elements.analyzeBtn.onclick = analyzeImage;
+        
+        // 資料庫匯出匯入
+        document.getElementById('export-db').onclick = async () => {
+            const data = {
+                reports: await new Promise(r => {
+                    const tx = db.transaction(["reports"], "readonly");
+                    const req = tx.objectStore("reports").getAll();
+                    req.onsuccess = () => r(req.result);
+                }),
+                categories: await new Promise(r => {
+                    const tx = db.transaction(["categories"], "readonly");
+                    const req = tx.objectStore("categories").getAll();
+                    req.onsuccess = () => r(req.result);
+                }),
+                settings: {
+                    adminPwd: await new Promise(r => {
+                        const tx = db.transaction(["settings"], "readonly");
+                        const req = tx.objectStore("settings").get("adminPwd");
+                        req.onsuccess = () => r(req.result);
+                    })
+                }
+            };
+            const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = `safety_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        };
+
+        document.getElementById('import-db').onclick = () => document.getElementById('db-file-input').click();
+        document.getElementById('db-file-input').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    const txR = db.transaction(["reports"], "readwrite");
+                    txR.objectStore("reports").clear();
+                    data.reports.forEach(r => txR.objectStore("reports").add(r));
+                    
+                    const txC = db.transaction(["categories"], "readwrite");
+                    txC.objectStore("categories").clear();
+                    data.categories.forEach(c => txC.objectStore("categories").add(c));
+                    
+                    if (data.settings?.adminPwd) {
+                        const txS = db.transaction(["settings"], "readwrite");
+                        txS.objectStore("settings").put(data.settings.adminPwd, "adminPwd");
+                    }
+                    alert("數據導入成功，系統將刷新。");
+                    location.reload();
+                } catch (err) { alert("無效的備份檔案"); }
+            };
+            reader.readAsText(file);
+        };
+
         initDB();
 
     </script>
