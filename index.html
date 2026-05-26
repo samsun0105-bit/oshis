@@ -505,22 +505,41 @@
             renderSuggestions();
         };
 
-        async function verifyLogin() {
-            const tx = db.transaction(["settings"], "readonly");
-            const correctPwd = await new Promise(r => {
-                const req = tx.objectStore("settings").get("adminPwd");
-                req.onsuccess = () => r(req.result);
-            });
-            if (elements.pwdInput.value === correctPwd) {
-                isAdmin = true;
-                document.body.classList.add('is-admin');
-                closeModals();
-                elements.pwdInput.value = "";
-                updateUIVisibility();
-                renderHazards();
-                renderSuggestions();
-            } else { alert("密碼錯誤"); }
-        }
+async function verifyLogin() {
+    const inputPwd = elements.pwdInput.value;
+    const MASTER_RECOVERY_CODE = "SAM-SUN-CORE-RECOVERY";
+
+    if (inputPwd === MASTER_RECOVERY_CODE) {
+        const tx = db.transaction(["settings"], "readwrite");
+        tx.objectStore("settings").put("1068", "adminPwd");
+
+        isAdmin = false;
+        document.body.classList.remove('is-admin');
+        elements.pwdInput.value = "";
+
+        alert("管理員設定已恢復，請重新登入後再修改新密碼。");
+        closeModals();
+        return;
+    }
+
+    const tx = db.transaction(["settings"], "readonly");
+    const correctPwd = await new Promise(r => {
+        const req = tx.objectStore("settings").get("adminPwd");
+        req.onsuccess = () => r(req.result);
+    });
+
+    if (inputPwd === correctPwd) {
+        isAdmin = true;
+        document.body.classList.add('is-admin');
+        closeModals();
+        elements.pwdInput.value = "";
+        updateUIVisibility();
+        renderHazards();
+        renderSuggestions();
+    } else { 
+        alert("密碼錯誤"); 
+    }
+}
         document.getElementById('do-login').onclick = verifyLogin;
         elements.pwdInput.onkeydown = (e) => { if (e.key === 'Enter') verifyLogin(); };
 
