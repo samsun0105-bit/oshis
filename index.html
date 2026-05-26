@@ -1145,7 +1145,7 @@ elements.printReportBtn.onclick = () => {
             const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.href = url; a.download = `safety_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.href = url; a.download = `職業安全危害識別系統_OSHIS_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
         };
 
