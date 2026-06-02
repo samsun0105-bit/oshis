@@ -393,32 +393,6 @@
     white-space: nowrap;
 }
 
-/* 手機版：英文自動換到下一行，避免擠在一起 */
-@media (max-width: 640px) {
-    .section-title-text {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.15rem;
-    }
-
-    .section-title-text .title-en {
-        font-size: 0.58rem;
-        white-space: normal;
-    }
-}
-
-@media (max-width: 640px) {
-    #analyze-btn .btn-title-inline {
-        flex-direction: column;
-        gap: 0.15rem;
-    }
-
-    #analyze-btn .btn-sub {
-        font-size: 0.58rem;
-        white-space: normal;
-    }
-}
-
 #analyze-btn .btn-title-inline {
     display: inline-flex;
     align-items: baseline;
@@ -442,6 +416,18 @@
     line-height: 1.1;
     white-space: nowrap;
     font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    #analyze-btn .btn-title-inline {
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    #analyze-btn .btn-sub {
+        font-size: 0.58rem;
+        white-space: normal;
+    }
 }
 
     h2.text-lg {
