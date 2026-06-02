@@ -366,6 +366,33 @@
     }
 }
 
+
+    /* Fine tuning: align section title icons and slim hazard left marker */
+    h2.text-lg {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.55rem !important;
+    }
+
+    h2.text-lg > i.fas,
+    h2.text-lg > i.fa {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 1.85rem !important;
+        height: 1.85rem !important;
+        min-width: 1.85rem !important;
+        margin-right: 0 !important;
+        line-height: 1 !important;
+        font-size: 0.9rem !important;
+        vertical-align: middle !important;
+        transform: translateY(0) !important;
+    }
+
+    #analysis-output .hazard-card {
+        border-left-width: 3px !important;
+    }
+
 @page {
     size: A4;
     margin: 10mm;
