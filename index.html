@@ -693,7 +693,7 @@ function updateUIVisibility() {
         currentReportData.hazards.length > 0;
 
     if (hasReport) {
-        elements.printReportBtn.classList.remove('hidden');
+        ;
     } else {
         elements.printReportBtn.classList.add('hidden');
     }
@@ -999,9 +999,16 @@ currentReportData = JSON.parse(text);
                 elements.imagePreview.classList.remove('hidden');
                 elements.resultsContainer.classList.remove('opacity-50');
                 elements.resultsContainer.style.pointerEvents = 'auto';
-                renderHazards(); renderSuggestions();
-                setTimeout(() => { drawHazardsOnImage(); updateUIVisibility(); }, 100);
-                closeModals();
+renderHazards();
+renderSuggestions();
+updateUIVisibility();
+
+setTimeout(() => {
+    drawHazardsOnImage();
+    updateUIVisibility();
+}, 100);
+
+closeModals();
             }
         };
 
