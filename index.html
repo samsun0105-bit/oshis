@@ -817,6 +817,7 @@
         let editingHazardIndex = -1;
         let editingSuggestionIndex = -1;
         let base64Image = "";
+        let lastAnalyzeTime = 0;
 
         const initDB = () => {
             return new Promise((resolve, reject) => {
@@ -1090,87 +1091,124 @@ function updateUIVisibility() {
             handleFile(e.dataTransfer.files[0]);
         });
 
-        function handleFile(file) {
-            if (!file || !file.type.startsWith('image/')) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                base64Image = e.target.result;
-                elements.previewImg.src = e.target.result;
-                elements.uploadPrompt.classList.add('hidden');
-                elements.imagePreview.classList.remove('hidden');
-                elements.analyzeBtn.disabled = false;
-                elements.resultsContainer.classList.add('opacity-50');
-                elements.analysisOutput.innerHTML = '<div class="text-slate-400 text-center py-12 italic">準備就緒</div>';
-                elements.printReportBtn.classList.add('hidden');
-                updateUIVisibility();
-                clearCanvas();
+function resizeImageToBase64(file, maxWidth = 1280, quality = 0.72) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const img = new Image();
+
+            img.onload = () => {
+                const scale = Math.min(1, maxWidth / img.width);
+                const canvas = document.createElement("canvas");
+
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                resolve(canvas.toDataURL("image/jpeg", quality));
             };
-            reader.readAsDataURL(file);
-        }
+
+            img.onerror = reject;
+            img.src = event.target.result;
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function handleFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+
+    try {
+        const compressedBase64 = await resizeImageToBase64(file, 1280, 0.72);
+
+        base64Image = compressedBase64;
+        elements.previewImg.src = compressedBase64;
+
+        elements.uploadPrompt.classList.add('hidden');
+        elements.imagePreview.classList.remove('hidden');
+        elements.analyzeBtn.disabled = false;
+        elements.resultsContainer.classList.add('opacity-50');
+        elements.analysisOutput.innerHTML = '<div class="text-slate-400 text-center py-12 italic">準備就緒</div>';
+        elements.printReportBtn.classList.add('hidden');
+
+        updateUIVisibility();
+        clearCanvas();
+    } catch (error) {
+        alert("圖片處理失敗，請重新選擇圖片。");
+    }
+}
 
         function clearCanvas() {
             const ctx = elements.canvas.getContext('2d');
             ctx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
         }
 
-        async function analyzeImage() {
-            setLoading(true);
-            clearCanvas();
-            const rawBase64 = base64Image.split(',')[1];
 
-            const sysPrompt = `你是一位專業職安專家。分析照片，識別所有不安全設施與行為。
-            請針對每個危害，找出其在照片中的座標位置 [ymin, xmin, ymax, xmax] (數值範圍 0-1000)。
-            同時，你必須根據台灣的「職業安全衛生法」、「職業安全衛生設施規則」、「營造安全衛生設施規則」等，為每個危害套入正確的「法源依據」。
-            
-            輸出 JSON 格式: 
-            { 
-                "hazards": [{
-                    "type": "危害名稱",
-                    "legal_basis": "法源依據 (例如: 職業安全衛生設施規則第 224 條)",
-                    "risk": "風險描述",
-                    "severity": "高/中/低",
-                    "box_2d": [ymin, xmin, ymax, xmax]
-                }], 
-                "suggestions": ["結合法規要求的建議1", "建議2"] 
+async function analyzeImage() {
+    const now = Date.now();
+
+    if (now - lastAnalyzeTime < 15000) {
+        alert("AI 辨識請勿連續快速執行，請稍候 15 秒後再試。");
+        return;
+    }
+
+    lastAnalyzeTime = now;
+
+    setLoading(true);
+    clearCanvas();
+
+    try {
+        const response = await fetch("/api/analyze-oshis", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                imageBase64: base64Image,
+                mimeType: "image/jpeg"
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            const errorMessage = result.error?.message || result.error || "";
+
+            if (
+                response.status === 429 ||
+                errorMessage.includes("quota") ||
+                errorMessage.includes("Quota") ||
+                errorMessage.includes("rate")
+            ) {
+                throw new Error("AI 辨識服務目前已達使用額度或請求次數限制，請稍候再試；若經常發生，請檢查 Gemini API 額度或啟用帳單。");
             }
-            語言: 繁體中文。座標必須精準對應到該物件。`;
-            
-            try {
-const response = await fetch("/api/analyze-oshis", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        imageBase64: base64Image,
-        mimeType: "image/png"
-    })
-});
 
-const result = await response.json();
-
-if (!response.ok) {
-    throw new Error(result.error?.message || result.error || "AI 識別失敗");
-}
-
-const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-if (!text) {
-    throw new Error("AI 未回傳有效 JSON 內容");
-}
-
-currentReportData = JSON.parse(text);
-                
-                renderHazards();
-                renderSuggestions();
-                drawHazardsOnImage();
-                updateUIVisibility();
-            } catch (error) {
-                alert("識別失敗: " + error.message);
-            } finally {
-                setLoading(false);
-            }
+            throw new Error(errorMessage || "AI 識別失敗");
         }
+
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!text) {
+            throw new Error("AI 未回傳有效 JSON 內容");
+        }
+
+        currentReportData = JSON.parse(text);
+
+        renderHazards();
+        renderSuggestions();
+        drawHazardsOnImage();
+        updateUIVisibility();
+    } catch (error) {
+        alert("識別失敗: " + error.message);
+    } finally {
+        setLoading(false);
+    }
+}
 
         elements.saveReportBtn.onclick = async () => {
             if (!isAdmin) {
