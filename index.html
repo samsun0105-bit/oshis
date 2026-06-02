@@ -370,9 +370,12 @@
     /* Fine tuning: align section title icons and slim hazard left marker */
 
 .section-title-text {
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.55rem;
     line-height: 1.15;
+    flex-wrap: wrap;
 }
 
 .section-title-text .title-cn {
@@ -382,29 +385,63 @@
 }
 
 .section-title-text .title-en {
-    margin-top: 0.15rem;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: #64748b;
-    font-weight: 600;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* 手機版：英文自動換到下一行，避免擠在一起 */
+@media (max-width: 640px) {
+    .section-title-text {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.15rem;
+    }
+
+    .section-title-text .title-en {
+        font-size: 0.58rem;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 640px) {
+    #analyze-btn .btn-title-inline {
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    #analyze-btn .btn-sub {
+        font-size: 0.58rem;
+        white-space: normal;
+    }
+}
+
+#analyze-btn .btn-title-inline {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    line-height: 1.15;
 }
 
 #analyze-btn .btn-main {
-    display: block;
     font-size: 0.95rem;
     font-weight: 700;
     line-height: 1.2;
 }
 
 #analyze-btn .btn-sub {
-    display: block;
-    margin-top: 0.15rem;
     font-size: 0.65rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     opacity: 0.86;
     line-height: 1.1;
+    white-space: nowrap;
+    font-weight: 700;
 }
 
     h2.text-lg {
@@ -680,10 +717,9 @@
                     </div>
 
 <button id="analyze-btn" disabled class="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 disabled:bg-slate-300 transition-all flex justify-center items-center">
-    <i class="fas fa-magnifying-glass-chart mr-3"></i>
-    <span id="btn-text">
-        <span class="btn-main">啟動 AI 危害辨識</span>
-        <span class="btn-sub">Start AI Hazard Analysis</span>
+    <span id="btn-text" class="btn-title-inline">
+        <span class="btn-main">啟動 AI 危害識別</span>
+        <span class="btn-sub">START AI HAZARD ANALYSIS</span>
     </span>
     <div id="btn-loader" class="loading-spinner ml-3 hidden"></div>
 </button>
@@ -1445,9 +1481,10 @@ function createAnnotatedImageForPrint() {
 }
         function setLoading(l) {
             elements.analyzeBtn.disabled = l;
-            elements.btnText.innerHTML = l
-    ? '<span class="btn-main">AI 辨識與法規比對中</span><span class="btn-sub">Analyzing hazards and regulations</span>'
-    : '<span class="btn-main">啟動 AI 危害辨識</span><span class="btn-sub">Start AI Hazard Analysis</span>';
+elements.btnText.className = "btn-title-inline";
+elements.btnText.innerHTML = l
+    ? '<span class="btn-main">AI 識別與法規比對中</span><span class="btn-sub">ANALYZING HAZARDS AND REGULATIONS</span>'
+    : '<span class="btn-main">啟動 AI 危害識別</span><span class="btn-sub">START AI HAZARD ANALYSIS</span>';
             elements.btnLoader.classList.toggle('hidden', !l);
             elements.resultsContainer.classList.toggle('opacity-50', l);
             elements.resultsContainer.style.pointerEvents = l ? 'none' : 'auto';
