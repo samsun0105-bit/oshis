@@ -688,12 +688,12 @@ async function verifyLogin() {
 
 function updateUIVisibility() {
     const hasReport =
-        base64Image &&
-        currentReportData.hazards &&
+        !!base64Image &&
+        Array.isArray(currentReportData.hazards) &&
         currentReportData.hazards.length > 0;
 
     if (hasReport) {
-        ;
+        elements.printReportBtn.classList.remove('hidden');
     } else {
         elements.printReportBtn.classList.add('hidden');
     }
@@ -865,7 +865,6 @@ currentReportData = JSON.parse(text);
                 renderHazards();
                 renderSuggestions();
                 drawHazardsOnImage();
-                elements.printReportBtn.classList.remove('hidden');
                 updateUIVisibility();
             } catch (error) {
                 alert("識別失敗: " + error.message);
@@ -1179,9 +1178,13 @@ function createAnnotatedImageForPrint() {
                 severity: document.getElementById('edit-h-severity').value,
                 box_2d: editingHazardIndex === -1 ? null : currentReportData.hazards[editingHazardIndex].box_2d
             };
-            if (editingHazardIndex === -1) currentReportData.hazards.push(h);
-            else currentReportData.hazards[editingHazardIndex] = h;
-            renderHazards(); drawHazardsOnImage(); closeModals();
+if (editingHazardIndex === -1) currentReportData.hazards.push(h);
+else currentReportData.hazards[editingHazardIndex] = h;
+
+renderHazards();
+drawHazardsOnImage();
+updateUIVisibility();
+closeModals();
         };
 
         document.getElementById('add-hazard-manual').onclick = () => {
