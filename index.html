@@ -514,7 +514,7 @@
     <script>
         let isAdmin = false;
         let db;
-        let currentReportData = { hazards: [], suggestions: [], overall_assessment: null };
+        let currentReportData = { hazards: [], suggestions: [] };
         let editingHazardIndex = -1;
         let editingSuggestionIndex = -1;
         let base64Image = "";
@@ -604,87 +604,6 @@ function closeModalsOutside(event) {
     if (event.target === elements.modalOverlay) {
         closeModals();
     }
-}
-
-function escapeHTML(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-function normalizeRiskLevel(severity, likelihood) {
-    const sev = severity || '中';
-    const like = likelihood || '中';
-    if (sev === '高' || (sev === '中' && like === '高')) return '高';
-    if (sev === '低' && like === '低') return '低';
-    return '中';
-}
-
-function normalizeReportData(data) {
-    const normalized = data && typeof data === 'object' ? data : {};
-    normalized.hazards = Array.isArray(normalized.hazards) ? normalized.hazards : [];
-    normalized.suggestions = Array.isArray(normalized.suggestions) ? normalized.suggestions : [];
-
-    normalized.hazards = normalized.hazards.map(h => {
-        const hazard = h && typeof h === 'object' ? h : {};
-        return {
-            type: hazard.type || hazard.hazard || '未命名危害',
-            category: hazard.category || '其他',
-            observed_condition: hazard.observed_condition || hazard.observation || '',
-            possible_consequence: hazard.possible_consequence || hazard.consequence || '',
-            legal_basis: hazard.legal_basis || '需人工確認法規條號',
-            legal_reason: hazard.legal_reason || '',
-            risk: hazard.risk || hazard.possible_consequence || hazard.observed_condition || '',
-            severity: hazard.severity || '中',
-            likelihood: hazard.likelihood || '中',
-            risk_level: hazard.risk_level || normalizeRiskLevel(hazard.severity, hazard.likelihood),
-            confidence: hazard.confidence || '中',
-            verification_required: hazard.verification_required !== false,
-            verification_note: hazard.verification_note || '仍需職安人員依現場作業條件、設備狀況及實際暴露情形確認。',
-            immediate_action: hazard.immediate_action || '',
-            corrective_action: hazard.corrective_action || '',
-            box_2d: hazard.box_2d || null
-        };
-    });
-
-    normalized.suggestions = normalized.suggestions.map(s => {
-        if (typeof s === 'string') {
-            return { priority: '短期', type: '管理控制', text: s, check_method: '由職安人員現場確認改善完成情形。' };
-        }
-        const suggestion = s && typeof s === 'object' ? s : {};
-        return {
-            priority: suggestion.priority || '短期',
-            type: suggestion.type || '管理控制',
-            text: suggestion.text || suggestion.content || '',
-            check_method: suggestion.check_method || '由職安人員現場確認改善完成情形。'
-        };
-    }).filter(s => s.text);
-
-    normalized.overall_assessment = normalized.overall_assessment || {
-        summary: normalized.hazards.length > 0 ? `本次照片共辨識 ${normalized.hazards.length} 項疑似職安危害，結果僅供初步查核參考。` : '本次照片未辨識出明確危害。',
-        highest_risk_level: normalized.hazards.some(h => h.risk_level === '高') ? '高' : (normalized.hazards.some(h => h.risk_level === '中') ? '中' : '低'),
-        need_stop_work: normalized.hazards.some(h => h.risk_level === '高'),
-        limitations: '本報告係依上傳照片進行 AI 初步危害辨識，實際法規適用、違規認定及改善措施仍需由職業安全衛生管理人員依現場狀況確認。'
-    };
-
-    return normalized;
-}
-
-function parseAIReportText(text) {
-    let cleaned = String(text || '').trim();
-    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
-    const first = cleaned.indexOf('{');
-    const last = cleaned.lastIndexOf('}');
-    if (first !== -1 && last !== -1 && last > first) cleaned = cleaned.slice(first, last + 1);
-    return normalizeReportData(JSON.parse(cleaned));
-}
-
-function suggestionToText(suggestion) {
-    if (typeof suggestion === 'string') return suggestion;
-    return suggestion?.text || '';
 }
 
         function showModal(id) {
@@ -881,7 +800,6 @@ function updateUIVisibility() {
                 elements.uploadPrompt.classList.add('hidden');
                 elements.imagePreview.classList.remove('hidden');
                 elements.analyzeBtn.disabled = false;
-                currentReportData = { hazards: [], suggestions: [], overall_assessment: null };
                 elements.resultsContainer.classList.add('opacity-50');
                 elements.analysisOutput.innerHTML = '<div class="text-slate-400 text-center py-12 italic">準備就緒</div>';
                 elements.printReportBtn.classList.add('hidden');
@@ -901,64 +819,24 @@ function updateUIVisibility() {
             clearCanvas();
             const rawBase64 = base64Image.split(',')[1];
 
-            const sysPrompt = `你是一位台灣職業安全衛生專業人員，請依據照片中「可明確觀察到」的內容進行初步危害辨識。
-
-重要判斷原則：
-1. 只能根據照片可見事實判斷，不得憑空假設。
-2. 若照片無法確認，請標示為「疑似」並要求人工複核。
-3. 法源依據請優先參考台灣職業安全衛生相關法規，例如：職業安全衛生法、職業安全衛生設施規則、營造安全衛生設施標準、危害性化學品標示及通識規則、勞工健康保護規則。
-4. 不確定條號時，不得捏造條號，請寫「需人工確認法規條號」。
-5. 改善建議需具體，並優先考量立即措施、工程控制、管理控制、教育訓練與個人防護具。
-6. 風險等級需依「嚴重度 severity」與「發生可能性 likelihood」綜合判斷。
-7. 請針對每個危害，找出其在照片中的座標位置 [ymin, xmin, ymax, xmax]，數值範圍 0-1000。
-8. 請輸出繁體中文，並只回傳純 JSON，不要加入 Markdown 或額外說明。
-
-風險判斷基準：
-- severity 高：可能造成死亡、墜落、截肢、感電、火災爆炸或重大職災。
-- severity 中：可能造成骨折、灼傷、夾捲傷或需就醫傷害。
-- severity 低：可能造成擦傷、絆倒、輕微碰撞或可立即排除之風險。
-- likelihood 高：照片中已有明顯暴露、多人作業或危害正在發生。
-- likelihood 中：有危害條件，但是否正在暴露需現場確認。
-- likelihood 低：僅疑似危害，照片證據不足。
-
-請輸出以下 JSON 格式：
-{
-  "hazards": [
-    {
-      "type": "危害名稱",
-      "category": "墜落/感電/火災爆炸/機械夾捲/物體飛落/化學暴露/滑倒絆倒/缺氧/交通動線/其他",
-      "observed_condition": "照片中可觀察到的具體狀況",
-      "possible_consequence": "可能造成的傷害或事故",
-      "legal_basis": "可能適用的法源依據；不確定時寫需人工確認法規條號",
-      "legal_reason": "為何此法規可能適用",
-      "severity": "高/中/低",
-      "likelihood": "高/中/低",
-      "risk_level": "高/中/低",
-      "confidence": "高/中/低",
-      "verification_required": true,
-      "verification_note": "需要現場複核的事項",
-      "immediate_action": "立即改善措施",
-      "corrective_action": "後續工程或管理改善措施",
-      "box_2d": [ymin, xmin, ymax, xmax]
-    }
-  ],
-  "suggestions": [
-    {
-      "priority": "立即/短期/中期",
-      "type": "工程控制/管理控制/教育訓練/個人防護具/現場整理",
-      "text": "具體改善建議",
-      "check_method": "改善完成確認方式"
-    }
-  ],
-  "overall_assessment": {
-    "summary": "整體風險摘要",
-    "highest_risk_level": "高/中/低",
-    "need_stop_work": true,
-    "limitations": "本結果僅依照片辨識，仍需職安人員現場確認。"
-  }
-}`;
+            const sysPrompt = `你是一位專業職安專家。分析照片，識別所有不安全設施與行為。
+            請針對每個危害，找出其在照片中的座標位置 [ymin, xmin, ymax, xmax] (數值範圍 0-1000)。
+            同時，你必須根據台灣的「職業安全衛生法」、「職業安全衛生設施規則」、「營造安全衛生設施規則」等，為每個危害套入正確的「法源依據」。
             
-try {
+            輸出 JSON 格式: 
+            { 
+                "hazards": [{
+                    "type": "危害名稱",
+                    "legal_basis": "法源依據 (例如: 職業安全衛生設施規則第 224 條)",
+                    "risk": "風險描述",
+                    "severity": "高/中/低",
+                    "box_2d": [ymin, xmin, ymax, xmax]
+                }], 
+                "suggestions": ["結合法規要求的建議1", "建議2"] 
+            }
+            語言: 繁體中文。座標必須精準對應到該物件。`;
+            
+            try {
 const response = await fetch("/api/analyze-oshis", {
     method: "POST",
     headers: {
@@ -983,7 +861,7 @@ if (!text) {
     throw new Error("AI 未回傳有效 JSON 內容");
 }
 
-currentReportData = parseAIReportText(text);
+currentReportData = JSON.parse(text);
                 
                 renderHazards();
                 renderSuggestions();
@@ -1013,8 +891,7 @@ currentReportData = parseAIReportText(text);
                     timestamp: Date.now(),
                     imageData: base64Image,
                     hazards: JSON.parse(JSON.stringify(currentReportData.hazards)),
-                    suggestions: JSON.parse(JSON.stringify(currentReportData.suggestions)),
-                    overall_assessment: JSON.parse(JSON.stringify(currentReportData.overall_assessment || null))
+                    suggestions: JSON.parse(JSON.stringify(currentReportData.suggestions))
                 };
                 store.add(reportToSave);
                 tx.oncomplete = () => alert("儲存紀錄完成！");
@@ -1116,11 +993,7 @@ currentReportData = parseAIReportText(text);
             });
             if (report) {
                 base64Image = report.imageData;
-                currentReportData = normalizeReportData({
-                    hazards: report.hazards,
-                    suggestions: report.suggestions,
-                    overall_assessment: report.overall_assessment
-                });
+                currentReportData = { hazards: report.hazards, suggestions: report.suggestions };
                 elements.previewImg.src = base64Image;
                 elements.uploadPrompt.classList.add('hidden');
                 elements.imagePreview.classList.remove('hidden');
@@ -1227,61 +1100,22 @@ function createAnnotatedImageForPrint() {
 
         function renderHazards() {
             elements.analysisOutput.innerHTML = '';
-            currentReportData = normalizeReportData(currentReportData);
-
-            if (currentReportData.overall_assessment && currentReportData.hazards.length > 0) {
-                const overall = currentReportData.overall_assessment;
-                const summaryCard = document.createElement('div');
-                summaryCard.className = "bg-slate-50 border border-slate-200 p-4 rounded-lg text-sm text-slate-700";
-                summaryCard.innerHTML = `
-                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                        <span class="font-bold text-slate-800"><i class="fas fa-chart-line mr-1 text-blue-500"></i>整體評估</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${overall.highest_risk_level === '高' ? 'bg-red-100 text-red-700' : overall.highest_risk_level === '中' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}">最高風險：${escapeHTML(overall.highest_risk_level || '中')}</span>
-                        ${overall.need_stop_work ? '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-red-600 text-white">建議立即管制/停工確認</span>' : ''}
-                    </div>
-                    <p class="text-xs leading-relaxed"><b>摘要：</b>${escapeHTML(overall.summary || '')}</p>
-                    <p class="text-[11px] text-slate-500 mt-2 leading-relaxed"><b>限制聲明：</b>${escapeHTML(overall.limitations || '本報告僅供初步辨識參考，仍需職安人員現場確認。')}</p>
-                `;
-                elements.analysisOutput.appendChild(summaryCard);
-            }
-
             if (currentReportData.hazards?.length > 0) {
                 currentReportData.hazards.forEach((h, i) => {
                     const card = document.createElement('div');
                     card.className = "hazard-card bg-white p-4 rounded-lg border shadow-sm relative group";
-                    const riskClass = h.risk_level === '高' ? 'bg-red-100 text-red-800' : h.risk_level === '中' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
-                    const confidenceClass = h.confidence === '高' ? 'bg-green-50 text-green-700' : h.confidence === '低' ? 'bg-orange-50 text-orange-700' : 'bg-blue-50 text-blue-700';
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-2 pr-12">
+                        <div class="flex justify-between items-start mb-1">
                             <span class="text-red-700 font-bold text-sm">
-                                <span class="bg-red-600 text-white px-1.5 py-0.5 rounded mr-2">#${i + 1}</span>${escapeHTML(h.type)}
+                                <span class="bg-red-600 text-white px-1.5 py-0.5 rounded mr-2">#${i + 1}</span>${h.type}
                             </span>
-                            <span class="${riskClass} text-[10px] px-2 py-0.5 rounded-full font-bold">綜合風險：${escapeHTML(h.risk_level)}</span>
+                            <span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold">${h.severity}</span>
                         </div>
-
-                        <div class="flex flex-wrap gap-1 mb-2">
-                            <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full">分類：${escapeHTML(h.category)}</span>
-                            <span class="bg-red-50 text-red-700 text-[10px] px-2 py-0.5 rounded-full">嚴重度：${escapeHTML(h.severity)}</span>
-                            <span class="bg-yellow-50 text-yellow-700 text-[10px] px-2 py-0.5 rounded-full">可能性：${escapeHTML(h.likelihood)}</span>
-                            <span class="${confidenceClass} text-[10px] px-2 py-0.5 rounded-full">AI信心：${escapeHTML(h.confidence)}</span>
-                            ${h.verification_required ? '<span class="bg-purple-50 text-purple-700 text-[10px] px-2 py-0.5 rounded-full">需人工複核</span>' : ''}
+                        <div class="bg-slate-50 border-l-2 border-slate-300 px-2 py-1 mb-2">
+                            <p class="text-[11px] text-slate-500 font-bold uppercase">法源依據：</p>
+                            <p class="text-xs text-blue-700 font-medium">${h.legal_basis || '待核定'}</p>
                         </div>
-
-                        <div class="space-y-2 text-xs text-slate-700">
-                            ${h.observed_condition ? `<p><b>觀察事實：</b>${escapeHTML(h.observed_condition)}</p>` : ''}
-                            ${h.possible_consequence ? `<p><b>可能後果：</b>${escapeHTML(h.possible_consequence)}</p>` : `<p><b>風險情況：</b>${escapeHTML(h.risk)}</p>`}
-
-                            <div class="bg-slate-50 border-l-2 border-slate-300 px-2 py-1">
-                                <p class="text-[11px] text-slate-500 font-bold uppercase">法源依據：</p>
-                                <p class="text-xs text-blue-700 font-medium">${escapeHTML(h.legal_basis || '需人工確認法規條號')}</p>
-                                ${h.legal_reason ? `<p class="text-[11px] text-slate-600 mt-1"><b>適用理由：</b>${escapeHTML(h.legal_reason)}</p>` : ''}
-                            </div>
-
-                            ${h.immediate_action ? `<p><b>立即措施：</b>${escapeHTML(h.immediate_action)}</p>` : ''}
-                            ${h.corrective_action ? `<p><b>後續改善：</b>${escapeHTML(h.corrective_action)}</p>` : ''}
-                            ${h.verification_note ? `<p class="text-[11px] text-slate-500"><b>複核提醒：</b>${escapeHTML(h.verification_note)}</p>` : ''}
-                        </div>
-
+                        <p class="text-xs text-slate-700"><b>風險情況：</b>${h.risk}</p>
                         ${isAdmin ? `
                             <div class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition">
                                 <button onclick="editHazard(${i})" class="bg-blue-500 text-white p-1 rounded text-[10px] hover:bg-blue-600"><i class="fas fa-edit"></i></button>
@@ -1298,24 +1132,15 @@ function createAnnotatedImageForPrint() {
 
         function renderSuggestions() {
             elements.suggestionsOutput.innerHTML = '';
-            currentReportData = normalizeReportData(currentReportData);
             if (currentReportData.suggestions?.length > 0) {
                 elements.suggestionsContainer.classList.remove('hidden');
                 currentReportData.suggestions.forEach((s, i) => {
                     const item = document.createElement('div');
                     item.className = "flex items-start justify-between space-x-2 text-sm text-slate-700 py-2 border-b border-slate-50 last:border-0 group";
-                    const priorityClass = s.priority === '立即' ? 'bg-red-100 text-red-700' : s.priority === '中期' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700';
                     item.innerHTML = `
                         <div class="flex items-start space-x-2">
                             <i class="fas fa-check text-green-500 mt-1"></i>
-                            <div>
-                                <div class="flex flex-wrap gap-1 mb-1">
-                                    <span class="${priorityClass} text-[10px] px-2 py-0.5 rounded-full font-bold">${escapeHTML(s.priority)}</span>
-                                    <span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-full">${escapeHTML(s.type)}</span>
-                                </div>
-                                <p>${escapeHTML(s.text)}</p>
-                                ${s.check_method ? `<p class="text-[11px] text-slate-500 mt-1"><b>確認方式：</b>${escapeHTML(s.check_method)}</p>` : ''}
-                            </div>
+                            <span>${s}</span>
                         </div>
                         ${isAdmin ? `
                             <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
@@ -1349,20 +1174,9 @@ function createAnnotatedImageForPrint() {
         document.getElementById('save-hazard-btn').onclick = () => {
             const h = {
                 type: document.getElementById('edit-h-type').value,
-                category: editingHazardIndex === -1 ? '其他' : (currentReportData.hazards[editingHazardIndex].category || '其他'),
-                observed_condition: editingHazardIndex === -1 ? '' : (currentReportData.hazards[editingHazardIndex].observed_condition || ''),
-                possible_consequence: document.getElementById('edit-h-risk').value,
                 legal_basis: document.getElementById('edit-h-law').value,
-                legal_reason: editingHazardIndex === -1 ? '管理員手動新增或修正，建議再由職安人員確認法規適用。' : (currentReportData.hazards[editingHazardIndex].legal_reason || ''),
                 risk: document.getElementById('edit-h-risk').value,
                 severity: document.getElementById('edit-h-severity').value,
-                likelihood: editingHazardIndex === -1 ? '中' : (currentReportData.hazards[editingHazardIndex].likelihood || '中'),
-                risk_level: normalizeRiskLevel(document.getElementById('edit-h-severity').value, editingHazardIndex === -1 ? '中' : currentReportData.hazards[editingHazardIndex].likelihood),
-                confidence: editingHazardIndex === -1 ? '高' : (currentReportData.hazards[editingHazardIndex].confidence || '中'),
-                verification_required: true,
-                verification_note: editingHazardIndex === -1 ? '此項目為人工新增，請依現場狀況確認。' : (currentReportData.hazards[editingHazardIndex].verification_note || ''),
-                immediate_action: editingHazardIndex === -1 ? '' : (currentReportData.hazards[editingHazardIndex].immediate_action || ''),
-                corrective_action: editingHazardIndex === -1 ? '' : (currentReportData.hazards[editingHazardIndex].corrective_action || ''),
                 box_2d: editingHazardIndex === -1 ? null : currentReportData.hazards[editingHazardIndex].box_2d
             };
 if (editingHazardIndex === -1) currentReportData.hazards.push(h);
@@ -1391,7 +1205,7 @@ closeModals();
 
         window.editSuggestion = (idx) => {
             editingSuggestionIndex = idx;
-            document.getElementById('edit-s-text').value = suggestionToText(currentReportData.suggestions[idx]);
+            document.getElementById('edit-s-text').value = currentReportData.suggestions[idx];
             showModal('edit-suggestion-modal');
         };
 
@@ -1405,13 +1219,8 @@ closeModals();
         document.getElementById('save-suggestion-btn').onclick = () => {
             const text = document.getElementById('edit-s-text').value.trim();
             if (!text) return;
-            if (editingSuggestionIndex === -1) {
-                currentReportData.suggestions.push({ priority: '短期', type: '管理控制', text, check_method: '由職安人員現場確認改善完成情形。' });
-            } else if (typeof currentReportData.suggestions[editingSuggestionIndex] === 'object') {
-                currentReportData.suggestions[editingSuggestionIndex].text = text;
-            } else {
-                currentReportData.suggestions[editingSuggestionIndex] = text;
-            }
+            if (editingSuggestionIndex === -1) currentReportData.suggestions.push(text);
+            else currentReportData.suggestions[editingSuggestionIndex] = text;
             renderSuggestions(); closeModals();
         };
 
