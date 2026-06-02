@@ -368,6 +368,45 @@
 
 
     /* Fine tuning: align section title icons and slim hazard left marker */
+
+.section-title-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.section-title-text .title-cn {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.section-title-text .title-en {
+    margin-top: 0.15rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 600;
+}
+
+#analyze-btn .btn-main {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+#analyze-btn .btn-sub {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.86;
+    line-height: 1.1;
+}
+
     h2.text-lg {
         display: flex !important;
         align-items: center !important;
@@ -603,9 +642,13 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="space-y-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-upload mr-2 text-blue-500"></i> 上傳現場照片
-                    </h2>
+<h2 class="text-lg font-semibold mb-4 flex items-center">
+    <i class="fas fa-upload mr-2 text-blue-500"></i>
+    <span class="section-title-text">
+        <span class="title-cn">上傳現場照片</span>
+        <span class="title-en">Site Photo Upload</span>
+    </span>
+</h2>
                     
                     <div id="drop-zone" class="drop-zone rounded-lg p-8 text-center cursor-pointer">
                         <input type="file" id="file-input" class="hidden" accept="image/*">
@@ -636,10 +679,14 @@
                         </button>
                     </div>
 
-                    <button id="analyze-btn" disabled class="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 disabled:bg-slate-300 transition-all flex justify-center items-center">
-                        <span id="btn-text">開始 AI 自動識別</span>
-                        <div id="btn-loader" class="loading-spinner ml-2 hidden"></div>
-                    </button>
+<button id="analyze-btn" disabled class="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 disabled:bg-slate-300 transition-all flex justify-center items-center">
+    <i class="fas fa-magnifying-glass-chart mr-3"></i>
+    <span id="btn-text">
+        <span class="btn-main">啟動 AI 危害辨識</span>
+        <span class="btn-sub">Start AI Hazard Analysis</span>
+    </span>
+    <div id="btn-loader" class="loading-spinner ml-3 hidden"></div>
+</button>
                 </div>
 
                 <div class="user-only bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -665,9 +712,13 @@
             <div id="results-container" class="space-y-6 opacity-50 pointer-events-none">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold flex items-center">
-                            <i class="fas fa-clipboard-list mr-2 text-red-500"></i> 識別結果報告
-                        </h2>
+<h2 class="text-lg font-semibold flex items-center">
+    <i class="fas fa-clipboard-list mr-2 text-red-500"></i>
+    <span class="section-title-text">
+        <span class="title-cn">識別結果報告</span>
+        <span class="title-en">Identification Report</span>
+    </span>
+</h2>
                         <div class="flex space-x-2">
                             <button id="save-report-btn" class="hidden text-xs bg-green-600 text-white px-3 py-1 rounded font-bold hover:bg-green-700 transition flex items-center">
                                 <i class="fas fa-save mr-1"></i> 儲存報告
@@ -688,9 +739,13 @@
 
                 <div id="suggestions-container" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold flex items-center">
-                            <i class="fas fa-check-circle mr-2 text-green-500"></i> 改善建議
-                        </h2>
+<h2 class="text-lg font-semibold flex items-center">
+    <i class="fas fa-check-circle mr-2 text-green-500"></i>
+    <span class="section-title-text">
+        <span class="title-cn">改善建議</span>
+        <span class="title-en">Corrective Actions</span>
+    </span>
+</h2>
                         <div class="admin-only">
                             <button id="add-suggestion-manual-btn" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold hover:bg-green-200 transition">+ 新增建議</button>
                         </div>
@@ -1390,7 +1445,9 @@ function createAnnotatedImageForPrint() {
 }
         function setLoading(l) {
             elements.analyzeBtn.disabled = l;
-            elements.btnText.innerText = l ? "正在識別與檢索法規..." : "開始 AI 自動識別";
+            elements.btnText.innerHTML = l
+    ? '<span class="btn-main">AI 辨識與法規比對中</span><span class="btn-sub">Analyzing hazards and regulations</span>'
+    : '<span class="btn-main">啟動 AI 危害辨識</span><span class="btn-sub">Start AI Hazard Analysis</span>';
             elements.btnLoader.classList.toggle('hidden', !l);
             elements.resultsContainer.classList.toggle('opacity-50', l);
             elements.resultsContainer.style.pointerEvents = l ? 'none' : 'auto';
