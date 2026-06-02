@@ -844,8 +844,7 @@ const response = await fetch("/api/analyze-oshis", {
     },
     body: JSON.stringify({
         imageBase64: base64Image,
-        mimeType: "image/png",
-        prompt: sysPrompt
+        mimeType: "image/png"
     })
 });
 
