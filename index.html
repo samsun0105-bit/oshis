@@ -478,31 +478,6 @@
         padding: 0 !important;
     }
 
-.print-title-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    align-items: center !important;
-    margin: 0 0 4px 0 !important;
-}
-
-.print-title-row h1 {
-    grid-column: 2 !important;
-    text-align: center !important;
-}
-
-#print-report-name-box {
-    grid-column: 3 !important;
-    text-align: center !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    color: #0f172a !important;
-    white-space: nowrap !important;
-}
-
-.print-report-name-label {
-    color: #475569 !important;
-}
-
     .hidden.print\:block h1 {
         font-size: 22px !important;
         line-height: 1.2 !important;
@@ -580,6 +555,35 @@
         border-bottom: 1px solid #e5e7eb !important;
     }
 
+#photo-section-title-row {
+    display: grid !important;
+    grid-template-columns: auto 1fr !important;
+    align-items: center !important;
+    column-gap: 24px !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 0 6px 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+#photo-section-title-row h2 {
+    border-bottom: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+}
+
+#print-photo-report-name {
+    display: block !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}    
+
     .hazard-card {
         break-inside: avoid !important;
         page-break-inside: avoid !important;
@@ -633,15 +637,10 @@
     </nav>
 
     <main class="max-w-6xl mx-auto p-4 md:p-8 flex-grow w-full">
-<div class="hidden print:block mb-8">
-    <div class="print-title-row">
-        <h1 class="text-3xl font-bold">職業安全危害識別報告</h1>
-
-        <div id="print-report-name-box">
-            <span class="print-report-name-label">報告名稱：</span>
-            <span id="print-report-name"></span>
-        </div>
-    </div>
+<div class="hidden print:block text-center mb-8">
+    <h1 class="text-3xl font-bold">職業安全危害識別報告</h1>
+    <p class="text-slate-500" id="print-date"></p>
+</div>
 
     <p class="text-slate-500 text-center" id="print-date"></p>
 </div>
@@ -649,9 +648,16 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="space-y-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-upload mr-2 text-blue-500"></i> 上傳現場照片
-                    </h2>
+<div id="photo-section-title-row" class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold flex items-center mb-0">
+        <i class="fas fa-upload mr-2 text-blue-500"></i> 上傳現場照片
+    </h2>
+
+    <div id="print-photo-report-name" class="hidden">
+        <span class="font-bold">報告名稱：</span>
+        <span id="print-photo-report-name-text"></span>
+    </div>
+</div>
                     
                     <div id="drop-zone" class="drop-zone rounded-lg p-8 text-center cursor-pointer">
                         <input type="file" id="file-input" class="hidden" accept="image/*">
@@ -1668,8 +1674,8 @@ elements.printReportBtn.onclick = () => {
         elements.reportNameInput.value = reportTitle;
     }
 
-    if (elements.printReportName) {
-        elements.printReportName.innerText = reportTitle;
+    if (elements.printPhotoReportNameText) {
+        elements.printPhotoReportNameText.innerText = reportTitle;
     }
 
     elements.printDate.innerText =
