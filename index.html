@@ -216,14 +216,14 @@
         object-fit: contain !important;
     }
 
-    #results-container {
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-        page-break-before: always !important;
-        break-before: page !important;
-    }
+#results-container {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    margin-top: 10px !important;
+    padding-top: 0 !important;
+    page-break-before: auto !important;
+    break-before: auto !important;
+}
 
     #results-container .bg-white {
         padding: 0 !important;
@@ -686,13 +686,24 @@ async function verifyLogin() {
             } else { alert("舊密碼錯誤"); }
         };
 
-        function updateUIVisibility() {
-            if (isAdmin && currentReportData.hazards?.length > 0) {
-                elements.saveReportBtn.classList.remove('hidden');
-            } else {
-                elements.saveReportBtn.classList.add('hidden');
-            }
-        }
+function updateUIVisibility() {
+    const hasReport =
+        base64Image &&
+        currentReportData.hazards &&
+        currentReportData.hazards.length > 0;
+
+    if (hasReport) {
+        elements.printReportBtn.classList.remove('hidden');
+    } else {
+        elements.printReportBtn.classList.add('hidden');
+    }
+
+    if (isAdmin && hasReport) {
+        elements.saveReportBtn.classList.remove('hidden');
+    } else {
+        elements.saveReportBtn.classList.add('hidden');
+    }
+}
 
         async function refreshCategories() {
             const tx = db.transaction(["categories"], "readonly");
