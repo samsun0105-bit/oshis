@@ -94,6 +94,10 @@
     display: block;
 }
 
+#print-suggestions-output {
+    display: none;
+}
+
 #report-name-input[readonly] {
     cursor: default !important;
     user-select: none !important;
@@ -638,22 +642,65 @@ label {
     margin: 1px 0 !important;
 }
 
-#suggestions-container {
-    margin-top: 2.3em !important;
+#results-container #suggestions-container {
+    display: block !important;
+    margin-top: 2em !important;
     padding: 0 !important;
     break-before: auto !important;
     page-break-before: auto !important;
     break-inside: auto !important;
     page-break-inside: auto !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
 }
 
-    #suggestions-output {
-        margin-top: 0 !important;
-    }
+#suggestions-output {
+    display: none !important;
+}
 
-    #suggestions-output > div {
-        padding: 5px 0 !important;
-    }
+#print-suggestions-output {
+    display: block !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+.print-suggestion-item {
+    display: table !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+    color: #334155 !important;
+    margin: 0 0 7px 0 !important;
+    padding: 0 0 6px 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+}
+
+.print-suggestion-check {
+    display: table-cell !important;
+    width: 22px !important;
+    color: #22c55e !important;
+    font-weight: 700 !important;
+    vertical-align: top !important;
+    padding-top: 1px !important;
+}
+
+.print-suggestion-text {
+    display: table-cell !important;
+    vertical-align: top !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
 
 }
     </style>
@@ -799,6 +846,7 @@ label {
                         </div>
                     </div>
                     <div id="suggestions-output" class="grid grid-cols-1 gap-2"></div>
+<div id="print-suggestions-output"></div>
                 </div>
             </div>
         </div>
@@ -975,6 +1023,7 @@ let currentReportId = null;
             resultsContainer: document.getElementById('results-container'),
             suggestionsContainer: document.getElementById('suggestions-container'),
             suggestionsOutput: document.getElementById('suggestions-output'),
+printSuggestionsOutput: document.getElementById('print-suggestions-output'),
             adminLoginBtn: document.getElementById('admin-login-btn'),
             modalOverlay: document.getElementById('modal-overlay'),
             loginModal: document.getElementById('login-modal'),
@@ -1679,31 +1728,62 @@ function createAnnotatedImageForPrint() {
             }
         }
 
-        function renderSuggestions() {
-            elements.suggestionsOutput.innerHTML = '';
-            if (currentReportData.suggestions?.length > 0) {
-                elements.suggestionsContainer.classList.remove('hidden');
-                currentReportData.suggestions.forEach((s, i) => {
-                    const item = document.createElement('div');
-                    item.className = "flex items-start justify-between space-x-2 text-sm text-slate-700 py-2 border-b border-slate-50 last:border-0 group";
-                    item.innerHTML = `
-                        <div class="flex items-start space-x-2">
-                            <i class="fas fa-check text-green-500 mt-1"></i>
-                            <span>${s}</span>
-                        </div>
-                        ${isAdmin ? `
-                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
-                                <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 px-1"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 px-1"><i class="fas fa-xmark"></i></button>
-                            </div>
-                        ` : ''}
-                    `;
-                    elements.suggestionsOutput.appendChild(item);
-                });
-            } else { elements.suggestionsContainer.classList.add('hidden'); }
-        }
+function renderSuggestions() {
+    elements.suggestionsOutput.innerHTML = '';
+    if (currentReportData.suggestions?.length > 0) {
+        elements.suggestionsContainer.classList.remove('hidden');
+        currentReportData.suggestions.forEach((s, i) => {
+            const item = document.createElement('div');
+            item.className = "flex items-start justify-between space-x-2 text-sm text-slate-700 py-2 border-b border-slate-50 last:border-0 group";
+            item.innerHTML = `
+                <div class="flex items-start space-x-2">
+                    <i class="fas fa-check text-green-500 mt-1"></i>
+                    <span>${s}</span>
+                </div>
+                ${isAdmin ? `
+                    <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
+                        <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 px-1"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 px-1"><i class="fas fa-xmark"></i></button>
+                    </div>
+                ` : ''}
+            `;
+            elements.suggestionsOutput.appendChild(item);
+        });
+    } else {
+        elements.suggestionsContainer.classList.add('hidden');
+    }
 
-        window.editHazard = (idx) => {
+    renderPrintSuggestions();
+}
+
+function renderPrintSuggestions() {
+    if (!elements.printSuggestionsOutput) return;
+
+    elements.printSuggestionsOutput.innerHTML = '';
+
+    if (!currentReportData.suggestions || currentReportData.suggestions.length === 0) {
+        return;
+    }
+
+    currentReportData.suggestions.forEach((s) => {
+        const item = document.createElement('div');
+        item.className = 'print-suggestion-item';
+
+        const check = document.createElement('span');
+        check.className = 'print-suggestion-check';
+        check.textContent = '✓';
+
+        const text = document.createElement('span');
+        text.className = 'print-suggestion-text';
+        text.textContent = s;
+
+        item.appendChild(check);
+        item.appendChild(text);
+        elements.printSuggestionsOutput.appendChild(item);
+    });
+}
+
+window.editHazard = (idx) => {
             editingHazardIndex = idx;
             const h = currentReportData.hazards[idx];
             document.getElementById('edit-h-type').value = h.type;
@@ -1774,6 +1854,8 @@ closeModals();
         };
 
 elements.printReportBtn.onclick = () => {
+    renderPrintSuggestions();
+
     const reportTitle = getReportTitle();
 
     if (elements.reportNameInput) {
