@@ -452,13 +452,32 @@
         padding: 0 !important;
     }
 
-    .grid {
-        display: block !important;
-    }
+.grid {
+    display: block !important;
+}
 
-    .grid > div {
-        width: 100% !important;
-    }
+.grid > div {
+    width: 100% !important;
+}
+
+/* 第一欄：上傳現場照片、選擇報告分類、報告名稱，固定留在第一頁 */
+.grid > div:first-child {
+    display: block !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+/* 第二欄：識別結果報告、改善建議，固定從第二頁開始 */
+#results-container {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    page-break-before: always !important;
+    break-before: page !important;
+}
 
     .space-y-6 > :not([hidden]) ~ :not([hidden]) {
         margin-top: 0 !important;
@@ -518,29 +537,69 @@
         display: none !important;
     }
 
+/* 第一頁保留分類與報告名稱 */
+#category-select,
+#report-name-input {
+    display: block !important;
+    width: 100% !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 13px !important;
+    padding: 6px 8px !important;
+    margin: 2px 0 8px 0 !important;
+    box-shadow: none !important;
+    appearance: none !important;
+}
+
+#category-select + div,
+#report-name-input {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+label {
+    display: block !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    margin-bottom: 3px !important;
+}    
+
 #preview-img {
     display: block !important;
     max-width: 100% !important;
-    max-height: 145mm !important;
+    max-height: 150mm !important;
     width: auto !important;
     height: auto !important;
-    margin: 0 auto !important;
+    margin: 0 auto 8px auto !important;
     object-fit: contain !important;
 }
 
 #results-container {
     opacity: 1 !important;
     pointer-events: auto !important;
-    margin-top: 4px !important;
+    margin-top: 0 !important;
     padding-top: 0 !important;
-    page-break-before: auto !important;
-    break-before: auto !important;
+    page-break-before: always !important;
+    break-before: page !important;
 }
 
     #results-container .bg-white {
         padding: 0 !important;
         margin: 0 !important;
     }
+
+#results-container > .bg-white:first-child {
+    page-break-before: auto !important;
+    break-before: auto !important;
+}
+
+#results-container h2 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    margin-bottom: 6px !important;
+}
 
 #results-container h2 {
     break-after: avoid !important;
@@ -594,12 +653,14 @@
     margin: 2px 0 !important;
 }
 
-    #suggestions-container {
-        margin-top: 12px !important;
-        padding: 0 !important;
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-    }
+#suggestions-container {
+    margin-top: 2em !important;
+    padding: 0 !important;
+    break-before: auto !important;
+    page-break-before: auto !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+}
 
     #suggestions-output {
         margin-top: 0 !important;
