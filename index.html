@@ -383,6 +383,49 @@
     }
 }
 
+@media screen and (max-width: 768px) {
+    body.is-admin .hazard-action-buttons,
+    body.is-admin .suggestion-action-buttons {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    body.is-admin .hazard-action-buttons button,
+    body.is-admin .suggestion-action-buttons button {
+        min-width: 28px !important;
+        min-height: 28px !important;
+        font-size: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    body.is-admin .suggestion-action-buttons {
+        flex-shrink: 0 !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body.is-admin #suggestions-output > div {
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+    body.is-admin #suggestions-output > div > div:first-child {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    body.is-admin #suggestions-output span {
+        word-break: break-word !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body.is-admin .hazard-card {
+        padding-right: 64px !important;
+    }
+}
 
     /* Fine tuning: align section title icons and slim hazard left marker */
     h2.text-lg {
@@ -1715,10 +1758,10 @@ function createAnnotatedImageForPrint() {
                         </div>
                         <p class="text-xs text-slate-700"><b>風險情況：</b>${h.risk}</p>
                         ${isAdmin ? `
-                            <div class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition">
-                                <button onclick="editHazard(${i})" class="bg-blue-500 text-white p-1 rounded text-[10px] hover:bg-blue-600"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteHazard(${i})" class="bg-red-500 text-white p-1 rounded text-[10px] hover:bg-red-600"><i class="fas fa-trash"></i></button>
-                            </div>
+<div class="hazard-action-buttons absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition">
+    <button onclick="editHazard(${i})" class="bg-blue-500 text-white p-1 rounded text-[10px] hover:bg-blue-600"><i class="fas fa-edit"></i></button>
+    <button onclick="deleteHazard(${i})" class="bg-red-500 text-white p-1 rounded text-[10px] hover:bg-red-600"><i class="fas fa-trash"></i></button>
+</div>
                         ` : ''}
                     `;
                     elements.analysisOutput.appendChild(card);
@@ -1741,10 +1784,10 @@ function renderSuggestions() {
                     <span>${s}</span>
                 </div>
                 ${isAdmin ? `
-                    <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition">
-                        <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 px-1"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 px-1"><i class="fas fa-xmark"></i></button>
-                    </div>
+<div class="suggestion-action-buttons flex space-x-2 opacity-0 group-hover:opacity-100 transition">
+    <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 px-1"><i class="fas fa-edit"></i></button>
+    <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 px-1"><i class="fas fa-xmark"></i></button>
+</div>
                 ` : ''}
             `;
             elements.suggestionsOutput.appendChild(item);
