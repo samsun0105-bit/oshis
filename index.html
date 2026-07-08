@@ -88,6 +88,7 @@
     left: 0;
     pointer-events: auto;
     z-index: 10;
+    touch-action: none;
 }
 
 #canvas-container.annotation-active {
@@ -383,14 +384,18 @@
     }
 
     @media (max-width: 768px) {
-        nav h1 {
-            font-size: 1.25rem !important;
-            letter-spacing: 0.06em;
-        }
+nav h1 {
+    font-size: 1.08rem !important;
+    letter-spacing: 0.04em;
+}
 
-        nav p {
-            display: none;
-        }
+nav p {
+    display: block;
+    font-size: 9px !important;
+    letter-spacing: 0.12em !important;
+    line-height: 1.2 !important;
+    margin-top: 2px !important;
+}
 
         main {
             padding-left: 1rem !important;
@@ -2598,6 +2603,89 @@ document.getElementById('edit-h-severity').value = "中";
 showModal('edit-hazard-modal');
 drawHazardsOnImage();
 });
+
+function getCanvasTouchPoint(event) {
+    const touch = event.touches[0] || event.changedTouches[0];
+    const rect = elements.canvas.getBoundingClientRect();
+
+    return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+    };
+}
+
+elements.canvas.addEventListener("touchstart", (event) => {
+    if (annotationMode !== "manual" && annotationMode !== "edit-box") return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    dragStartPoint = getCanvasTouchPoint(event);
+    dragCurrentPoint = dragStartPoint;
+}, { passive: false });
+
+elements.canvas.addEventListener("touchmove", (event) => {
+    if (annotationMode !== "manual" && annotationMode !== "edit-box") return;
+    if (!dragStartPoint) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    dragCurrentPoint = getCanvasTouchPoint(event);
+    drawTempAnnotationBox();
+}, { passive: false });
+
+elements.canvas.addEventListener("touchend", (event) => {
+    if (annotationMode !== "manual" && annotationMode !== "edit-box") return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!dragStartPoint) return;
+
+    dragCurrentPoint = getCanvasTouchPoint(event);
+
+    const width = Math.abs(dragCurrentPoint.x - dragStartPoint.x);
+    const height = Math.abs(dragCurrentPoint.y - dragStartPoint.y);
+
+    if (width < 12 || height < 12) {
+        dragStartPoint = null;
+        dragCurrentPoint = null;
+        drawHazardsOnImage();
+        return;
+    }
+
+    const newBox = canvasPointToBox(dragStartPoint, dragCurrentPoint);
+
+    dragStartPoint = null;
+    dragCurrentPoint = null;
+
+    if (annotationMode === "edit-box" && selectedHazardIndex >= 0) {
+        currentReportData.hazards[selectedHazardIndex].box_2d = newBox;
+
+        annotationMode = null;
+        selectedHazardIndex = -1;
+        elements.canvasContainer.classList.remove("annotation-active");
+
+        drawHazardsOnImage();
+        renderHazards();
+        return;
+    }
+
+    pendingManualBox = newBox;
+
+    annotationMode = null;
+    elements.canvasContainer.classList.remove("annotation-active");
+
+    editingHazardIndex = -1;
+    document.getElementById('edit-h-type').value = "";
+    document.getElementById('edit-h-law').value = "";
+    document.getElementById('edit-h-risk').value = "";
+    document.getElementById('edit-h-severity').value = "中";
+
+    showModal('edit-hazard-modal');
+    drawHazardsOnImage();
+}, { passive: false });
 
 window.addEventListener("resize", () => {
     drawHazardsOnImage();
