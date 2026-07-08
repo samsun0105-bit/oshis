@@ -86,8 +86,24 @@
     position: absolute;
     top: 0;
     left: 0;
-    pointer-events: none;
+    pointer-events: auto;
     z-index: 10;
+}
+
+#canvas-container.annotation-active {
+    cursor: crosshair;
+}
+
+#canvas-container.annotation-active #preview-img {
+    outline: 2px solid rgba(37, 99, 235, 0.45);
+    outline-offset: 4px;
+}
+
+.hazard-card.hazard-selected {
+    border-color: #2563eb !important;
+    border-left-color: #2563eb !important;
+    background: linear-gradient(135deg, #eff6ff, #ffffff) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16), 0 16px 34px rgba(15, 23, 42, 0.12) !important;
 }
 
 #preview-img {
@@ -249,51 +265,21 @@
         transform: translateY(-1px);
     }
 
-#analyze-btn {
-    position: relative !important;
-    overflow: visible !important;
-    background: linear-gradient(
-        90deg,
-        #4f46e5 0%,
-        #2563eb 52%,
-        #06b6d4 100%
-    ) !important;
-    border: 1px solid rgba(255, 255, 255, 0.26);
-    box-shadow: 0 15px 28px rgba(37, 99, 235, 0.24) !important;
-    letter-spacing: 0.05em;
-}
+    #analyze-btn {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #0f172a 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow: 0 15px 28px rgba(37, 99, 235, 0.24) !important;
+        letter-spacing: 0.05em;
+    }
 
-#analyze-btn::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.18),
-        transparent 38%,
-        rgba(255, 255, 255, 0.15)
-    );
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    pointer-events: none;
-}
+    #analyze-btn:hover:not(:disabled) {
+        box-shadow: 0 18px 34px rgba(37, 99, 235, 0.32) !important;
+    }
 
-#analyze-btn:hover:not(:disabled) {
-    box-shadow: 0 18px 36px rgba(6, 182, 212, 0.34) !important;
-    transform: translateY(-1px);
-}
-
-#analyze-btn:hover:not(:disabled)::before {
-    opacity: 1;
-}
-
-#analyze-btn:disabled {
-    background: linear-gradient(135deg, #cbd5e1, #94a3b8) !important;
-    box-shadow: none !important;
-    opacity: 0.72;
-    cursor: not-allowed;
-}
+    #analyze-btn:disabled {
+        background: linear-gradient(135deg, #cbd5e1, #94a3b8) !important;
+        box-shadow: none !important;
+    }
 
     #history-btn,
     #export-db,
@@ -413,6 +399,112 @@
     }
 }
 
+/* ===== Premium Safety Dashboard Tone v2：有感外觀優化，不改功能與版面 ===== */
+@media screen {
+    body {
+        background:
+            radial-gradient(circle at top left, rgba(15, 23, 42, 0.10), transparent 34rem),
+            linear-gradient(180deg, #f4f7fb 0%, #e9eef5 52%, #f8fafc 100%) !important;
+    }
+
+    nav {
+        background: linear-gradient(135deg, #020617 0%, #0f172a 55%, #1e293b 100%) !important;
+        box-shadow: 0 18px 38px rgba(2, 6, 23, 0.34) !important;
+    }
+
+    .bg-white {
+        background: rgba(255, 255, 255, 0.985) !important;
+        border: 1px solid #d5dce7 !important;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.075) !important;
+    }
+
+    #drop-zone {
+        background: linear-gradient(180deg, #f8fafc, #eef3f8) !important;
+        border-color: #94a3b8 !important;
+    }
+
+    #analyze-btn {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%) !important;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.28) !important;
+    }
+
+    .bg-blue-50 {
+        background: #f8fafc !important;
+        border-color: #d5dce7 !important;
+        box-shadow: none !important;
+    }
+
+    .bg-blue-50 h3 {
+        color: #0f172a !important;
+    }
+
+    .bg-blue-50 ul {
+        color: #475569 !important;
+    }
+
+    h2 i {
+        background: #f1f5f9 !important;
+    }
+
+    .hazard-card {
+        border-left-color: #b91c1c !important;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.065) !important;
+    }
+
+    .hazard-card .bg-red-600 {
+        background: #b91c1c !important;
+    }
+
+    .hazard-card span.bg-red-100 {
+        background: #fef2f2 !important;
+        color: #991b1b !important;
+    }
+
+    #suggestions-output > div {
+        background: #f9fbfa !important;
+        border-color: #d7e2dc !important;
+    }
+
+    #suggestions-output > div:hover {
+        background: #f1f7f3 !important;
+        border-color: #a8cdb3 !important;
+    }
+
+    #save-report-btn {
+        background: #15803d !important;
+    }
+
+    #print-report-btn {
+        background: #1e293b !important;
+    }
+
+    .system-footer {
+        background: linear-gradient(135deg, #020617 0%, #111827 100%) !important;
+    }
+}
+
+/* 管理員模式：危害項目、改善建議操作圖示全尺寸常駐顯示 */
+body.is-admin .hazard-action-buttons,
+body.is-admin .suggestion-action-buttons,
+body.is-admin .history-edit-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* 危害卡片右上角預留操作圖示空間，避免風險等級與鉛筆/垃圾桶重疊 */
+body.is-admin .hazard-card {
+    padding-right: 1rem !important;
+}
+
+/* 危害項目表頭右側：風險等級 + 操作圖示排列 */
+.hazard-header-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
 @media screen and (max-width: 768px) {
     body.is-admin .hazard-action-buttons,
     body.is-admin .suggestion-action-buttons {
@@ -420,19 +512,28 @@
         pointer-events: auto !important;
     }
 
-    body.is-admin .hazard-action-buttons button,
-    body.is-admin .suggestion-action-buttons button {
-        min-width: 28px !important;
-        min-height: 28px !important;
-        font-size: 12px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
+body.is-admin .suggestion-action-buttons button {
+    min-width: 20px !important;
+    min-height: 20px !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
 
     body.is-admin .suggestion-action-buttons {
         flex-shrink: 0 !important;
     }
+
+body.is-admin .suggestion-action-buttons {
+    width: 42px !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+}
+
 }
 
 @media screen and (max-width: 768px) {
@@ -453,7 +554,11 @@
 
 @media screen and (max-width: 768px) {
     body.is-admin .hazard-card {
-        padding-right: 64px !important;
+        padding-right: 1rem !important;
+    }
+
+    .hazard-header-right {
+        gap: 5px;
     }
 }
 
@@ -507,9 +612,12 @@
     #print-report-btn,
     #save-report-btn,
     #history-btn,
-    #manage-cats-btn {
-        display: none !important;
-    }
+#manage-cats-btn,
+.hazard-action-buttons,
+.suggestion-action-buttons,
+.history-edit-btn {
+    display: none !important;
+}
 
     html,
     body {
@@ -812,6 +920,15 @@ h2 {
     overflow-wrap: anywhere !important;
 }
 
+.print-suggestion-hazards {
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 11px !important;
+    color: #64748b !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
+}
+
 }
     </style>
 </head>
@@ -896,33 +1013,17 @@ h2 {
 </button>
                     </div>
 
-<button
-    id="analyze-btn"
-    disabled
-    class="group relative overflow-visible
-           w-full mt-6
-           bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500
-           hover:from-indigo-500 hover:via-blue-500 hover:to-cyan-400
-           text-white py-3 rounded-xl font-semibold
-           shadow-lg shadow-blue-500/20
-           hover:shadow-cyan-400/40
-           transition-all duration-300
-           flex justify-center items-center gap-2
-           disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
->
-    <span class="flex items-center justify-center gap-2">
-        <i class="fa-solid fa-shield-halved text-white"></i>
-        <span id="btn-text">啟動 AI 危害識別</span>
-        <i id="btn-loader" class="fa-solid fa-spinner fa-spin hidden ml-1"></i>
-    </span>
-</button>
+                    <button id="analyze-btn" disabled class="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 disabled:bg-slate-300 transition-all flex justify-center items-center">
+                        <span id="btn-text">啟動 AI 危害識別</span>
+                        <div id="btn-loader" class="loading-spinner ml-2 hidden"></div>
+                    </button>
                 </div>
 
                 <div class="user-only bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-700 mb-3"><i class="fas fa-database mr-1"></i> 數據備份</h3>
+                    <h3 class="text-sm font-bold text-slate-700 mb-3"><i class="fas fa-database mr-1"></i> 資料備份</h3>
                     <div class="flex space-x-2">
-                        <button id="export-db" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded text-xs hover:bg-slate-200"><i class="fas fa-upload mr-1"></i> 導出數據</button>
-                        <button id="import-db" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded text-xs hover:bg-slate-200"><i class="fas fa-download mr-1"></i> 導入數據</button>
+                        <button id="export-db" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded text-xs hover:bg-slate-200"><i class="fas fa-upload mr-1"></i> 匯出資料</button>
+                        <button id="import-db" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded text-xs hover:bg-slate-200"><i class="fas fa-download mr-1"></i> 匯入資料</button>
                         <input type="file" id="db-file-input" class="hidden" accept=".json">
                     </div>
                 </div>
@@ -982,7 +1083,7 @@ h2 {
     <div class="footer-line"></div>
 
     <p class="footer-title">
-        © 2026 職業安全衛生室｜職業安全危害識別系統
+        © 職業安全衛生室｜職業安全危害識別系統
     </p>
 
     <p class="footer-dev">
@@ -1050,6 +1151,10 @@ h2 {
                 <div>
                     <label class="text-xs font-bold text-slate-500">建議內容</label>
                     <textarea id="edit-s-text" class="w-full p-2 border rounded h-24" placeholder="請輸入改善建議方案"></textarea>
+<div>
+    <label class="text-xs font-bold text-slate-500">適用危害項目</label>
+    <div id="suggestion-hazard-links" class="mt-2 max-h-40 overflow-y-auto border rounded-lg p-2 bg-slate-50 space-y-1 text-xs"></div>
+</div>                    
                 </div>
             </div>
             <div class="flex space-x-2 mt-6">
@@ -1096,6 +1201,9 @@ let editingSuggestionIndex = -1;
 let base64Image = "";
 let lastAnalyzeTime = 0;
 let currentReportId = null;
+let selectedHazardIndex = -1;
+let annotationMode = null; // null / "manual" / "edit-box"
+let pendingManualBox = null;
 
         const initDB = () => {
             return new Promise((resolve, reject) => {
@@ -1266,6 +1374,46 @@ async function verifyLogin() {
             } else { alert("舊密碼錯誤"); }
         };
 
+function normalizeHazardData() {
+    if (!currentReportData) {
+        currentReportData = { hazards: [], suggestions: [] };
+    }
+
+    if (!Array.isArray(currentReportData.hazards)) {
+        currentReportData.hazards = [];
+    }
+
+    if (!Array.isArray(currentReportData.suggestions)) {
+        currentReportData.suggestions = [];
+    }
+
+    currentReportData.hazards = currentReportData.hazards.map((h, index) => ({
+        id: h.id || `H${String(index + 1).padStart(3, "0")}`,
+        source: h.source || "ai",
+        enabled: h.enabled !== false,
+        type: h.type || "",
+        severity: h.severity || "中",
+        legal_basis: h.legal_basis || "",
+        risk: h.risk || "",
+        box_2d: h.box_2d || null
+    }));
+
+currentReportData.suggestions = currentReportData.suggestions.map((s) => {
+    if (typeof s === "string") {
+        return {
+            text: s,
+            hazardIds: []
+        };
+    }
+
+    return {
+        text: s.text || "",
+        hazardIds: Array.isArray(s.hazardIds) ? s.hazardIds : []
+    };
+});
+
+}
+        
 function updateUIVisibility() {
     const hasReport =
         !!base64Image &&
@@ -1416,7 +1564,21 @@ async function syncCurrentReportTitleToHistory() {
             }
         };
 
-        elements.dropZone.onclick = () => elements.fileInput.click();
+        elements.dropZone.onclick = (event) => {
+    if (annotationMode === "manual") {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+    }
+
+    if (event.target === elements.canvas || event.target === elements.canvasContainer) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+    }
+
+    elements.fileInput.click();
+};
         elements.fileInput.onchange = (e) => handleFile(e.target.files[0]);
         document.getElementById('reselect-btn').onclick = (e) => { e.stopPropagation(); elements.fileInput.click(); };
 
@@ -1540,6 +1702,7 @@ async function analyzeImage() {
         }
 
 currentReportData = JSON.parse(text);
+normalizeHazardData();
 
 if (elements.reportNameInput && !elements.reportNameInput.value.trim()) {
     elements.reportNameInput.value = getReportTitle();
@@ -1580,14 +1743,20 @@ const reportToSave = {
     hazards: JSON.parse(JSON.stringify(currentReportData.hazards)),
     suggestions: JSON.parse(JSON.stringify(currentReportData.suggestions))
 };
-const addReq = store.add(reportToSave);
 
-addReq.onsuccess = (event) => {
-    currentReportId = event.target.result;
-};
+if (currentReportId) {
+    reportToSave.id = currentReportId;
+    store.put(reportToSave);
+} else {
+    const addReq = store.add(reportToSave);
+
+    addReq.onsuccess = (event) => {
+        currentReportId = event.target.result;
+    };
+}
 
 tx.oncomplete = () => {
-    alert("儲存紀錄完成！");
+    alert(currentReportId ? "報告已更新完成！" : "儲存紀錄完成！");
 };
             } catch (e) {
                 alert("儲存失敗: " + e.message);
@@ -1633,7 +1802,7 @@ tx.oncomplete = () => {
                             </div>
                             <div class="flex items-center mt-1">
                                 <h4 id="report-title-${report.id}" class="font-bold text-slate-700 line-clamp-1 flex-grow">${displayTitle}</h4>
-                                ${isAdmin ? `<button onclick="editHistoryTitle(${report.id})" class="text-blue-500 hover:text-blue-700 ml-2 text-xs opacity-0 group-hover:opacity-100 transition"><i class="fas fa-edit"></i></button>` : ''}
+                                ${isAdmin ? `<button onclick="editHistoryTitle(${report.id})" class="history-edit-btn text-blue-500 hover:text-blue-700 ml-2 text-xs opacity-100 transition" title="編輯報告名稱"><i class="fas fa-edit"></i></button>` : ''}
                             </div>
                             <div class="flex mt-3 space-x-2">
                                 <button onclick="previewHistory(${report.id})" class="flex-1 bg-white border border-blue-200 text-blue-600 text-xs py-1.5 rounded hover:bg-blue-50 transition">查看預覽</button>
@@ -1713,6 +1882,7 @@ if (report) {
     currentReportId = report.id;
     base64Image = report.imageData;
     currentReportData = { hazards: report.hazards, suggestions: report.suggestions };
+normalizeHazardData();
 
     if (elements.reportNameInput) {
         elements.reportNameInput.value = report.title || getReportTitle();
@@ -1736,6 +1906,150 @@ closeModals();
             }
         };
 
+function startManualAnnotation() {
+    if (!isAdmin) {
+        alert("請先登入管理員模式，才能新增人工紅框。");
+        return;
+    }
+
+    if (!base64Image) {
+        alert("請先上傳現場照片。");
+        return;
+    }
+
+    annotationMode = "manual";
+    pendingManualBox = null;
+    selectedHazardIndex = -1;
+
+    elements.canvasContainer.classList.add("annotation-active");
+
+    alert("請在照片上拖曳框選要新增的危害位置。");
+}
+
+function startEditHazardBox(idx) {
+    if (!isAdmin) {
+        alert("請先登入管理員模式，才能修正紅框。");
+        return;
+    }
+
+    if (!base64Image) {
+        alert("請先上傳現場照片。");
+        return;
+    }
+
+    selectedHazardIndex = idx;
+    annotationMode = "edit-box";
+    pendingManualBox = null;
+
+    elements.canvasContainer.classList.add("annotation-active");
+
+    alert(`請在照片上重新拖曳框選 #${idx + 1} 的危害位置。`);
+}
+
+let dragStartPoint = null;
+let dragCurrentPoint = null;
+
+function getCanvasPoint(event) {
+    const rect = elements.canvas.getBoundingClientRect();
+
+    return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+    };
+}
+
+function canvasPointToBox(start, end) {
+    const canvasWidth = elements.canvas.width;
+    const canvasHeight = elements.canvas.height;
+
+    const left = Math.max(0, Math.min(start.x, end.x));
+    const top = Math.max(0, Math.min(start.y, end.y));
+    const right = Math.min(canvasWidth, Math.max(start.x, end.x));
+    const bottom = Math.min(canvasHeight, Math.max(start.y, end.y));
+
+    return [
+        Math.round((top / canvasHeight) * 1000),
+        Math.round((left / canvasWidth) * 1000),
+        Math.round((bottom / canvasHeight) * 1000),
+        Math.round((right / canvasWidth) * 1000)
+    ];
+}
+
+function drawTempAnnotationBox() {
+    drawHazardsOnImage();
+
+    if (!dragStartPoint || !dragCurrentPoint) return;
+
+    const ctx = elements.canvas.getContext("2d");
+
+    const left = Math.min(dragStartPoint.x, dragCurrentPoint.x);
+    const top = Math.min(dragStartPoint.y, dragCurrentPoint.y);
+    const width = Math.abs(dragCurrentPoint.x - dragStartPoint.x);
+    const height = Math.abs(dragCurrentPoint.y - dragStartPoint.y);
+
+    ctx.save();
+    ctx.strokeStyle = "#2563eb";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(left, top, width, height);
+    ctx.restore();
+}
+
+function getHazardIndexAtPoint(point) {
+    const canvasWidth = elements.canvas.width;
+    const canvasHeight = elements.canvas.height;
+
+    for (let i = currentReportData.hazards.length - 1; i >= 0; i--) {
+        const h = currentReportData.hazards[i];
+
+        if (h.enabled === false || !h.box_2d) continue;
+
+        const [ymin, xmin, ymax, xmax] = h.box_2d;
+
+        const left = (xmin / 1000) * canvasWidth;
+        const top = (ymin / 1000) * canvasHeight;
+        const right = (xmax / 1000) * canvasWidth;
+        const bottom = (ymax / 1000) * canvasHeight;
+
+        if (
+            point.x >= left &&
+            point.x <= right &&
+            point.y >= top &&
+            point.y <= bottom
+        ) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+function selectHazardFromCanvas(event) {
+    if (annotationMode === "manual" || annotationMode === "edit-box") return;
+
+    const point = getCanvasPoint(event);
+    const idx = getHazardIndexAtPoint(point);
+
+    if (idx === -1) {
+    selectedHazardIndex = -1;
+    renderHazards();
+    drawHazardsOnImage();
+    return;
+}
+
+    selectedHazardIndex = idx;
+    renderHazards();
+    drawHazardsOnImage();
+
+    const cards = elements.analysisOutput.querySelectorAll('.hazard-card');
+    if (cards[idx]) {
+        cards[idx].scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
+}
+
 function drawHazardsOnImage() {
     const img = elements.previewImg;
     const canvas = elements.canvas;
@@ -1753,8 +2067,9 @@ const displayHeight = img.offsetHeight;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    (currentReportData.hazards || []).forEach((h, index) => {
-        if (!h.box_2d) return;
+(currentReportData.hazards || []).forEach((h, index) => {
+    if (h.enabled === false) return;
+    if (!h.box_2d) return;
 
         const [ymin, xmin, ymax, xmax] = h.box_2d;
 
@@ -1763,11 +2078,13 @@ const displayHeight = img.offsetHeight;
         const width = ((xmax - xmin) / 1000) * displayWidth;
         const height = ((ymax - ymin) / 1000) * displayHeight;
 
-        ctx.strokeStyle = '#ef4444';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(left, top, width, height);
+const isSelected = selectedHazardIndex === index;
 
-        ctx.fillStyle = '#ef4444';
+ctx.strokeStyle = isSelected ? '#2563eb' : '#ef4444';
+ctx.lineWidth = isSelected ? 4 : 3;
+ctx.strokeRect(left, top, width, height);
+
+ctx.fillStyle = isSelected ? '#2563eb' : '#ef4444';
         ctx.fillRect(left, Math.max(top - 24, 0), 36, 24);
 
         ctx.fillStyle = '#ffffff';
@@ -1787,8 +2104,9 @@ function createAnnotatedImageForPrint() {
     const ctx = tempCanvas.getContext("2d");
     ctx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    (currentReportData.hazards || []).forEach((h, index) => {
-        if (!h.box_2d) return;
+(currentReportData.hazards || []).forEach((h, index) => {
+    if (h.enabled === false) return;
+    if (!h.box_2d) return;
 
         const [ymin, xmin, ymax, xmax] = h.box_2d;
 
@@ -1827,32 +2145,90 @@ function createAnnotatedImageForPrint() {
             if (currentReportData.hazards?.length > 0) {
                 currentReportData.hazards.forEach((h, i) => {
                     const card = document.createElement('div');
-                    card.className = "hazard-card bg-white p-4 rounded-lg border shadow-sm relative group";
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-1">
-                            <span class="text-red-700 font-bold text-sm">
-                                <span class="bg-red-600 text-white px-1.5 py-0.5 rounded mr-2">#${i + 1}</span>${h.type}
-                            </span>
-                            <span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold">${h.severity}</span>
-                        </div>
-                        <div class="bg-slate-50 border-l-2 border-slate-300 px-2 py-1 mb-2">
-                            <p class="text-[11px] text-slate-500 font-bold uppercase">法源依據：</p>
-                            <p class="text-xs text-blue-700 font-medium">${h.legal_basis || '待核定'}</p>
-                        </div>
-                        <p class="text-xs text-slate-700"><b>風險情況：</b>${h.risk}</p>
-                        ${isAdmin ? `
-<div class="hazard-action-buttons absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition">
-    <button onclick="editHazard(${i})" class="bg-blue-500 text-white p-1 rounded text-[10px] hover:bg-blue-600"><i class="fas fa-edit"></i></button>
-    <button onclick="deleteHazard(${i})" class="bg-red-500 text-white p-1 rounded text-[10px] hover:bg-red-600"><i class="fas fa-trash"></i></button>
+                    card.className = `hazard-card bg-white p-4 rounded-lg border shadow-sm relative group cursor-pointer ${selectedHazardIndex === i ? 'hazard-selected' : ''}`;
+card.onclick = (event) => {
+    if (event.target.closest('button')) return;
+
+    selectedHazardIndex = i;
+    renderHazards();
+    drawHazardsOnImage();
+
+    card.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+};
+card.innerHTML = `
+    <div class="flex justify-between items-start mb-2 gap-2">
+        <span class="text-red-700 font-bold text-sm pr-2 flex-1 min-w-0">
+            <span class="bg-red-600 text-white px-1.5 py-0.5 rounded mr-2">#${i + 1}</span>${h.type}
+        </span>
+
+        <div class="hazard-header-right">
+<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+    風險級別：${h.severity}
+</span>
+
+            ${isAdmin ? `
+<div class="hazard-action-buttons flex space-x-2 opacity-100 transition">
+<button onclick="editHazard(${i})" class="text-blue-500 hover:text-blue-700 text-xs" title="編輯內容">
+    <i class="fas fa-edit"></i>
+</button>
+<button onclick="startEditHazardBox(${i})" class="text-slate-500 hover:text-slate-700 text-xs" title="修正框選">
+    <i class="fas fa-crop-simple"></i>
+</button>
+<button onclick="deleteHazard(${i})" class="text-red-500 hover:text-red-700 text-xs" title="刪除">
+    <i class="fas fa-trash"></i>
+</button>
 </div>
-                        ` : ''}
-                    `;
+            ` : ''}
+        </div>
+    </div>
+
+    <div class="bg-slate-50 border-l-2 border-slate-300 px-2 py-1 mb-2">
+        <p class="text-[11px] text-slate-500 font-bold uppercase">法源依據：</p>
+        <p class="text-xs text-blue-700 font-medium">${h.legal_basis || '待核定'}</p>
+    </div>
+
+    <p class="text-xs text-slate-700"><b>風險情況：</b>${h.risk}</p>
+`;
                     elements.analysisOutput.appendChild(card);
                 });
             } else {
                 elements.analysisOutput.innerHTML = '<div class="text-center py-12 italic text-slate-400">請上傳圖片並點擊開始分析</div>';
             }
         }
+
+function renderSuggestionHazardLinks(selectedIds = []) {
+    const container = document.getElementById('suggestion-hazard-links');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!currentReportData.hazards || currentReportData.hazards.length === 0) {
+        container.innerHTML = '<div class="text-slate-400 italic">目前尚無危害項目</div>';
+        return;
+    }
+
+    currentReportData.hazards.forEach((h, index) => {
+        if (h.enabled === false) return;
+
+        const checked = selectedIds.includes(h.id) ? 'checked' : '';
+
+        const row = document.createElement('label');
+        row.className = 'flex items-start gap-2 p-1.5 rounded hover:bg-white cursor-pointer';
+
+        row.innerHTML = `
+            <input type="checkbox" class="suggestion-hazard-checkbox mt-0.5" value="${h.id}" ${checked}>
+            <span>
+                <b>#${index + 1}</b>
+                <span class="text-slate-700">${h.type || '未命名危害'}</span>
+            </span>
+        `;
+
+        container.appendChild(row);
+    });
+}
 
 function renderSuggestions() {
     elements.suggestionsOutput.innerHTML = '';
@@ -1862,14 +2238,32 @@ function renderSuggestions() {
             const item = document.createElement('div');
             item.className = "flex items-start justify-between space-x-2 text-sm text-slate-700 py-2 border-b border-slate-50 last:border-0 group";
             item.innerHTML = `
-                <div class="flex items-start space-x-2">
-                    <i class="fas fa-check text-green-500 mt-1"></i>
-                    <span>${s}</span>
-                </div>
+<div class="flex items-start space-x-2 flex-1 min-w-0">
+    <i class="fas fa-check text-green-500 mt-1"></i>
+
+    <div class="flex-1 min-w-0">
+        <div class="text-slate-700 leading-relaxed">${s.text}</div>
+
+        ${s.hazardIds && s.hazardIds.length > 0 ? `
+            <div class="mt-2 flex items-center gap-1.5 text-[10px] text-slate-500 whitespace-nowrap overflow-x-auto">
+                <span class="font-bold shrink-0">適用危害：</span>
+                ${s.hazardIds.map(id => {
+                    const idx = currentReportData.hazards.findIndex(h => h.id === id);
+                    if (idx < 0) return '';
+                    return `<span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded shrink-0">#${idx + 1}</span>`;
+                }).join('')}
+            </div>
+        ` : ''}
+    </div>
+</div>
                 ${isAdmin ? `
-<div class="suggestion-action-buttons flex space-x-2 opacity-0 group-hover:opacity-100 transition">
-    <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 px-1"><i class="fas fa-edit"></i></button>
-    <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 px-1"><i class="fas fa-xmark"></i></button>
+<div class="suggestion-action-buttons flex items-center justify-end gap-1.5 opacity-100 transition">
+    <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 text-xs px-0.5" title="編輯">
+        <i class="fas fa-edit"></i>
+    </button>
+    <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 text-xs px-0.5" title="刪除">
+        <i class="fas fa-xmark"></i>
+    </button>
 </div>
                 ` : ''}
             `;
@@ -1899,13 +2293,32 @@ function renderPrintSuggestions() {
         check.className = 'print-suggestion-check';
         check.textContent = '✓';
 
-        const text = document.createElement('span');
-        text.className = 'print-suggestion-text';
-        text.textContent = s;
+const text = document.createElement('span');
+text.className = 'print-suggestion-text';
 
-        item.appendChild(check);
-        item.appendChild(text);
-        elements.printSuggestionsOutput.appendChild(item);
+const suggestionText = document.createElement('div');
+suggestionText.textContent = s.text || "";
+text.appendChild(suggestionText);
+
+if (s.hazardIds && s.hazardIds.length > 0) {
+    const hazardLine = document.createElement('div');
+    hazardLine.className = 'print-suggestion-hazards';
+
+    const hazardLabels = s.hazardIds
+        .map(id => {
+            const idx = currentReportData.hazards.findIndex(h => h.id === id);
+            return idx >= 0 ? `#${idx + 1}` : '';
+        })
+        .filter(Boolean)
+        .join('、');
+
+    hazardLine.textContent = hazardLabels ? `適用危害：${hazardLabels}` : '';
+    text.appendChild(hazardLine);
+}
+
+item.appendChild(check);
+item.appendChild(text);
+elements.printSuggestionsOutput.appendChild(item);
     });
 }
 
@@ -1927,13 +2340,20 @@ window.editHazard = (idx) => {
         };
 
         document.getElementById('save-hazard-btn').onclick = () => {
-            const h = {
-                type: document.getElementById('edit-h-type').value,
-                legal_basis: document.getElementById('edit-h-law').value,
-                risk: document.getElementById('edit-h-risk').value,
-                severity: document.getElementById('edit-h-severity').value,
-                box_2d: editingHazardIndex === -1 ? null : currentReportData.hazards[editingHazardIndex].box_2d
-            };
+const oldHazard = editingHazardIndex === -1 ? null : currentReportData.hazards[editingHazardIndex];
+
+const h = {
+    id: oldHazard?.id || `H${String(currentReportData.hazards.length + 1).padStart(3, "0")}`,
+    source: oldHazard?.source || "manual",
+    enabled: oldHazard?.enabled !== false,
+    type: document.getElementById('edit-h-type').value,
+    legal_basis: document.getElementById('edit-h-law').value,
+    risk: document.getElementById('edit-h-risk').value,
+    severity: document.getElementById('edit-h-severity').value,
+    box_2d: pendingManualBox || oldHazard?.box_2d || null
+};
+
+pendingManualBox = null;
 if (editingHazardIndex === -1) currentReportData.hazards.push(h);
 else currentReportData.hazards[editingHazardIndex] = h;
 
@@ -1943,26 +2363,28 @@ updateUIVisibility();
 closeModals();
         };
 
-        document.getElementById('add-hazard-manual').onclick = () => {
-            editingHazardIndex = -1;
-            document.getElementById('edit-h-type').value = "";
-            document.getElementById('edit-h-law').value = "";
-            document.getElementById('edit-h-risk').value = "";
-            showModal('edit-hazard-modal');
-        };
+document.getElementById('add-hazard-manual').onclick = () => {
+    startManualAnnotation();
+};
 
         // 恢復/新增建議功能
-        document.getElementById('add-suggestion-manual-btn').onclick = () => {
-            editingSuggestionIndex = -1;
-            document.getElementById('edit-s-text').value = "";
-            showModal('edit-suggestion-modal');
-        };
+document.getElementById('add-suggestion-manual-btn').onclick = () => {
+    editingSuggestionIndex = -1;
+    document.getElementById('edit-s-text').value = "";
+    renderSuggestionHazardLinks([]);
+    showModal('edit-suggestion-modal');
+};
 
-        window.editSuggestion = (idx) => {
-            editingSuggestionIndex = idx;
-            document.getElementById('edit-s-text').value = currentReportData.suggestions[idx];
-            showModal('edit-suggestion-modal');
-        };
+window.editSuggestion = (idx) => {
+    editingSuggestionIndex = idx;
+
+    const suggestion = currentReportData.suggestions[idx];
+
+    document.getElementById('edit-s-text').value = suggestion.text || "";
+    renderSuggestionHazardLinks(suggestion.hazardIds || []);
+
+    showModal('edit-suggestion-modal');
+};
 
         window.deleteSuggestion = (idx) => {
             if (confirm("確定刪除此改善建議？")) {
@@ -1974,12 +2396,27 @@ closeModals();
         document.getElementById('save-suggestion-btn').onclick = () => {
             const text = document.getElementById('edit-s-text').value.trim();
             if (!text) return;
-            if (editingSuggestionIndex === -1) currentReportData.suggestions.push(text);
-            else currentReportData.suggestions[editingSuggestionIndex] = text;
+const oldSuggestion = editingSuggestionIndex === -1 ? null : currentReportData.suggestions[editingSuggestionIndex];
+
+const checkedHazardIds = Array.from(
+    document.querySelectorAll('.suggestion-hazard-checkbox:checked')
+).map(input => input.value);
+
+const suggestion = {
+    text,
+    hazardIds: checkedHazardIds
+};
+
+if (editingSuggestionIndex === -1) currentReportData.suggestions.push(suggestion);
+else currentReportData.suggestions[editingSuggestionIndex] = suggestion;
             renderSuggestions(); closeModals();
         };
 
 elements.printReportBtn.onclick = () => {
+    selectedHazardIndex = -1;
+    renderHazards();
+    drawHazardsOnImage();
+
     renderPrintSuggestions();
 
     const reportTitle = getReportTitle();
@@ -2042,7 +2479,7 @@ elements.printReportBtn.onclick = () => {
             const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.href = url; a.download = `職業安全危害識別系統_HIS_${new Date().toISOString().split('T')[0]}.json`;
+            a.href = url; a.download = `職安危害識別HIS_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
         };
 
@@ -2066,12 +2503,102 @@ elements.printReportBtn.onclick = () => {
                         const txS = db.transaction(["settings"], "readwrite");
                         txS.objectStore("settings").put(data.settings.adminPwd, "adminPwd");
                     }
-                    alert("數據導入成功，系統將刷新。");
+                    alert("預覽資料載入成功！");
                     location.reload();
                 } catch (err) { alert("無效的備份檔案"); }
             };
             reader.readAsText(file);
         };
+
+elements.canvas.addEventListener("click", (event) => {
+    selectHazardFromCanvas(event);
+});
+
+document.addEventListener("click", (event) => {
+    if (annotationMode === "manual" || annotationMode === "edit-box") return;
+    if (selectedHazardIndex === -1) return;
+
+    const clickedHazardCard = event.target.closest(".hazard-card");
+    const clickedCanvas = event.target.closest("#hazard-canvas");
+    const clickedActionButton = event.target.closest("button");
+
+    if (clickedHazardCard || clickedCanvas || clickedActionButton) return;
+
+    selectedHazardIndex = -1;
+    renderHazards();
+    drawHazardsOnImage();
+});
+
+elements.canvas.addEventListener("mousedown", (event) => {
+    if (annotationMode !== "manual" && annotationMode !== "edit-box") return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    dragStartPoint = getCanvasPoint(event);
+    dragCurrentPoint = dragStartPoint;
+});
+
+elements.canvas.addEventListener("mousemove", (event) => {
+    if (annotationMode !== "manual" && annotationMode !== "edit-box") return;
+    if (!dragStartPoint) return;
+
+    dragCurrentPoint = getCanvasPoint(event);
+    drawTempAnnotationBox();
+});
+
+elements.canvas.addEventListener("mouseup", (event) => {
+if (annotationMode !== "manual" && annotationMode !== "edit-box") return;
+
+event.preventDefault();
+event.stopPropagation();
+
+if (!dragStartPoint) return;
+
+    dragCurrentPoint = getCanvasPoint(event);
+
+    const width = Math.abs(dragCurrentPoint.x - dragStartPoint.x);
+    const height = Math.abs(dragCurrentPoint.y - dragStartPoint.y);
+
+    if (width < 12 || height < 12) {
+        dragStartPoint = null;
+        dragCurrentPoint = null;
+        drawHazardsOnImage();
+        return;
+    }
+
+const newBox = canvasPointToBox(dragStartPoint, dragCurrentPoint);
+
+dragStartPoint = null;
+dragCurrentPoint = null;
+
+if (annotationMode === "edit-box" && selectedHazardIndex >= 0) {
+    currentReportData.hazards[selectedHazardIndex].box_2d = newBox;
+
+    annotationMode = null;
+    selectedHazardIndex = -1;
+    elements.canvasContainer.classList.remove("annotation-active");
+
+    drawHazardsOnImage();
+    renderHazards();
+    return;
+}
+
+pendingManualBox = newBox;
+
+annotationMode = null;
+elements.canvasContainer.classList.remove("annotation-active");
+
+editingHazardIndex = -1;
+document.getElementById('edit-h-type').value = "";
+document.getElementById('edit-h-law').value = "";
+document.getElementById('edit-h-risk').value = "";
+document.getElementById('edit-h-severity').value = "中";
+
+showModal('edit-hazard-modal');
+drawHazardsOnImage();
+});
+
 window.addEventListener("resize", () => {
     drawHazardsOnImage();
 });
