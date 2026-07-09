@@ -517,12 +517,13 @@ nav h1 {
     letter-spacing: 0.04em;
 }
 
-nav p {
-    display: block;
-    font-size: 9px !important;
-    letter-spacing: 0.12em !important;
-    line-height: 1.2 !important;
-    margin-top: 2px !important;
+@media (max-width: 480px) and (orientation: portrait) {
+    nav p {
+        font-size: 8px !important;
+        letter-spacing: 0.06em !important;
+        line-height: 1.15 !important;
+        white-space: nowrap !important;
+    }
 }
 
         main {
@@ -804,8 +805,12 @@ body.is-admin .suggestion-action-buttons {
     .bg-blue-50,
     #print-report-btn,
     #save-report-btn,
-    #history-btn,
+#history-btn,
+#data-backup-panel,
 #manage-cats-btn,
+#photo-action-tools,
+#add-hazard-manual,
+#add-suggestion-manual-btn,
 .hazard-action-buttons,
 .suggestion-action-buttons,
 .history-edit-btn {
@@ -1156,9 +1161,6 @@ h2 {
     <p class="text-slate-500" id="print-date"></p>
 </div>
 
-    <p class="text-slate-500 text-center" id="print-date"></p>
-</div>
-
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="space-y-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -1430,11 +1432,11 @@ h2 {
             <div class="space-y-3">
                 <div>
                     <label class="text-xs font-bold text-slate-500">危害類型</label>
-                    <input type="text" id="edit-h-type" class="w-full p-2 border rounded" placeholder="例如：防護欄缺失">
+                    <textarea id="edit-h-type" rows="1" class="w-full p-2 border rounded resize-y min-h-[42px]" placeholder="例如：防護欄缺失"></textarea>
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-500">法源依據</label>
-                    <input type="text" id="edit-h-law" class="w-full p-2 border rounded" placeholder="例如：設施規則第 224 條">
+                    <textarea id="edit-h-law" rows="1" class="w-full p-2 border rounded resize-y min-h-[42px]" placeholder="例如：設施規則第 224 條"></textarea>
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-500">風險情況</label>
@@ -2377,7 +2379,9 @@ const reportToSave = {
     suggestions: JSON.parse(JSON.stringify(currentReportData.suggestions))
 };
 
-if (currentReportId) {
+const isUpdatingReport = !!currentReportId;
+
+if (isUpdatingReport) {
     reportToSave.id = currentReportId;
     store.put(reportToSave);
 } else {
@@ -2389,7 +2393,7 @@ if (currentReportId) {
 }
 
 tx.oncomplete = () => {
-    alert(currentReportId ? "報告已更新完成！" : "儲存紀錄完成！");
+    alert(isUpdatingReport ? "報告已更新完成！" : "儲存紀錄完成！");
 };
             } catch (e) {
                 alert("儲存失敗: " + e.message);
