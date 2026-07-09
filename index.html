@@ -6,7 +6,11 @@
     <title>職業安全危害識別系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap');
+
         @keyframes logoGradient {
             0% { color: #facc15; }
             50% { color: #fde047; }
@@ -37,9 +41,119 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
+.photo-tool-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #dbe4f0;
+    background: #f8fafc;
+    color: #475569;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+}
+
+.photo-tool-btn:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+        .db-action-btn {
+    border: 1px solid #dbe4f0;
+    background: #f8fafc;
+    color: #334155;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.db-action-btn:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+.action-locked {
+    opacity: 0.52;
+    filter: grayscale(0.18);
+    cursor: pointer;
+}
+
+.action-locked:hover {
+    background: #f8fafc;
+    color: #334155;
+    border-color: #dbe4f0;
+}
+
+.modal-overlay {
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.scale-in-center {
+    animation: scale-in-center 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+@keyframes scale-in-center {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
         .admin-only { display: none; }
-        body.is-admin .admin-only { display: block; }
-        body.is-admin .user-only { display: none; }
+
+.editor-only { display: none; }
+body.is-admin .editor-only,
+body.is-editor .editor-only {
+    display: block;
+}
+
+body.is-admin #photo-action-tools,
+body.is-editor #photo-action-tools {
+    display: flex;
+}
+
+body.is-admin #undo-photo-action.editor-only,
+body.is-editor #undo-photo-action.editor-only {
+    display: inline-flex;
+}
+
+body.is-admin .admin-only { display: block; }
+body.is-admin .user-only { display: none; }
+
+body.is-editor .editor-visible { display: block; }
+body.is-editor .user-only { display: none; }
+
+body.is-admin #logout-btn {
+    color: #facc15 !important;
+}
+
+body.is-editor #logout-btn {
+    color: #22c55e !important;
+}
+
+body.is-admin #logout-btn:hover {
+    color: #fde047 !important;
+}
+
+body.is-admin #permission-settings-btn {
+    color: #facc15 !important;
+}
+
+body.is-admin #permission-settings-btn:hover {
+    color: #fde047 !important;
+}
+
+body.is-editor #logout-btn:hover {
+    color: #4ade80 !important;
+}
 
         #canvas-container {
             position: relative;
@@ -215,18 +329,32 @@
         box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
     }
 
-    #drop-zone:hover {
-        border-color: var(--oshis-blue) !important;
-        background:
-            linear-gradient(180deg, rgba(239, 246, 255, 0.95), rgba(219, 234, 254, 0.72));
-        transform: translateY(-1px);
-    }
+#drop-zone:hover {
+    border-color: #94a3b8 !important;
+    background: linear-gradient(180deg, #f8fafc, #eef3f8) !important;
+    transform: none !important;
+}
 
-    #drop-zone.active {
-        border-color: var(--oshis-blue) !important;
-        background: #eff6ff !important;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-    }
+body.is-admin #drop-zone:hover,
+body.is-editor #drop-zone:hover {
+    border-color: var(--oshis-blue) !important;
+    background:
+        linear-gradient(180deg, rgba(239, 246, 255, 0.95), rgba(219, 234, 254, 0.72)) !important;
+    transform: translateY(-1px);
+}
+
+#drop-zone.active {
+    border-color: #94a3b8 !important;
+    background: #f8fafc !important;
+    box-shadow: none !important;
+}
+
+body.is-admin #drop-zone.active,
+body.is-editor #drop-zone.active {
+    border-color: var(--oshis-blue) !important;
+    background: #eff6ff !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+}
 
     #upload-prompt i {
         color: #93c5fd !important;
@@ -604,6 +732,66 @@ body.is-admin .suggestion-action-buttons {
     }
 }
 
+/* ===== 權限登入 / 權限設定視窗：完全比照標準程序系統 ===== */
+#login-modal,
+#pwd-modal {
+    font-family: 'Inter', 'Noto Sans TC', sans-serif !important;
+}
+
+#login-modal input,
+#pwd-modal input {
+    border-radius: 0.75rem !important;
+    box-shadow: none !important;
+}
+
+/* 權限登入密碼框 */
+#admin-pwd-input {
+    border: 1px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+#admin-pwd-input:focus {
+    background-color: #ffffff !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgb(224 231 255) !important;
+}
+
+/* 權限設定密碼框 */
+#old-pwd,
+#new-pwd,
+#editor-pwd-input {
+    border: none !important;
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+#old-pwd:focus,
+#new-pwd:focus,
+#editor-pwd-input:focus {
+    border: none !important;
+    background-color: #f1f5f9 !important;
+    box-shadow: 0 0 0 2px #6366f1 !important;
+}
+
+/* 避免危害系統全域 bg-white / input 樣式影響權限彈窗 */
+#login-modal.bg-white,
+#pwd-modal.bg-white,
+#login-modal .bg-white,
+#pwd-modal .bg-white {
+    background-color: #ffffff !important;
+}
+
+#login-modal h3,
+#pwd-modal h2 {
+    font-weight: 900 !important;
+}
+
+#login-modal label,
+#pwd-modal label {
+    font-weight: 700 !important;
+}
+
 @media print {
     nav,
     footer,
@@ -952,9 +1140,12 @@ h2 {
                 <button id="admin-login-btn" class="user-only text-xl hover:text-yellow-400 transition-colors px-2">
                     <i class="fas fa-lock"></i>
                 </button>
-                <button id="logout-btn" class="admin-only text-xl hover:text-green-400 transition-colors px-2">
+                <button id="logout-btn" class="admin-only editor-visible text-xl hover:text-green-400 transition-colors px-2">
                     <i class="fas fa-lock-open"></i>
                 </button>
+<button id="permission-settings-btn" class="admin-only text-xl hover:text-yellow-300 transition-colors px-2" title="權限與密碼設定">
+    <i class="fas fa-gear"></i>
+</button>                
             </div>
         </div>
     </nav>
@@ -973,8 +1164,19 @@ h2 {
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
 <div id="photo-section-title-row" class="flex items-center justify-between mb-4">
     <h2 class="text-lg font-semibold flex items-center mb-0">
-        <i class="fas fa-upload mr-2 text-blue-500"></i> 上傳現場照片
+        <i data-lucide="image-up" class="w-5 h-5 text-blue-500"></i>
+        上傳現場照片
     </h2>
+
+    <div id="photo-action-tools" class="flex items-center gap-2">
+        <button id="undo-photo-action" class="photo-tool-btn editor-only" title="返回上一步">
+            <i data-lucide="undo-2" class="w-4 h-4"></i>
+        </button>
+
+<button id="reset-photo-action" class="photo-tool-btn" title="回到原始畫面">
+    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+</button>
+    </div>
 </div>
                     
                     <div id="drop-zone" class="drop-zone rounded-lg p-8 text-center cursor-pointer">
@@ -996,7 +1198,7 @@ h2 {
                     <div class="mt-4 space-y-2">
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-xs font-bold text-slate-500">選擇報告分類</label>
-                            <button id="manage-cats-btn" class="admin-only text-[10px] text-blue-600 hover:underline"><i class="fas fa-cog mr-1"></i>管理分類</button>
+                            <button id="manage-cats-btn" class="editor-only text-[10px] text-blue-600 hover:underline"><i class="fas fa-cog mr-1"></i>管理分類</button>
                         </div>
 <select id="category-select" class="w-full p-2 border rounded bg-slate-50 text-sm">
     <!-- 分類將由 JavaScript 動態生成 -->
@@ -1024,18 +1226,29 @@ h2 {
                     </button>
                 </div>
 
-                <div class="user-only bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-700 mb-3"><i class="fas fa-database mr-1"></i> 資料備份</h3>
-                    <div class="flex space-x-2">
-                        <button id="export-db" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded text-xs hover:bg-slate-200"><i class="fas fa-upload mr-1"></i> 匯出資料</button>
-                        <button id="import-db" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded text-xs hover:bg-slate-200"><i class="fas fa-download mr-1"></i> 匯入資料</button>
-                        <input type="file" id="db-file-input" class="hidden" accept=".json">
-                    </div>
-                </div>
+<div id="data-backup-panel" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+    <h3 class="text-sm font-bold text-slate-700 mb-3">
+        <i data-lucide="database" class="w-4 h-4 inline-block mr-1"></i> 資料備份
+    </h3>
+
+    <div class="grid grid-cols-2 gap-2">
+        <button id="export-db" class="db-action-btn">
+            <i data-lucide="file-output" class="w-3.5 h-3.5"></i>
+            <span>匯出資料</span>
+        </button>
+
+        <button id="import-db" class="db-action-btn">
+            <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
+            <span>載入預覽</span>
+        </button>
+
+        <input type="file" id="db-file-input" class="hidden" accept=".json">
+    </div>
+</div>
 
                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <h3 class="text-blue-800 font-medium text-sm mb-2"><i class="fas fa-info-circle mr-1"></i> 使用說明</h3>
-                    <ul class="text-blue-700 text-xs space-y-1 list-disc list-inside">
+                    <h3 class="text-slate-900 font-black text-sm mb-2 tracking-wide"><i class="fas fa-info-circle mr-1"></i> 使用說明</h3>
+                    <ul class="text-slate-600 text-xs space-y-1.5 list-disc list-inside leading-relaxed font-medium">
                         <li>請上傳光線充足、涵蓋作業環境全景的照片。</li>
                         <li>AI 將分析環境中的不安全狀態（設施）與不安全行為。</li>
                         <li><b>本系統將自動對照《職業安全衛生法》等相關法規依據。</b></li>
@@ -1057,8 +1270,8 @@ h2 {
                             <button id="print-report-btn" class="hidden text-xs bg-slate-800 text-white px-3 py-1 rounded font-bold hover:bg-slate-700 transition flex items-center">
                                 <i class="fas fa-print mr-1"></i> 列印報告
                             </button>
-                            <div class="admin-only">
-                                <button id="add-hazard-manual" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200 transition">+ 新增項目</button>
+<div class="editor-only">
+    <button id="add-hazard-manual" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200 transition">+ 新增項目</button>
                             </div>
                         </div>
                     </div>
@@ -1073,8 +1286,8 @@ h2 {
                         <h2 class="text-lg font-semibold flex items-center">
                             <i class="fas fa-check-circle mr-2 text-green-500"></i> 改善建議
                         </h2>
-                        <div class="admin-only">
-                            <button id="add-suggestion-manual-btn" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold hover:bg-green-200 transition">+ 新增建議</button>
+<div class="editor-only">
+    <button id="add-suggestion-manual-btn" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold hover:bg-green-200 transition">+ 新增建議</button>
                         </div>
                     </div>
                     <div id="suggestions-output" class="grid grid-cols-1 gap-2"></div>
@@ -1097,28 +1310,120 @@ h2 {
 </footer>
 
     <!-- Modals -->
-    <div id="modal-overlay" onclick="closeModalsOutside(event)" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div id="login-modal" onclick="event.stopPropagation()" class="bg-white p-6 rounded-xl w-full max-w-xs shadow-2xl hidden">
-            <h3 class="font-bold mb-4 text-slate-800">管理員身份驗證</h3>
-            <input type="password" id="admin-pwd-input" class="w-full p-2 border rounded mb-4" placeholder="請輸入密碼">
-            <div class="flex space-x-2">
-                <button id="do-login" class="flex-1 bg-slate-800 text-white py-2 rounded shadow">登入</button>
-                <button onclick="closeModals()" class="flex-1 bg-slate-200 py-2 rounded">取消</button>
+    <div id="modal-overlay" onclick="closeModalsOutside(event)" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-[500] p-4">
+<div id="login-modal" onclick="event.stopPropagation()" class="w-full max-w-sm mx-4 overflow-hidden rounded-2xl bg-white shadow-xl border border-slate-200 scale-in-center hidden">
+    <div class="relative bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900 px-5 py-4 text-white">
+        <button onclick="closeModals()"
+                class="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition flex items-center justify-center"
+                title="關閉">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+
+        <div class="pr-8">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="lock-keyhole" class="w-5 h-5 text-yellow-300"></i>
+                <h3 class="text-lg font-black tracking-wide">權限登入</h3>
             </div>
-            <button id="show-pwd-modal-btn" class="w-full mt-4 text-xs text-blue-600 hover:underline text-center">修改密碼</button>
+
+            <p class="mt-1 text-[11px] text-slate-300 tracking-[0.14em] font-semibold">
+                ACCESS CONTROL
+            </p>
+        </div>
+    </div>
+
+    <div class="px-5 py-5 space-y-4">
+        <div class="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-2.5 text-base font-black">
+            <i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i>
+            安全驗證
         </div>
 
-        <div id="pwd-modal" class="bg-white p-6 rounded-xl w-full max-w-xs shadow-2xl hidden">
-            <h3 class="font-bold mb-4">修改管理員密碼</h3>
-            <div class="space-y-3 mb-4">
-                <input type="password" id="old-pwd" class="w-full p-2 border rounded" placeholder="舊密碼">
-                <input type="password" id="new-pwd" class="w-full p-2 border rounded" placeholder="新密碼">
+        <p class="text-center text-xs text-slate-500 leading-relaxed">
+            請輸入管理者或使用者密碼，以啟動對應的系統操作權限。
+        </p>
+
+        <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2 text-center">
+                請輸入登入密碼
+            </label>
+
+            <input
+                type="password"
+                id="admin-pwd-input"
+                placeholder="••••••"
+                class="w-full h-11 border border-slate-300 rounded-xl px-4 text-base text-center tracking-[0.42em] font-bold bg-slate-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition text-slate-900"
+            >
+        </div>
+
+        <button id="do-login"
+                class="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-2">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            登入驗證
+        </button>
+
+        <p id="login-error" class="hidden text-center text-red-500 text-xs font-bold">
+            密碼錯誤，請重新輸入
+        </p>
+
+        <p class="text-[10px] text-center text-slate-400 leading-relaxed">
+            未登入狀態可載入預覽、查看歷史報告與列印報告；上傳照片、AI 識別、編輯、儲存與資料匯出需登入權限。
+        </p>
+    </div>
+</div>
+
+<div id="pwd-modal" onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-2xl shadow-2xl scale-in-center hidden">
+    <div class="p-5">
+        <div class="flex flex-col items-center text-center mb-3">
+            <div class="bg-yellow-50 p-2 rounded-full mb-2">
+                <i data-lucide="key-round" class="w-6 h-6 text-yellow-600"></i>
             </div>
-            <div class="flex space-x-2">
-                <button id="do-change-pwd" class="flex-1 bg-blue-600 text-white py-2 rounded shadow">確認修改</button>
-                <button id="back-to-login" class="flex-1 bg-slate-200 py-2 rounded">返回</button>
+            <h2 class="text-lg font-black text-slate-800">權限與密碼設定</h2>
+            <p class="text-xs text-slate-500 mt-1">僅管理者可修改密碼與使用者權限</p>
+        </div>
+
+        <div class="space-y-2">
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">目前管理者密碼</label>
+                <input type="password" id="old-pwd"
+                       class="w-full px-4 py-2 bg-slate-100 border-none rounded-lg focus:ring-2 focus:ring-indigo-500 transition outline-none text-sm text-slate-900"
+                       placeholder="••••••">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">新管理者密碼</label>
+                <input type="password" id="new-pwd"
+                       class="w-full px-4 py-2 bg-slate-100 border-none rounded-lg focus:ring-2 focus:ring-indigo-500 transition outline-none text-sm text-slate-900"
+                       placeholder="••••••">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">新使用者密碼</label>
+                <input type="password" id="editor-pwd-input"
+                       class="w-full px-4 py-2 bg-slate-100 border-none rounded-lg focus:ring-2 focus:ring-indigo-500 transition outline-none text-sm text-slate-900"
+                       placeholder="••••••">
+            </div>
+
+            <label class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 cursor-pointer">
+                <input type="checkbox" id="editor-enabled-check" class="w-4 h-4 accent-indigo-600">
+                <span class="text-sm font-bold text-slate-700">啟用使用者共用權限</span>
+            </label>
+
+            <p class="text-[11px] text-slate-400 leading-snug">
+                使用者權限可上傳照片、AI 識別、編輯、儲存、載入資料與匯出資料；刪除與權限設定仍限管理者。
+            </p>
+
+            <p id="pwd-change-error" class="hidden text-[11px] text-red-500 font-bold"></p>
+
+            <div class="flex gap-2 pt-1">
+                <button id="do-change-pwd" class="flex-1 bg-indigo-600 text-white py-1.5 rounded-lg font-bold hover:bg-indigo-700 transition text-xs">
+                    儲存設定
+                </button>
+                <button onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-600 py-1.5 rounded-lg font-bold hover:bg-slate-200 transition text-xs">
+                    取消
+                </button>
             </div>
         </div>
+    </div>
+</div>
 
         <div id="edit-hazard-modal" class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl hidden">
             <h3 id="hazard-modal-title" class="font-bold mb-4">編輯危害項目</h3>
@@ -1197,8 +1502,23 @@ h2 {
         </div>
     </div>
 
+<div id="toast" class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-[300] bg-white text-slate-900 px-5 py-3 rounded-xl shadow-2xl font-bold flex items-center space-x-3">
+    <span id="toast-icon" class="text-green-500">✓</span>
+    <span id="toast-msg">操作成功</span>
+</div>
+
     <script>
+const DEFAULT_ADMIN_PASSWORD = "SamCore@1068";
+const DEFAULT_EDITOR_PASSWORD = "TeamUser001";
+const MASTER_RECOVERY_CODE = "SAM-SUN-CORE-RECOVERY";
+
 let isAdmin = false;
+let isEditor = false;
+let editorEnabled = true;
+
+let systemPassword = DEFAULT_ADMIN_PASSWORD;
+let editorPassword = DEFAULT_EDITOR_PASSWORD;
+
 let db;
 let currentReportData = { hazards: [], suggestions: [] };
 let editingHazardIndex = -1;
@@ -1209,8 +1529,136 @@ let currentReportId = null;
 let selectedHazardIndex = -1;
 let annotationMode = null; // null / "manual" / "edit-box"
 let pendingManualBox = null;
+let previewReports = null;
+let previewCategories = null;
+let hazardUndoStack = [];
 
-        const initDB = () => {
+function pushUndoState() {
+    if (!currentReportData) return;
+
+    hazardUndoStack.push({
+        base64Image,
+        currentReportData: JSON.parse(JSON.stringify(currentReportData)),
+        currentReportId,
+        selectedHazardIndex,
+        reportName: elements.reportNameInput ? elements.reportNameInput.value : ""
+    });
+
+    if (hazardUndoStack.length > 20) {
+        hazardUndoStack.shift();
+    }
+}
+
+function isPreviewDataActive() {
+    return !canImportData() && Array.isArray(previewReports);
+}
+
+function initIcons() {
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    const icon = document.getElementById("toast-icon");
+    const msg = document.getElementById("toast-msg");
+
+    if (!toast || !icon || !msg) {
+        alert(message);
+        return;
+    }
+
+    msg.innerText = message;
+    icon.innerText = type === "error" ? "!" : "✓";
+    icon.className = type === "error" ? "text-red-500" : "text-green-500";
+
+    toast.classList.remove("translate-y-20", "opacity-0");
+
+    clearTimeout(window.__oshisToastTimer);
+    window.__oshisToastTimer = setTimeout(() => {
+        toast.classList.add("translate-y-20", "opacity-0");
+    }, 2600);
+}
+
+function updateDataActionButtons() {
+    const exportBtn = document.getElementById("export-db");
+    const importBtn = document.getElementById("import-db");
+
+    if (exportBtn) {
+        exportBtn.innerHTML = `
+            <i data-lucide="file-output" class="w-3.5 h-3.5"></i>
+            <span>匯出資料</span>
+        `;
+        exportBtn.classList.toggle("action-locked", !canExportData());
+exportBtn.removeAttribute("title");
+    }
+
+    if (importBtn) {
+        if (isAdmin) {
+            importBtn.innerHTML = `
+                <i data-lucide="file-input" class="w-3.5 h-3.5"></i>
+                <span>匯入資料</span>
+            `;
+            importBtn.title = "匯入正式資料，會覆蓋目前紀錄";
+        } else if (isEditor) {
+            importBtn.innerHTML = `
+                <i data-lucide="file-input" class="w-3.5 h-3.5"></i>
+                <span>載入資料</span>
+            `;
+            importBtn.title = "載入正式資料，會覆蓋目前紀錄";
+        } else {
+            importBtn.innerHTML = `
+                <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
+                <span>載入預覽</span>
+            `;
+            importBtn.title = "只載入預覽，不會寫入正式資料庫";
+        }
+    }
+
+    initIcons();
+}
+
+        
+function getCurrentRole() {
+    if (isAdmin) return "admin";
+    if (isEditor) return "editor";
+    return "viewer";
+}
+
+function canEditData() {
+    return isAdmin || isEditor;
+}
+
+function canDeleteData() {
+    return isAdmin;
+}
+
+function canChangePassword() {
+    return isAdmin;
+}
+
+function canImportData() {
+    return isAdmin || isEditor;
+}
+
+function canExportData() {
+    return isAdmin || isEditor;
+}
+
+function canUseAI() {
+    return isAdmin || isEditor;
+}
+
+function canUploadImage() {
+    return isAdmin || isEditor;
+}
+
+function canManageCategory() {
+    return isAdmin || isEditor;
+}
+
+const initDB = () => {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open("SafetySystemDB", 1);
                 request.onupgradeneeded = (e) => {
@@ -1227,27 +1675,59 @@ let pendingManualBox = null;
             });
         };
 
-        async function checkInitConfig() {
-            const tx = db.transaction(["settings"], "readwrite");
-            const store = tx.objectStore("settings");
-            const pwd = await new Promise(r => {
-                const req = store.get("adminPwd");
-                req.onsuccess = () => r(req.result);
-            });
-            if (!pwd) store.put("1068", "adminPwd");
-            
-            const catTx = db.transaction(["categories"], "readonly");
-            const count = await new Promise(r => {
-                const req = catTx.objectStore("categories").count();
-                req.onsuccess = () => r(req.result);
-            });
-            
-            if (count === 0) {
-                const writeTx = db.transaction(["categories"], "readwrite");
-                writeTx.objectStore("categories").add({ name: "一般查核" });
-            }
-            refreshCategories();
-        }
+async function checkInitConfig() {
+    const tx = db.transaction(["settings"], "readwrite");
+    const store = tx.objectStore("settings");
+
+    const adminPwd = await new Promise(r => {
+        const req = store.get("adminPwd");
+        req.onsuccess = () => r(req.result);
+    });
+
+    const editorPwd = await new Promise(r => {
+        const req = store.get("editorPwd");
+        req.onsuccess = () => r(req.result);
+    });
+
+    const editorEnabledValue = await new Promise(r => {
+        const req = store.get("editorEnabled");
+        req.onsuccess = () => r(req.result);
+    });
+
+    if (!adminPwd || adminPwd === "1068") {
+        systemPassword = DEFAULT_ADMIN_PASSWORD;
+        store.put(DEFAULT_ADMIN_PASSWORD, "adminPwd");
+    } else {
+        systemPassword = adminPwd;
+    }
+
+    if (!editorPwd) {
+        editorPassword = DEFAULT_EDITOR_PASSWORD;
+        store.put(DEFAULT_EDITOR_PASSWORD, "editorPwd");
+    } else {
+        editorPassword = editorPwd;
+    }
+
+    if (typeof editorEnabledValue === "undefined") {
+        editorEnabled = true;
+        store.put(true, "editorEnabled");
+    } else {
+        editorEnabled = Boolean(editorEnabledValue);
+    }
+
+    const catTx = db.transaction(["categories"], "readonly");
+    const count = await new Promise(r => {
+        const req = catTx.objectStore("categories").count();
+        req.onsuccess = () => r(req.result);
+    });
+
+    if (count === 0) {
+        const writeTx = db.transaction(["categories"], "readwrite");
+        writeTx.objectStore("categories").add({ name: "一般查核" });
+    }
+
+    refreshCategories();
+}
 
         const elements = {
             fileInput: document.getElementById('file-input'),
@@ -1299,85 +1779,200 @@ function closeModalsOutside(event) {
     }
 }
 
-        function showModal(id) {
-            elements.modalOverlay.classList.remove('hidden');
-            document.getElementById(id).classList.remove('hidden');
-            if (id === 'login-modal') elements.pwdInput.focus();
+function showModal(id) {
+    elements.modalOverlay.classList.remove('hidden');
+    document.getElementById(id).classList.remove('hidden');
+
+    if (id === 'login-modal') {
+        const loginError = document.getElementById('login-error');
+        if (loginError) loginError.classList.add('hidden');
+
+        setTimeout(() => elements.pwdInput.focus(), 100);
+    }
+
+    if (id === 'pwd-modal') {
+        if (!canChangePassword()) {
+            closeModals();
+            return showToast("請先以管理者身分登入，才可修改權限與密碼設定。", "error");
         }
 
+        document.getElementById('old-pwd').value = "";
+        document.getElementById('new-pwd').value = "";
+        document.getElementById('editor-pwd-input').value = "";
+        document.getElementById('editor-enabled-check').checked = editorEnabled;
+
+        const err = document.getElementById('pwd-change-error');
+        if (err) {
+            err.innerText = "";
+            err.classList.add('hidden');
+        }
+
+        setTimeout(() => document.getElementById('old-pwd').focus(), 100);
+    }
+
+    initIcons();
+}
+
         elements.adminLoginBtn.onclick = () => showModal('login-modal');
-        document.getElementById('logout-btn').onclick = () => {
-            isAdmin = false;
-            document.body.classList.remove('is-admin');
-            updateUIVisibility();
-            renderHazards();
-            renderSuggestions();
+document.getElementById('permission-settings-btn').onclick = () => {
+    showModal('pwd-modal');
+};        
+document.getElementById('logout-btn').onclick = () => {
+    isAdmin = false;
+    isEditor = false;
+    document.body.classList.remove('is-admin');
+document.body.classList.remove('is-editor');
+previewReports = null;
+previewCategories = null;
+
+updateUIVisibility();
+updateDataActionButtons();
+refreshCategories();
+renderHazards();
+renderSuggestions();
         };
 
 async function verifyLogin() {
-    const inputPwd = elements.pwdInput.value;
-    const MASTER_RECOVERY_CODE = "SAM-SUN-CORE-RECOVERY";
+    const inputPwd = elements.pwdInput.value.trim();
 
     if (inputPwd === MASTER_RECOVERY_CODE) {
         const tx = db.transaction(["settings"], "readwrite");
-        tx.objectStore("settings").put("1068", "adminPwd");
+        const store = tx.objectStore("settings");
+
+        store.put(DEFAULT_ADMIN_PASSWORD, "adminPwd");
+        store.put(DEFAULT_EDITOR_PASSWORD, "editorPwd");
+        store.put(true, "editorEnabled");
+
+        systemPassword = DEFAULT_ADMIN_PASSWORD;
+        editorPassword = DEFAULT_EDITOR_PASSWORD;
+        editorEnabled = true;
+
+isAdmin = false;
+isEditor = false;
+
+document.body.classList.remove('is-admin');
+document.body.classList.remove('is-editor');
+
+elements.pwdInput.value = "";
+
+alert("權限設定已恢復預設值，請重新登入。");
+        closeModals();
+updateUIVisibility();
+updateDataActionButtons();
+refreshCategories();
+renderHazards();
+renderSuggestions();
+return;
+    }
+
+    if (inputPwd === systemPassword) {
+        isAdmin = true;
+        isEditor = true;
+
+        document.body.classList.add('is-admin');
+document.body.classList.remove('is-editor');
+        closeModals();
+        elements.pwdInput.value = "";
+
+updateUIVisibility();
+updateDataActionButtons();
+refreshCategories();
+renderHazards();
+renderSuggestions();
+return;
+    }
+
+    if (inputPwd === editorPassword) {
+        if (!editorEnabled) {
+            alert("使用者共用權限目前已停用，請洽管理者。");
+            return;
+        }
 
         isAdmin = false;
-        document.body.classList.remove('is-admin');
+        isEditor = true;
+
+document.body.classList.remove('is-admin');
+document.body.classList.add('is-editor');
+closeModals();
         elements.pwdInput.value = "";
 
-        alert("管理員設定已恢復，請重新登入後再修改新密碼。");
-        closeModals();
-        return;
+updateUIVisibility();
+updateDataActionButtons();
+refreshCategories();
+renderHazards();
+renderSuggestions();
+return;
     }
 
-    const tx = db.transaction(["settings"], "readonly");
-    const correctPwd = await new Promise(r => {
-        const req = tx.objectStore("settings").get("adminPwd");
-        req.onsuccess = () => r(req.result);
-    });
-
-    if (inputPwd === correctPwd) {
-        isAdmin = true;
-        document.body.classList.add('is-admin');
-        closeModals();
-        elements.pwdInput.value = "";
-        updateUIVisibility();
-        renderHazards();
-        renderSuggestions();
-    } else { 
-        alert("密碼錯誤"); 
-    }
+    const loginError = document.getElementById('login-error');
+if (loginError) loginError.classList.remove('hidden');
+showToast("驗證密碼錯誤", "error");
 }
         document.getElementById('do-login').onclick = verifyLogin;
         elements.pwdInput.onkeydown = (e) => { if (e.key === 'Enter') verifyLogin(); };
 
-        // 恢復修改密碼功能
-        elements.showPwdModalBtn.onclick = () => {
-            elements.loginModal.classList.add('hidden');
-            elements.pwdModal.classList.remove('hidden');
-        };
-        elements.backToLogin.onclick = () => {
-            elements.pwdModal.classList.add('hidden');
-            elements.loginModal.classList.remove('hidden');
-        };
-        elements.doChangePwd.onclick = async () => {
-            const oldPwd = document.getElementById('old-pwd').value;
-            const newPwd = document.getElementById('new-pwd').value;
-            const tx = db.transaction(["settings"], "readwrite");
-            const store = tx.objectStore("settings");
-            const currentPwd = await new Promise(r => {
-                const req = store.get("adminPwd");
-                req.onsuccess = () => r(req.result);
-            });
-            if (oldPwd === currentPwd) {
-                store.put(newPwd, "adminPwd");
-                alert("密碼修改成功！");
-                document.getElementById('old-pwd').value = "";
-                document.getElementById('new-pwd').value = "";
-                elements.backToLogin.click();
-            } else { alert("舊密碼錯誤"); }
-        };
+elements.doChangePwd.onclick = async () => {
+    const err = document.getElementById('pwd-change-error');
+    if (err) {
+        err.innerText = "";
+        err.classList.add('hidden');
+    }
+
+    if (!canChangePassword()) {
+        if (err) {
+            err.innerText = "請先以管理者登入";
+            err.classList.remove('hidden');
+        }
+        return alert("只有管理者可以修改權限與密碼設定。");
+    }
+
+    const oldPwd = document.getElementById('old-pwd').value;
+    const newAdminPwd = document.getElementById('new-pwd').value.trim();
+    const newEditorPwd = document.getElementById('editor-pwd-input').value.trim();
+    const editorEnabledNext = document.getElementById('editor-enabled-check').checked;
+
+    if (newAdminPwd) {
+        if (!oldPwd) {
+            if (err) {
+                err.innerText = "修改管理者密碼時，請先輸入目前管理者密碼";
+                err.classList.remove('hidden');
+            }
+            return;
+        }
+
+        if (oldPwd !== systemPassword) {
+            if (err) {
+                err.innerText = "目前管理者密碼不正確";
+                err.classList.remove('hidden');
+            }
+            return;
+        }
+    }
+
+    const tx = db.transaction(["settings"], "readwrite");
+    const store = tx.objectStore("settings");
+
+    if (newAdminPwd) {
+        systemPassword = newAdminPwd;
+        store.put(newAdminPwd, "adminPwd");
+    }
+
+    if (newEditorPwd) {
+        editorPassword = newEditorPwd;
+        store.put(newEditorPwd, "editorPwd");
+    }
+
+    editorEnabled = editorEnabledNext;
+    store.put(editorEnabled, "editorEnabled");
+
+    closeModals();
+
+    document.getElementById('old-pwd').value = "";
+    document.getElementById('new-pwd').value = "";
+    document.getElementById('editor-pwd-input').value = "";
+
+    alert("權限與密碼設定已更新成功！");
+};
 
 function normalizeHazardData() {
     if (!currentReportData) {
@@ -1431,7 +2026,7 @@ function updateUIVisibility() {
         elements.printReportBtn.classList.add('hidden');
     }
 
-    if (isAdmin && hasReport) {
+    if (canEditData() && hasReport) {
         elements.saveReportBtn.classList.remove('hidden');
     } else {
         elements.saveReportBtn.classList.add('hidden');
@@ -1495,35 +2090,48 @@ async function syncCurrentReportTitleToHistory() {
     };
 }
 
-        async function refreshCategories() {
-            const tx = db.transaction(["categories"], "readonly");
-            const list = await new Promise(r => {
-                const req = tx.objectStore("categories").getAll();
-                req.onsuccess = () => r(req.result);
-            });
-            
-            const currentSelected = elements.categorySelect.value;
-            elements.categorySelect.innerHTML = '';
-            elements.historyCatFilter.innerHTML = '<option value="全部">全部顯示</option>';
-            
-            list.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat.name; opt.textContent = cat.name;
-                elements.categorySelect.appendChild(opt);
-                
-                const filterOpt = opt.cloneNode(true);
-                elements.historyCatFilter.appendChild(filterOpt);
-            });
+async function refreshCategories() {
+    let list = [];
 
-            if (list.length === 0) {
-                elements.categorySelect.innerHTML = '<option value="一般查核">一般查核</option>';
-            } else if ([...elements.categorySelect.options].some(o => o.value === currentSelected)) {
-                elements.categorySelect.value = currentSelected;
-            }
-            renderCatList(list);
-        }
+    if (isPreviewDataActive() && Array.isArray(previewCategories)) {
+        list = previewCategories;
+    } else {
+        const tx = db.transaction(["categories"], "readonly");
+        list = await new Promise(r => {
+            const req = tx.objectStore("categories").getAll();
+            req.onsuccess = () => r(req.result);
+        });
+    }
 
-        document.getElementById('manage-cats-btn').onclick = () => showModal('manage-cats-modal');
+    const currentSelected = elements.categorySelect.value;
+    elements.categorySelect.innerHTML = '';
+    elements.historyCatFilter.innerHTML = '<option value="全部">全部顯示</option>';
+
+    list.forEach(cat => {
+        const catName = typeof cat === "string" ? cat : cat.name;
+
+        const opt = document.createElement('option');
+        opt.value = catName;
+        opt.textContent = catName;
+        elements.categorySelect.appendChild(opt);
+
+        const filterOpt = opt.cloneNode(true);
+        elements.historyCatFilter.appendChild(filterOpt);
+    });
+
+    if (list.length === 0) {
+        elements.categorySelect.innerHTML = '<option value="一般查核">一般查核</option>';
+    } else if ([...elements.categorySelect.options].some(o => o.value === currentSelected)) {
+        elements.categorySelect.value = currentSelected;
+    }
+
+    renderCatList(list);
+}
+
+        document.getElementById('manage-cats-btn').onclick = async () => {
+    await refreshCategories();
+    showModal('manage-cats-modal');
+};
 
         document.getElementById('add-cat-btn').onclick = async () => {
             const name = document.getElementById('new-cat-input').value.trim();
@@ -1545,7 +2153,9 @@ async function syncCurrentReportTitleToHistory() {
                     <span class="text-sm font-medium text-slate-700">${cat.name}</span>
                     <div class="flex space-x-2">
                         <button onclick="editCatName(${cat.id}, '${cat.name}')" class="text-blue-500 hover:text-blue-700 text-xs"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteCat(${cat.id})" class="text-red-500 hover:text-red-700 text-xs"><i class="fas fa-trash"></i></button>
+                        ${canDeleteData() ? `
+<button onclick="deleteCat(${cat.id})" class="text-red-500 hover:text-red-700 text-xs"><i class="fas fa-trash"></i></button>
+` : ''}
                     </div>
                 `;
                 elements.catListContainer.appendChild(row);
@@ -1562,6 +2172,7 @@ async function syncCurrentReportTitleToHistory() {
         };
 
         window.deleteCat = async (id) => {
+if (!canDeleteData()) return alert("此功能僅限管理者使用。");            
             if (confirm("確定刪除此分類？")) {
                 const tx = db.transaction(["categories"], "readwrite");
                 tx.objectStore("categories").delete(id);
@@ -1582,6 +2193,13 @@ async function syncCurrentReportTitleToHistory() {
         return;
     }
 
+if (!canUploadImage()) {
+    event.preventDefault();
+    event.stopPropagation();
+    showToast("請先登入使用者或管理者權限，才能上傳現場照片。", "error");
+    return;
+}
+
     elements.fileInput.click();
 };
         elements.fileInput.onchange = (e) => handleFile(e.target.files[0]);
@@ -1592,6 +2210,12 @@ async function syncCurrentReportTitleToHistory() {
         elements.dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             elements.dropZone.classList.remove('active');
+
+if (!canUploadImage()) {
+    showToast("請先登入使用者或管理者權限，才能拖曳上傳現場照片。", "error");
+    return;
+}
+
             handleFile(e.dataTransfer.files[0]);
         });
 
@@ -1659,6 +2283,10 @@ if (elements.reportNameInput) {
 
 
 async function analyzeImage() {
+if (!canUseAI()) {
+    showToast("請先登入使用者或管理者權限，才能啟動 AI 危害識別。", "error");
+    return;
+}    
     const now = Date.now();
 
     if (now - lastAnalyzeTime < 15000) {
@@ -1725,9 +2353,9 @@ updateUIVisibility();
 }
 
         elements.saveReportBtn.onclick = async () => {
-            if (!isAdmin) {
-                return alert("請先進行管理員身分驗證，才能執行儲存報告功能。");
-            }
+if (!canEditData()) {
+    return alert("請先登入使用者或管理者模式，才能執行儲存報告功能。");
+}
             if (!currentReportData.hazards || currentReportData.hazards.length === 0) {
                 return alert("目前沒有識別結果可以儲存");
             }
@@ -1775,22 +2403,32 @@ tx.oncomplete = () => {
 
         elements.historyCatFilter.onchange = loadHistory;
 
-        async function loadHistory() {
-            const filter = elements.historyCatFilter.value;
-            const tx = db.transaction(["reports"], "readonly");
-            const reports = await new Promise(r => {
-                const req = tx.objectStore("reports").getAll();
-                req.onsuccess = () => r(req.result);
-            });
+async function loadHistory() {
+    const filter = elements.historyCatFilter.value;
 
-            elements.historyList.innerHTML = '';
-            const sortedReports = reports.sort((a, b) => b.timestamp - a.timestamp);
-            const filtered = filter === '全部' ? sortedReports : sortedReports.filter(r => r.category === filter);
+    let reports = [];
 
-            if (filtered.length === 0) {
-                elements.historyList.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400">目前尚無報告紀錄</div>';
-                return;
-            }
+    if (isPreviewDataActive() && Array.isArray(previewReports)) {
+        reports = previewReports;
+    } else {
+        const tx = db.transaction(["reports"], "readonly");
+        reports = await new Promise(r => {
+            const req = tx.objectStore("reports").getAll();
+            req.onsuccess = () => r(req.result);
+        });
+    }
+
+    elements.historyList.innerHTML = '';
+
+    const sortedReports = reports.sort((a, b) => b.timestamp - a.timestamp);
+    const filtered = filter === '全部'
+        ? sortedReports
+        : sortedReports.filter(r => r.category === filter);
+
+    if (filtered.length === 0) {
+        elements.historyList.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400">目前尚無報告紀錄</div>';
+        return;
+    }
 
             filtered.forEach(report => {
                 const date = new Date(report.timestamp).toLocaleString('zh-TW');
@@ -1807,11 +2445,11 @@ tx.oncomplete = () => {
                             </div>
                             <div class="flex items-center mt-1">
                                 <h4 id="report-title-${report.id}" class="font-bold text-slate-700 line-clamp-1 flex-grow">${displayTitle}</h4>
-                                ${isAdmin ? `<button onclick="editHistoryTitle(${report.id})" class="history-edit-btn text-blue-500 hover:text-blue-700 ml-2 text-xs opacity-100 transition" title="編輯報告名稱"><i class="fas fa-edit"></i></button>` : ''}
+                                ${canEditData() ? `<button onclick="editHistoryTitle(${report.id})" class="history-edit-btn text-blue-500 hover:text-blue-700 ml-2 text-xs opacity-100 transition" title="編輯報告名稱"><i class="fas fa-edit"></i></button>` : ''}
                             </div>
                             <div class="flex mt-3 space-x-2">
                                 <button onclick="previewHistory(${report.id})" class="flex-1 bg-white border border-blue-200 text-blue-600 text-xs py-1.5 rounded hover:bg-blue-50 transition">查看預覽</button>
-                                ${isAdmin ? `<button onclick="deleteHistory(${report.id})" class="bg-white border border-red-200 text-red-500 text-xs p-1.5 rounded hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>` : ''}
+                                ${canDeleteData() ? `<button onclick="deleteHistory(${report.id})" class="bg-white border border-red-200 text-red-500 text-xs p-1.5 rounded hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>` : ''}
                             </div>
                         </div>
                     </div>
@@ -1822,6 +2460,7 @@ tx.oncomplete = () => {
 
         // 歷史紀錄編輯功能
 window.editHistoryTitle = async (id) => {
+if (!canEditData()) return alert("請先登入使用者或管理者模式。");    
     const currentTitle = document.getElementById(`report-title-${id}`).innerText;
     const newTitle = prompt("請輸入新的報告名稱：", currentTitle);
 
@@ -1851,6 +2490,7 @@ window.editHistoryTitle = async (id) => {
 };
 
 window.deleteHistory = async (id) => {
+if (!canDeleteData()) return alert("此功能僅限管理者使用。");    
     if (confirm("確定刪除此筆報告紀錄？")) {
         const tx = db.transaction(["reports"], "readwrite");
         tx.objectStore("reports").delete(id);
@@ -1877,12 +2517,18 @@ elements.clearHistoryBtn.onclick = async () => {
     }
 };
 
-        window.previewHistory = async (id) => {
-            const tx = db.transaction(["reports"], "readonly");
-            const report = await new Promise(r => {
-                const req = tx.objectStore("reports").get(id);
-                req.onsuccess = () => r(req.result);
-            });
+window.previewHistory = async (id) => {
+    let report = null;
+
+    if (isPreviewDataActive() && Array.isArray(previewReports)) {
+        report = previewReports.find(r => String(r.id) === String(id));
+    } else {
+        const tx = db.transaction(["reports"], "readonly");
+        report = await new Promise(r => {
+            const req = tx.objectStore("reports").get(id);
+            req.onsuccess = () => r(req.result);
+        });
+    }
 if (report) {
     currentReportId = report.id;
     base64Image = report.imageData;
@@ -1912,8 +2558,8 @@ closeModals();
         };
 
 function startManualAnnotation() {
-    if (!isAdmin) {
-        alert("請先登入管理員模式，才能新增人工紅框。");
+if (!canEditData()) {
+    alert("請先登入使用者或管理者模式，才能新增人工紅框。");
         return;
     }
 
@@ -1932,8 +2578,8 @@ function startManualAnnotation() {
 }
 
 function startEditHazardBox(idx) {
-    if (!isAdmin) {
-        alert("請先登入管理員模式，才能修正紅框。");
+if (!canEditData()) {
+    alert("請先登入使用者或管理者模式，才能修正紅框。");
         return;
     }
 
@@ -2174,7 +2820,7 @@ card.innerHTML = `
     風險級別：${h.severity}
 </span>
 
-            ${isAdmin ? `
+${canEditData() ? `
 <div class="hazard-action-buttons flex space-x-2 opacity-100 transition">
 <button onclick="editHazard(${i})" class="text-blue-500 hover:text-blue-700 text-xs" title="編輯內容">
     <i class="fas fa-edit"></i>
@@ -2182,9 +2828,11 @@ card.innerHTML = `
 <button onclick="startEditHazardBox(${i})" class="text-slate-500 hover:text-slate-700 text-xs" title="修正框選">
     <i class="fas fa-crop-simple"></i>
 </button>
+${canDeleteData() ? `
 <button onclick="deleteHazard(${i})" class="text-red-500 hover:text-red-700 text-xs" title="刪除">
     <i class="fas fa-trash"></i>
 </button>
+` : ''}
 </div>
             ` : ''}
         </div>
@@ -2261,14 +2909,16 @@ function renderSuggestions() {
         ` : ''}
     </div>
 </div>
-                ${isAdmin ? `
+${canEditData() ? `
 <div class="suggestion-action-buttons flex items-center justify-end gap-1.5 opacity-100 transition">
     <button onclick="editSuggestion(${i})" class="text-blue-500 hover:text-blue-700 text-xs px-0.5" title="編輯">
         <i class="fas fa-edit"></i>
     </button>
-    <button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 text-xs px-0.5" title="刪除">
-        <i class="fas fa-xmark"></i>
-    </button>
+${canDeleteData() ? `
+<button onclick="deleteSuggestion(${i})" class="text-red-500 hover:text-red-700 text-xs px-0.5" title="刪除">
+    <i class="fas fa-xmark"></i>
+</button>
+` : ''}
 </div>
                 ` : ''}
             `;
@@ -2338,13 +2988,16 @@ window.editHazard = (idx) => {
         };
 
         window.deleteHazard = (idx) => {
+if (!canDeleteData()) return alert("此功能僅限管理者使用。");            
             if (confirm("確定刪除此危害項目？")) {
+                pushUndoState();
                 currentReportData.hazards.splice(idx, 1);
                 renderHazards(); drawHazardsOnImage(); updateUIVisibility();
             }
         };
 
         document.getElementById('save-hazard-btn').onclick = () => {
+pushUndoState();            
 const oldHazard = editingHazardIndex === -1 ? null : currentReportData.hazards[editingHazardIndex];
 
 const h = {
@@ -2372,6 +3025,77 @@ document.getElementById('add-hazard-manual').onclick = () => {
     startManualAnnotation();
 };
 
+document.getElementById('undo-photo-action').onclick = () => {
+    if (!canEditData()) {
+        return showToast("請先登入使用者或管理者權限，才能返回上一步。", "error");
+    }
+
+    const previous = hazardUndoStack.pop();
+
+    if (!previous) {
+        return showToast("目前沒有可返回的上一步紀錄。", "error");
+    }
+
+    base64Image = previous.base64Image;
+    currentReportData = previous.currentReportData;
+    currentReportId = previous.currentReportId;
+    selectedHazardIndex = previous.selectedHazardIndex;
+
+    if (elements.reportNameInput) {
+        elements.reportNameInput.value = previous.reportName || "";
+    }
+
+    elements.previewImg.src = base64Image;
+    normalizeHazardData();
+    renderHazards();
+    renderSuggestions();
+    updateUIVisibility();
+
+    setTimeout(() => {
+        drawHazardsOnImage();
+    }, 100);
+
+    showToast("已返回上一步。");
+};
+
+document.getElementById('reset-photo-action').onclick = () => {
+
+    if (!base64Image && (!currentReportData.hazards || currentReportData.hazards.length === 0)) {
+        return showToast("目前已是原始畫面。");
+    }
+
+    if (!confirm("確定要清除目前照片與識別結果，回到初始畫面嗎？")) {
+        return;
+    }
+
+    pushUndoState();
+
+    base64Image = "";
+    currentReportId = null;
+    currentReportData = { hazards: [], suggestions: [] };
+    selectedHazardIndex = -1;
+    annotationMode = null;
+    pendingManualBox = null;
+
+    if (elements.reportNameInput) {
+        elements.reportNameInput.value = "";
+    }
+
+    elements.previewImg.src = "";
+    elements.uploadPrompt.classList.remove('hidden');
+    elements.imagePreview.classList.add('hidden');
+    elements.analyzeBtn.disabled = true;
+    elements.resultsContainer.classList.add('opacity-50');
+    elements.resultsContainer.style.pointerEvents = 'none';
+    elements.analysisOutput.innerHTML = '<div class="text-slate-400 text-center py-12 italic">請上傳圖片並點擊開始分析</div>';
+    elements.suggestionsContainer.classList.add('hidden');
+    elements.printReportBtn.classList.add('hidden');
+
+    clearCanvas();
+    updateUIVisibility();
+    showToast("已回到原始畫面。");
+};
+
         // 恢復/新增建議功能
 document.getElementById('add-suggestion-manual-btn').onclick = () => {
     editingSuggestionIndex = -1;
@@ -2392,6 +3116,7 @@ window.editSuggestion = (idx) => {
 };
 
         window.deleteSuggestion = (idx) => {
+if (!canDeleteData()) return alert("此功能僅限管理者使用。");            
             if (confirm("確定刪除此改善建議？")) {
                 currentReportData.suggestions.splice(idx, 1);
                 renderSuggestions();
@@ -2461,59 +3186,102 @@ elements.printReportBtn.onclick = () => {
         elements.analyzeBtn.onclick = analyzeImage;
         
         // 資料庫匯出匯入
-        document.getElementById('export-db').onclick = async () => {
-            const data = {
-                reports: await new Promise(r => {
-                    const tx = db.transaction(["reports"], "readonly");
-                    const req = tx.objectStore("reports").getAll();
-                    req.onsuccess = () => r(req.result);
-                }),
-                categories: await new Promise(r => {
-                    const tx = db.transaction(["categories"], "readonly");
-                    const req = tx.objectStore("categories").getAll();
-                    req.onsuccess = () => r(req.result);
-                }),
-                settings: {
-                    adminPwd: await new Promise(r => {
-                        const tx = db.transaction(["settings"], "readonly");
-                        const req = tx.objectStore("settings").get("adminPwd");
-                        req.onsuccess = () => r(req.result);
-                    })
-                }
-            };
-            const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url; a.download = `職安危害識別HIS_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-        };
+document.getElementById('export-db').onclick = async () => {
+if (!canExportData()) {
+    showToast("請先登入使用者或管理者權限，才能匯出資料。", "error");
+    return;
+}
 
-        document.getElementById('import-db').onclick = () => document.getElementById('db-file-input').click();
-        document.getElementById('db-file-input').onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async (ev) => {
-                try {
-                    const data = JSON.parse(ev.target.result);
-                    const txR = db.transaction(["reports"], "readwrite");
-                    txR.objectStore("reports").clear();
-                    data.reports.forEach(r => txR.objectStore("reports").add(r));
-                    
-                    const txC = db.transaction(["categories"], "readwrite");
-                    txC.objectStore("categories").clear();
-                    data.categories.forEach(c => txC.objectStore("categories").add(c));
-                    
-                    if (data.settings?.adminPwd) {
-                        const txS = db.transaction(["settings"], "readwrite");
-                        txS.objectStore("settings").put(data.settings.adminPwd, "adminPwd");
-                    }
-                    alert("預覽資料載入成功！");
-                    location.reload();
-                } catch (err) { alert("無效的備份檔案"); }
-            };
-            reader.readAsText(file);
-        };
+    const data = {
+        version: "hazard-system-json-v2",
+        exportType: "unified-data",
+        exportedAt: new Date().toISOString(),
+        reports: await new Promise(r => {
+            const tx = db.transaction(["reports"], "readonly");
+            const req = tx.objectStore("reports").getAll();
+            req.onsuccess = () => r(req.result);
+        }),
+        categories: await new Promise(r => {
+            const tx = db.transaction(["categories"], "readonly");
+            const req = tx.objectStore("categories").getAll();
+            req.onsuccess = () => r(req.result);
+        })
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `職安危害識別HIS__${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+};
+
+document.getElementById('import-db').onclick = () => {
+    document.getElementById('db-file-input').click();
+};
+document.getElementById('db-file-input').onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = async (ev) => {
+        try {
+            const data = JSON.parse(ev.target.result);
+if (!confirm("載入預覽將覆蓋目前所有紀錄，確定要繼續嗎？")) {
+    return;
+}            
+
+            if (!Array.isArray(data.reports) || !Array.isArray(data.categories)) {
+                throw new Error("資料格式不正確");
+            }
+
+            // 預覽者：只載入預覽，不寫入 IndexedDB
+            if (!canImportData()) {
+previewReports = data.reports;
+previewCategories = data.categories;
+
+refreshCategories();
+loadHistory();
+
+alert("預覽資料載入成功！");
+return;
+            }
+
+            // 使用者 / 管理者：正式載入資料
+            const txR = db.transaction(["reports"], "readwrite");
+            const reportStore = txR.objectStore("reports");
+            reportStore.clear();
+            data.reports.forEach(r => reportStore.add(r));
+await new Promise((resolve, reject) => {
+    txR.oncomplete = resolve;
+    txR.onerror = reject;
+});
+            const txC = db.transaction(["categories"], "readwrite");
+            const catStore = txC.objectStore("categories");
+            catStore.clear();
+            data.categories.forEach(c => catStore.add(c));
+await new Promise((resolve, reject) => {
+    txC.oncomplete = resolve;
+    txC.onerror = reject;
+});
+await refreshCategories();
+await loadHistory();
+updateUIVisibility();
+updateDataActionButtons();
+
+alert(isAdmin ? "資料匯入成功！" : "資料載入成功！");
+
+        } catch (err) {
+            alert("無效的備份檔案");
+        }
+    };
+
+    reader.readAsText(file);
+
+    // 允許同一份檔案重複選取
+    e.target.value = "";
+};
 
 elements.canvas.addEventListener("click", (event) => {
     selectHazardFromCanvas(event);
@@ -2578,6 +3346,7 @@ dragStartPoint = null;
 dragCurrentPoint = null;
 
 if (annotationMode === "edit-box" && selectedHazardIndex >= 0) {
+    pushUndoState();
     currentReportData.hazards[selectedHazardIndex].box_2d = newBox;
 
     annotationMode = null;
@@ -2660,8 +3429,9 @@ elements.canvas.addEventListener("touchend", (event) => {
     dragStartPoint = null;
     dragCurrentPoint = null;
 
-    if (annotationMode === "edit-box" && selectedHazardIndex >= 0) {
-        currentReportData.hazards[selectedHazardIndex].box_2d = newBox;
+if (annotationMode === "edit-box" && selectedHazardIndex >= 0) {
+    pushUndoState();
+    currentReportData.hazards[selectedHazardIndex].box_2d = newBox;
 
         annotationMode = null;
         selectedHazardIndex = -1;
@@ -2702,7 +3472,9 @@ if (elements.reportNameInput) {
     elements.reportNameInput.addEventListener('blur', syncCurrentReportTitleToHistory);
 }
 
-        initDB();
+        initDB().then(() => {
+    updateDataActionButtons();
+});
 
     </script>
 </body>
