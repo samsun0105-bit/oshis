@@ -60,6 +60,30 @@
     border-color: #bfdbfe;
 }
 
+#create-inspection-btn:disabled {
+    background: #f8fafc !important;
+    color: #94a3b8 !important;
+    border-color: #e2e8f0 !important;
+    opacity: 0.55;
+    cursor: default !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+#create-inspection-btn:disabled:hover {
+    background: #f8fafc !important;
+    color: #94a3b8 !important;
+    border-color: #e2e8f0 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+#create-inspection-btn:not(:disabled):hover {
+    background: #f0fdf4 !important;
+    color: #15803d !important;
+    border-color: #bbf7d0 !important;
+}
+
         .db-action-btn {
     border: 1px solid #dbe4f0;
     background: #f8fafc;
@@ -134,7 +158,9 @@ body.is-editor #photo-action-tools {
 }
 
 body.is-admin #undo-photo-action.editor-only,
-body.is-editor #undo-photo-action.editor-only {
+body.is-editor #undo-photo-action.editor-only,
+body.is-admin #create-inspection-btn.editor-only,
+body.is-editor #create-inspection-btn.editor-only {
     display: inline-flex;
 }
 
@@ -813,6 +839,110 @@ body.is-admin .suggestion-action-buttons {
     font-weight: 700 !important;
 }
 
+.inspection-document {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 12mm;
+    color: #111827;
+    font-family: "Noto Sans TC", sans-serif;
+}
+
+.inspection-doc-header {
+    border: 2px solid #0f172a;
+}
+
+.inspection-doc-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-align: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #0f172a;
+}
+
+.inspection-doc-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.inspection-doc-meta > div {
+    min-height: 38px;
+    padding: 8px 10px;
+    border-right: 1px solid #0f172a;
+    border-bottom: 1px solid #0f172a;
+    font-size: 12px;
+}
+
+.inspection-doc-meta > div:nth-child(even) {
+    border-right: none;
+}
+
+.inspection-doc-section {
+    margin-top: 12px;
+    border: 1px solid #0f172a;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.inspection-doc-section-title {
+    padding: 7px 10px;
+    background: #e2e8f0;
+    border-bottom: 1px solid #0f172a;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+}
+
+.inspection-doc-section-body {
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.inspection-doc-photo {
+    display: block;
+    width: 100%;
+    max-height: 100mm;
+    object-fit: contain;
+    margin: 0 auto;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+}
+
+.inspection-doc-empty-photo {
+    height: 90mm;
+    border: 1px dashed #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+    background: #f8fafc;
+}
+
+.inspection-doc-field {
+    min-height: 44px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.inspection-doc-signature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid #0f172a;
+}
+
+.inspection-doc-signature-grid > div {
+    min-height: 58px;
+    padding: 8px 10px;
+    border-right: 1px solid #0f172a;
+}
+
+.inspection-doc-signature-grid > div:last-child {
+    border-right: none;
+}
+
 @media print {
     nav,
     footer,
@@ -828,6 +958,7 @@ body.is-admin .suggestion-action-buttons {
 #history-btn,
 #data-backup-panel,
 #manage-cats-btn,
+#create-inspection-btn,
 #photo-action-tools,
 #add-hazard-manual,
 #add-suggestion-manual-btn,
@@ -1185,19 +1316,33 @@ h2 {
             <div class="space-y-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
 <div id="photo-section-title-row" class="flex items-center justify-between mb-4">
-    <h2 class="text-lg font-semibold flex items-center mb-0">
-        <i data-lucide="image-up" class="w-5 h-5 text-blue-500"></i>
-        上傳現場照片
-    </h2>
+
+    <div class="flex items-center gap-2 min-w-0">
+        <h2 class="text-lg font-semibold flex items-center mb-0 whitespace-nowrap">
+            <i data-lucide="image-up" class="w-5 h-5 text-blue-500"></i>
+            上傳現場照片
+        </h2>
+
+        <button
+            id="create-inspection-btn"
+            type="button"
+            class="photo-tool-btn editor-only"
+            title="開立改善單"
+            aria-label="開立改善單"
+            disabled
+        >
+            <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+        </button>
+    </div>
 
     <div id="photo-action-tools" class="flex items-center gap-2">
         <button id="undo-photo-action" class="photo-tool-btn editor-only" title="返回上一步">
             <i data-lucide="undo-2" class="w-4 h-4"></i>
         </button>
 
-<button id="reset-photo-action" class="photo-tool-btn" title="回到原始畫面">
-    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-</button>
+        <button id="reset-photo-action" class="photo-tool-btn" title="回到原始畫面">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        </button>
     </div>
 </div>
                     
@@ -1447,6 +1592,388 @@ h2 {
     </div>
 </div>
 
+<div
+    id="inspection-create-modal"
+    onclick="event.stopPropagation()"
+    class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl scale-in-center hidden overflow-hidden max-h-[90vh] overflow-y-auto"
+>
+    <div class="relative bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-900 px-5 py-4 text-white">
+        <button
+            type="button"
+            onclick="closeModals()"
+            class="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition flex items-center justify-center"
+            title="關閉"
+        >
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+
+        <div class="pr-10">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-300"></i>
+                <h3 class="text-lg font-black tracking-wide">開立缺失改善單</h3>
+            </div>
+
+            <p class="mt-1 text-[11px] text-slate-300 tracking-[0.12em] font-semibold">
+                CORRECTIVE ACTION NOTICE
+            </p>
+        </div>
+    </div>
+
+    <div class="p-5 space-y-5">
+        <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+            <p class="text-sm font-black text-emerald-800">
+                將目前危害識別結果轉為正式缺失改善文件
+            </p>
+            <p class="text-xs text-emerald-700 mt-1 leading-relaxed">
+                現場照片、危害項目、法源依據及改善建議將自動帶入。
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    案件編號
+                </label>
+                <input
+                    id="inspection-case-no"
+                    type="text"
+                    class="w-full p-2.5 border rounded bg-slate-100 text-sm font-bold"
+                    readonly
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    稽查日期
+                </label>
+                <input
+                    id="inspection-date"
+                    type="date"
+                    class="w-full p-2.5 border rounded text-sm"
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    年度資料夾
+                </label>
+                <input
+                    id="inspection-year"
+                    type="text"
+                    class="w-full p-2.5 border rounded bg-slate-100 text-sm font-bold"
+                    readonly
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    區域位置
+                </label>
+                <input
+                    id="inspection-area"
+                    type="text"
+                    class="w-full p-2.5 border rounded text-sm"
+                    placeholder="例如：第一廠區／配電室"
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    受稽查單位
+                </label>
+                <input
+                    id="inspection-unit"
+                    type="text"
+                    class="w-full p-2.5 border rounded text-sm"
+                    placeholder="請輸入受稽查單位"
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    稽查人員
+                </label>
+                <input
+                    id="inspection-inspector"
+                    type="text"
+                    class="w-full p-2.5 border rounded text-sm"
+                    placeholder="請輸入稽查人員"
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    改善期限
+                </label>
+                <input
+                    id="inspection-due-date"
+                    type="date"
+                    class="w-full p-2.5 border rounded text-sm"
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    改善單標題
+                </label>
+                <input
+                    id="inspection-title"
+                    type="text"
+                    class="w-full p-2.5 border rounded text-sm"
+                    placeholder="例如：配電室電氣缺失改善"
+                >
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <h4 class="text-xs font-black text-slate-700 mb-3">
+                目前帶入內容
+            </h4>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                <div class="bg-white rounded-lg border border-slate-200 p-3">
+                    <div id="inspection-photo-count" class="text-lg font-black text-slate-800">0</div>
+                    <div class="text-[10px] text-slate-500">現場照片</div>
+                </div>
+
+                <div class="bg-white rounded-lg border border-slate-200 p-3">
+                    <div id="inspection-hazard-count" class="text-lg font-black text-red-700">0</div>
+                    <div class="text-[10px] text-slate-500">危害項目</div>
+                </div>
+
+                <div class="bg-white rounded-lg border border-slate-200 p-3">
+                    <div id="inspection-law-count" class="text-lg font-black text-blue-700">0</div>
+                    <div class="text-[10px] text-slate-500">法源依據</div>
+                </div>
+
+                <div class="bg-white rounded-lg border border-slate-200 p-3">
+                    <div id="inspection-suggestion-count" class="text-lg font-black text-emerald-700">0</div>
+                    <div class="text-[10px] text-slate-500">改善建議</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button
+                type="button"
+                onclick="closeModals()"
+                class="flex-1 bg-slate-100 text-slate-600 py-2.5 rounded-xl font-bold hover:bg-slate-200 transition text-sm"
+            >
+                取消
+            </button>
+
+            <button
+                id="preview-inspection-btn"
+                type="button"
+                class="flex-[2] bg-emerald-600 text-white py-2.5 rounded-xl font-black hover:bg-emerald-700 transition text-sm flex items-center justify-center gap-2"
+            >
+                <i data-lucide="file-search" class="w-4 h-4"></i>
+                預覽改善單
+            </button>
+        </div>
+    </div>
+</div>
+<div
+    id="inspection-preview-modal"
+    onclick="event.stopPropagation()"
+    class="bg-white w-full max-w-5xl rounded-2xl shadow-2xl scale-in-center hidden overflow-hidden max-h-[94vh] flex flex-col"
+>
+    <div class="relative bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-900 px-5 py-4 text-white shrink-0">
+        <button
+            type="button"
+            onclick="closeModals()"
+            class="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition flex items-center justify-center"
+            title="關閉"
+        >
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+
+        <div class="pr-10">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-300"></i>
+                <h3 class="text-lg font-black tracking-wide">缺失改善單預覽</h3>
+            </div>
+
+            <p class="mt-1 text-[11px] text-slate-300 tracking-[0.12em] font-semibold">
+                CORRECTIVE ACTION NOTICE PREVIEW
+            </p>
+        </div>
+    </div>
+
+<div class="bg-slate-100 px-4 py-3 border-b border-slate-200 shrink-0">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+
+        <button
+            id="back-to-inspection-edit-btn"
+            type="button"
+            class="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-2 rounded-lg hover:bg-slate-50 flex items-center gap-1.5"
+        >
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            返回編輯
+        </button>
+
+<div class="flex items-center gap-2">
+    <button
+        id="inspection-attachments-btn"
+        type="button"
+        class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-lg hover:bg-emerald-100 flex items-center gap-1.5"
+    >
+        <i data-lucide="paperclip" class="w-4 h-4"></i>
+        改善回覆
+    </button>
+
+    <button
+        id="save-inspection-btn"
+        type="button"
+        class="text-xs font-bold text-white bg-emerald-600 px-3 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-1.5"
+    >
+        <i data-lucide="save" class="w-4 h-4"></i>
+        儲存改善單
+    </button>
+
+    <button
+        id="print-inspection-preview-btn"
+        type="button"
+        class="text-xs font-bold text-white bg-slate-800 px-3 py-2 rounded-lg hover:bg-slate-700 flex items-center gap-1.5"
+    >
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        列印改善單
+    </button>
+</div>
+
+    </div>
+</div>
+
+<div class="overflow-auto bg-slate-200 p-4 md:p-6">
+        <article
+            id="inspection-document-preview"
+            class="inspection-document bg-white mx-auto shadow-xl"
+        ></article>
+    </div>
+</div>
+<div
+    id="inspection-attachments-modal"
+    onclick="event.stopPropagation()"
+    class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl scale-in-center hidden overflow-hidden max-h-[90vh] flex flex-col"
+>
+    <div class="relative bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-900 px-5 py-4 text-white shrink-0">
+        <button
+            type="button"
+            onclick="closeModals()"
+            class="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white flex items-center justify-center"
+            title="關閉"
+        >
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+
+        <div class="pr-10">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="folder-paperclip" class="w-5 h-5 text-emerald-300"></i>
+                <h3 class="text-lg font-black tracking-wide">
+                    改善回覆附件
+                </h3>
+            </div>
+
+            <p class="mt-1 text-[11px] text-slate-300 tracking-[0.12em] font-semibold">
+                CORRECTIVE ACTION ATTACHMENTS
+            </p>
+        </div>
+    </div>
+
+    <div class="p-5 overflow-y-auto">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4">
+            <div class="text-xs text-slate-500">
+                案件編號
+            </div>
+
+            <div
+                id="attachment-case-no"
+                class="text-sm font-black text-slate-800 mt-1"
+            >
+                -
+            </div>
+
+            <div
+                id="attachment-case-title"
+                class="text-xs text-slate-500 mt-1"
+            >
+                -
+            </div>
+        </div>
+
+        <div
+            id="attachment-upload-panel"
+            class="editor-only rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-4"
+        >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">
+                        附件類型
+                    </label>
+
+                    <select
+                        id="attachment-type"
+                        class="w-full p-2.5 border rounded text-sm"
+                    >
+                        <option value="單位改善回覆">單位改善回覆</option>
+                        <option value="改善後照片">改善後照片</option>
+                        <option value="主管簽核文件">主管簽核文件</option>
+                        <option value="其他佐證資料">其他佐證資料</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">
+                        選擇檔案
+                    </label>
+
+                    <input
+                        id="inspection-attachment-file"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                        class="w-full p-2 border rounded text-sm bg-white"
+                    >
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <label class="block text-xs font-bold text-slate-600 mb-1">
+                    附件說明
+                </label>
+
+                <input
+                    id="attachment-note"
+                    type="text"
+                    class="w-full p-2.5 border rounded text-sm"
+                    placeholder="例如：設備課改善完成回覆"
+                >
+            </div>
+
+            <button
+                id="upload-inspection-attachment-btn"
+                type="button"
+                class="mt-3 w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm font-black hover:bg-emerald-700 flex items-center justify-center gap-2"
+            >
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                上傳改善回覆
+            </button>
+        </div>
+
+        <div>
+            <h4 class="text-sm font-black text-slate-700 mb-3 flex items-center gap-2">
+                <i data-lucide="files" class="w-4 h-4"></i>
+                已上傳附件
+            </h4>
+
+            <div
+                id="inspection-attachment-list"
+                class="space-y-2"
+            >
+                <div class="text-center text-slate-400 text-sm py-8">
+                    目前尚無附件
+                </div>
+            </div>
+        </div>
         <div id="edit-hazard-modal" class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl hidden">
             <h3 id="hazard-modal-title" class="font-bold mb-4">編輯危害項目</h3>
             <div class="space-y-3">
@@ -1502,28 +2029,108 @@ h2 {
                 <button id="add-cat-btn" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold">新增</button>
             </div>
             <div id="cat-list-container" class="max-h-60 overflow-y-auto border rounded divide-y"></div>
-            <div class="mt-6">
-                <button onclick="closeModals()" class="w-full bg-slate-200 py-2 rounded">關閉</button>
-            </div>
+<div class="mt-6">
+    <button
+        onclick="closeModals()"
+        class="w-full bg-slate-200 py-2 rounded"
+    >
+        關閉
+    </button>
+</div>
+
+</div>
+
+<div
+    id="history-modal"
+    class="bg-white p-6 rounded-xl w-full max-w-5xl shadow-2xl hidden flex flex-col max-h-[90vh]"
+>
+    <h3 class="font-bold mb-4 text-xl flex items-center justify-between">
+        <span>
+            <i class="fas fa-history mr-2 text-blue-600"></i>
+            歷史報告清單
+        </span>
+
+        <button
+            onclick="closeModals()"
+            class="text-slate-400 hover:text-slate-600"
+            title="關閉"
+        >
+            <i class="fas fa-times"></i>
+        </button>
+    </h3>
+
+    <div class="grid grid-cols-2 gap-2 mb-4 bg-slate-100 p-1 rounded-xl">
+        <button
+            id="history-hazard-tab"
+            type="button"
+            class="history-tab-btn bg-white text-blue-700 shadow-sm py-2 rounded-lg text-xs font-black"
+        >
+            <i data-lucide="shield-alert" class="w-4 h-4 inline-block mr-1"></i>
+            危害識別報告
+        </button>
+
+        <button
+            id="history-inspection-tab"
+            type="button"
+            class="history-tab-btn text-slate-500 py-2 rounded-lg text-xs font-black"
+        >
+            <i data-lucide="clipboard-check" class="w-4 h-4 inline-block mr-1"></i>
+            稽查改善報告
+        </button>
+    </div>
+
+    <div id="hazard-history-panel" class="flex flex-col min-h-0 flex-grow">
+        <div class="flex gap-4 mb-4">
+            <select
+                id="history-cat-filter"
+                class="p-2 border rounded text-sm bg-slate-50 flex-grow"
+            >
+                <option value="全部">全部顯示</option>
+            </select>
+
+            <button
+                id="clear-history-btn"
+                class="admin-only text-xs bg-red-50 text-red-600 px-3 py-2 rounded hover:bg-red-100 transition"
+            >
+                清空所有紀錄
+            </button>
         </div>
 
-        <div id="history-modal" class="bg-white p-6 rounded-xl w-full max-w-4xl shadow-2xl hidden flex flex-col max-h-[90vh]">
-            <h3 class="font-bold mb-4 text-xl flex items-center justify-between">
-                <span><i class="fas fa-history mr-2 text-blue-600"></i>歷史報告清單</span>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
-            </h3>
-            <div class="flex gap-4 mb-4">
-                <select id="history-cat-filter" class="p-2 border rounded text-sm bg-slate-50 flex-grow">
-                    <option value="全部">全部顯示</option>
-                </select>
-                <button id="clear-history-btn" class="admin-only text-xs bg-red-50 text-red-600 px-3 py-2 rounded hover:bg-red-100 transition">清空所有紀錄</button>
-            </div>
-            <div id="history-list" class="overflow-y-auto flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 p-1">
-                <!-- 報告卡片動態生成 -->
-            </div>
+        <div
+            id="history-list"
+            class="overflow-y-auto flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 p-1"
+        >
         </div>
     </div>
 
+    <div
+        id="inspection-history-panel"
+        class="hidden flex flex-col min-h-0 flex-grow"
+    >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <select
+                id="inspection-year-filter"
+                class="p-2 border rounded text-sm bg-slate-50"
+            >
+                <option value="全部">全部年度</option>
+            </select>
+
+            <select
+                id="inspection-unit-filter"
+                class="p-2 border rounded text-sm bg-slate-50"
+            >
+                <option value="全部">全部受稽查單位</option>
+            </select>
+        </div>
+
+        <div
+            id="inspection-history-list"
+            class="overflow-y-auto flex-grow space-y-4 p-1"
+        >
+        </div>
+    </div>
+</div>
+</div>
 <div id="toast" class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-[300] bg-white text-slate-900 px-5 py-3 rounded-xl shadow-2xl font-bold flex items-center space-x-3">
     <span id="toast-icon" class="text-green-500">✓</span>
     <span id="toast-msg">操作成功</span>
@@ -1554,6 +2161,7 @@ let pendingManualBox = null;
 let previewReports = null;
 let previewCategories = null;
 let hazardUndoStack = [];
+let currentInspectionDraft = null;
 
 function pushUndoState() {
     if (!currentReportData) return;
@@ -1682,12 +2290,80 @@ function canManageCategory() {
 
 const initDB = () => {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open("SafetySystemDB", 1);
+                const request = indexedDB.open("SafetySystemDB", 3);
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains("settings")) db.createObjectStore("settings");
                     if (!db.objectStoreNames.contains("categories")) db.createObjectStore("categories", { keyPath: "id", autoIncrement: true });
                     if (!db.objectStoreNames.contains("reports")) db.createObjectStore("reports", { keyPath: "id", autoIncrement: true });
+if (!db.objectStoreNames.contains("inspectionReports")) {
+    const inspectionStore = db.createObjectStore(
+        "inspectionReports",
+        {
+            keyPath: "id",
+            autoIncrement: true
+        }
+
+if (!db.objectStoreNames.contains("inspectionAttachments")) {
+    const attachmentStore = db.createObjectStore(
+        "inspectionAttachments",
+        {
+            keyPath: "id",
+            autoIncrement: true
+        }
+    );
+
+    attachmentStore.createIndex(
+        "inspectionReportId",
+        "inspectionReportId",
+        {
+            unique: false
+        }
+    );
+
+    attachmentStore.createIndex(
+        "caseNo",
+        "caseNo",
+        {
+            unique: false
+        }
+    );
+
+    attachmentStore.createIndex(
+        "uploadedAt",
+        "uploadedAt",
+        {
+            unique: false
+        }
+    );
+}
+
+    );
+
+    inspectionStore.createIndex(
+        "year",
+        "year",
+        {
+            unique: false
+        }
+    );
+
+    inspectionStore.createIndex(
+        "area",
+        "area",
+        {
+            unique: false
+        }
+    );
+
+    inspectionStore.createIndex(
+        "caseNo",
+        "caseNo",
+        {
+            unique: true
+        }
+    );
+}                    
                 };
                 request.onsuccess = (e) => {
                     db = e.target.result;
@@ -1786,8 +2462,9 @@ printSuggestionsOutput: document.getElementById('print-suggestions-output'),
             pwdModal: document.getElementById('pwd-modal'),
             backToLogin: document.getElementById('back-to-login'),
             doChangePwd: document.getElementById('do-change-pwd'),
-            clearHistoryBtn: document.getElementById('clear-history-btn'),
+clearHistoryBtn: document.getElementById('clear-history-btn'),
 reportNameInput: document.getElementById('report-name-input'),
+createInspectionBtn: document.getElementById('create-inspection-btn'),
         };
 
         function closeModals() {
@@ -2059,6 +2736,930 @@ function updateUIVisibility() {
         elements.reportNameInput.classList.toggle('bg-slate-50', !isAdmin);
         elements.reportNameInput.classList.toggle('bg-white', isAdmin);
     }
+
+if (elements.createInspectionBtn) {
+    const canCreateInspection =
+        canEditData() &&
+        !!base64Image &&
+        Array.isArray(currentReportData.hazards) &&
+        currentReportData.hazards.length > 0;
+
+    elements.createInspectionBtn.disabled = !canCreateInspection;
+}
+
+}
+
+function escapeInspectionHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function formatInspectionDisplayDate(dateValue) {
+    if (!dateValue) return "";
+
+    const parts = dateValue.split("-");
+    if (parts.length !== 3) return dateValue;
+
+    return `${parts[0]} 年 ${parts[1]} 月 ${parts[2]} 日`;
+}
+
+function formatDateInputValue(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+function updateInspectionYearFromDate() {
+    const dateInput = document.getElementById("inspection-date");
+    const yearInput = document.getElementById("inspection-year");
+
+    if (!dateInput || !yearInput) return;
+
+    const dateValue = dateInput.value;
+
+    if (!dateValue) {
+        yearInput.value = "";
+        return;
+    }
+
+    const year = dateValue.split("-")[0];
+    yearInput.value = `${year} 年度`;
+}
+
+function generateTemporaryInspectionNo(dateValue = "") {
+    const year =
+        dateValue && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
+            ? dateValue.split("-")[0]
+            : String(new Date().getFullYear());
+
+    const timestampTail = String(Date.now()).slice(-4);
+
+    return `OSH-INS-${year}-${timestampTail}`;
+}
+
+async function generateFormalInspectionNo(year) {
+    const tx = db.transaction(
+        ["inspectionReports"],
+        "readonly"
+    );
+
+    const store = tx.objectStore("inspectionReports");
+
+    const reports = await new Promise((resolve, reject) => {
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            resolve(request.result || []);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+
+    const yearPrefix = `OSH-INS-${year}-`;
+
+    const usedNumbers = reports
+        .filter(report =>
+            String(report.caseNo || "").startsWith(yearPrefix)
+        )
+        .map(report => {
+            const tail = String(report.caseNo).split("-").pop();
+            return Number(tail);
+        })
+        .filter(number => Number.isInteger(number));
+
+    const nextNumber =
+        usedNumbers.length > 0
+            ? Math.max(...usedNumbers) + 1
+            : 1;
+
+    return `${yearPrefix}${String(nextNumber).padStart(3, "0")}`;
+}
+
+function openInspectionCreateModal() {
+    if (!canEditData()) {
+        return showToast(
+            "請先登入使用者或管理者權限，才能開立改善單。",
+            "error"
+        );
+    }
+
+    if (!base64Image) {
+        return showToast(
+            "請先上傳現場照片。",
+            "error"
+        );
+    }
+
+    if (
+        !Array.isArray(currentReportData.hazards) ||
+        currentReportData.hazards.length === 0
+    ) {
+        return showToast(
+            "請先完成危害識別，再開立改善單。",
+            "error"
+        );
+    }
+
+currentInspectionDraft = null;
+
+    const now = new Date();
+
+const inspectionDateInput =
+    document.getElementById("inspection-date");
+
+inspectionDateInput.value =
+    formatDateInputValue(now);
+
+document.getElementById("inspection-case-no").value =
+    generateTemporaryInspectionNo(inspectionDateInput.value);
+
+updateInspectionYearFromDate();
+
+    document.getElementById("inspection-title").value =
+        getReportTitle();
+
+    document.getElementById("inspection-photo-count").innerText =
+        base64Image ? "1" : "0";
+
+    document.getElementById("inspection-hazard-count").innerText =
+        currentReportData.hazards.length;
+
+    document.getElementById("inspection-law-count").innerText =
+        currentReportData.hazards.filter(h =>
+            String(h.legal_basis || "").trim()
+        ).length;
+
+    document.getElementById("inspection-suggestion-count").innerText =
+        Array.isArray(currentReportData.suggestions)
+            ? currentReportData.suggestions.length
+            : 0;
+
+    showModal("inspection-create-modal");
+}
+
+function fillInspectionFormFromDraft(draft) {
+    if (!draft) return;
+
+    document.getElementById("inspection-case-no").value =
+        draft.caseNo || "";
+
+    document.getElementById("inspection-date").value =
+        draft.inspectionDate || "";
+
+    document.getElementById("inspection-year").value =
+        draft.yearFolder ||
+        (
+            draft.inspectionDate
+                ? `${draft.inspectionDate.split("-")[0]} 年度`
+                : ""
+        );
+
+    document.getElementById("inspection-area").value =
+        draft.area || "";
+
+    document.getElementById("inspection-unit").value =
+        draft.inspectedUnit || "";
+
+    document.getElementById("inspection-inspector").value =
+        draft.inspector || "";
+
+    document.getElementById("inspection-due-date").value =
+        draft.dueDate || "";
+
+    document.getElementById("inspection-title").value =
+        draft.title || "";
+
+    document.getElementById("inspection-photo-count").innerText =
+        draft.beforeImage || draft.annotatedImage ? "1" : "0";
+
+    document.getElementById("inspection-hazard-count").innerText =
+        Array.isArray(draft.hazards)
+            ? draft.hazards.length
+            : 0;
+
+    document.getElementById("inspection-law-count").innerText =
+        Array.isArray(draft.hazards)
+            ? draft.hazards.filter(h =>
+                String(h.legal_basis || "").trim()
+            ).length
+            : 0;
+
+    document.getElementById("inspection-suggestion-count").innerText =
+        Array.isArray(draft.suggestions)
+            ? draft.suggestions.length
+            : 0;
+}
+
+function buildInspectionDraftFromForm() {
+    const caseNo =
+        document.getElementById("inspection-case-no").value.trim();
+
+    const inspectionDate =
+        document.getElementById("inspection-date").value;
+
+    const yearFolder =
+        document.getElementById("inspection-year").value.trim();
+
+    const area =
+        document.getElementById("inspection-area").value.trim();
+
+    const inspectedUnit =
+        document.getElementById("inspection-unit").value.trim();
+
+    const inspector =
+        document.getElementById("inspection-inspector").value.trim();
+
+    const dueDate =
+        document.getElementById("inspection-due-date").value;
+
+    const title =
+        document.getElementById("inspection-title").value.trim();
+
+    if (!inspectionDate) {
+        showToast("請選擇稽查日期。", "error");
+        return null;
+    }
+
+    if (!area) {
+        showToast("請輸入區域位置。", "error");
+        document.getElementById("inspection-area").focus();
+        return null;
+    }
+
+    if (!inspectedUnit) {
+        showToast("請輸入受稽查單位。", "error");
+        document.getElementById("inspection-unit").focus();
+        return null;
+    }
+
+    if (!inspector) {
+        showToast("請輸入稽查人員。", "error");
+        document.getElementById("inspection-inspector").focus();
+        return null;
+    }
+
+    if (!dueDate) {
+        showToast("請選擇改善期限。", "error");
+        document.getElementById("inspection-due-date").focus();
+        return null;
+    }
+
+    if (dueDate < inspectionDate) {
+    showToast(
+        "改善期限不可早於稽查日期。",
+        "error"
+    );
+
+    document
+        .getElementById("inspection-due-date")
+        .focus();
+
+    return null;
+}
+
+    if (!title) {
+        showToast("請輸入改善單標題。", "error");
+        document.getElementById("inspection-title").focus();
+        return null;
+    }
+
+const existingDraft =
+    currentInspectionDraft &&
+    Number.isInteger(currentInspectionDraft.id)
+        ? currentInspectionDraft
+        : null;
+
+return {
+    id: existingDraft ? existingDraft.id : null,
+    caseNo:
+        existingDraft
+            ? existingDraft.caseNo
+            : caseNo,
+        inspectionDate,
+        yearFolder,
+        area,
+        inspectedUnit,
+        inspector,
+        dueDate,
+        title,
+
+sourceReportId:
+    existingDraft?.sourceReportId ??
+    currentReportId ??
+    null,
+
+sourceReportTitle:
+    existingDraft?.sourceReportTitle ||
+    getReportTitle(),
+
+sourceCategory:
+    existingDraft?.sourceCategory ||
+    elements.categorySelect.value ||
+    "",
+
+beforeImage:
+    existingDraft?.beforeImage ||
+    base64Image,
+
+annotatedImage:
+    existingDraft?.annotatedImage ||
+    createAnnotatedImageForPrint() ||
+    base64Image,
+
+hazards:
+    existingDraft
+        ? JSON.parse(
+            JSON.stringify(existingDraft.hazards || [])
+        )
+        : JSON.parse(
+            JSON.stringify(currentReportData.hazards || [])
+        ),
+
+suggestions:
+    existingDraft
+        ? JSON.parse(
+            JSON.stringify(existingDraft.suggestions || [])
+        )
+        : JSON.parse(
+            JSON.stringify(currentReportData.suggestions || [])
+        ),
+
+status:
+    existingDraft?.status ||
+    "待改善",
+
+createdAt:
+    existingDraft?.createdAt ||
+    Date.now(),
+
+updatedAt:
+    Date.now()
+    };
+}
+
+function renderInspectionDocument(draft) {
+    const preview =
+        document.getElementById("inspection-document-preview");
+
+    if (!preview || !draft) return;
+
+    const hazardRows = draft.hazards.map((hazard, index) => `
+        <div class="inspection-doc-field">
+            <div style="font-weight:900; margin-bottom:5px;">
+                ${index + 1}. ${escapeInspectionHtml(hazard.type || "未命名缺失")}
+            </div>
+
+            <div>
+                <strong>風險級別：</strong>
+                ${escapeInspectionHtml(hazard.severity || "待確認")}
+            </div>
+
+            <div>
+                <strong>不符合原因說明：</strong>
+                ${escapeInspectionHtml(hazard.risk || "")}
+            </div>
+
+            <div>
+                <strong>法源依據：</strong>
+                ${escapeInspectionHtml(hazard.legal_basis || "待核定")}
+            </div>
+        </div>
+    `).join("");
+
+    const suggestionRows = draft.suggestions.map((suggestion, index) => {
+        const text =
+            typeof suggestion === "string"
+                ? suggestion
+                : suggestion.text;
+
+        return `
+            <div class="inspection-doc-field">
+                ${index + 1}. ${escapeInspectionHtml(text || "")}
+            </div>
+        `;
+    }).join("");
+
+    preview.innerHTML = `
+        <div class="inspection-doc-header">
+            <div class="inspection-doc-title">
+                職業安全衛生現場稽查缺失改善通知單
+            </div>
+
+            <div class="inspection-doc-meta">
+                <div>
+                    <strong>案件編號：</strong>
+                    ${escapeInspectionHtml(draft.caseNo)}
+                </div>
+
+                <div>
+                    <strong>年度資料夾：</strong>
+                    ${escapeInspectionHtml(draft.yearFolder)}
+                </div>
+
+                <div>
+                    <strong>稽查日期：</strong>
+                    ${escapeInspectionHtml(
+                        formatInspectionDisplayDate(draft.inspectionDate)
+                    )}
+                </div>
+
+                <div>
+                    <strong>改善期限：</strong>
+                    ${escapeInspectionHtml(
+                        formatInspectionDisplayDate(draft.dueDate)
+                    )}
+                </div>
+
+                <div>
+                    <strong>區域位置：</strong>
+                    ${escapeInspectionHtml(draft.area)}
+                </div>
+
+                <div>
+                    <strong>受稽查單位：</strong>
+                    ${escapeInspectionHtml(draft.inspectedUnit)}
+                </div>
+
+                <div>
+                    <strong>稽查人員：</strong>
+                    ${escapeInspectionHtml(draft.inspector)}
+                </div>
+
+                <div>
+                    <strong>案件狀態：</strong>
+                    ${escapeInspectionHtml(draft.status)}
+                </div>
+            </div>
+        </div>
+
+        <section class="inspection-doc-section">
+            <div class="inspection-doc-section-title">
+                一、改善單主旨
+            </div>
+
+            <div class="inspection-doc-section-body">
+                ${escapeInspectionHtml(draft.title)}
+            </div>
+        </section>
+
+        <section class="inspection-doc-section">
+            <div class="inspection-doc-section-title">
+                二、不符合現場照片
+            </div>
+
+            <div class="inspection-doc-section-body">
+                <img
+                    src="${draft.annotatedImage}"
+                    alt="不符合現場照片"
+                    class="inspection-doc-photo"
+                >
+            </div>
+        </section>
+
+        <section class="inspection-doc-section">
+            <div class="inspection-doc-section-title">
+                三、不符合事項及原因說明
+            </div>
+
+            <div>
+                ${hazardRows || `
+                    <div class="inspection-doc-field">
+                        尚無不符合事項
+                    </div>
+                `}
+            </div>
+        </section>
+
+        <section class="inspection-doc-section">
+            <div class="inspection-doc-section-title">
+                四、要求改善事項
+            </div>
+
+            <div>
+                ${suggestionRows || `
+                    <div class="inspection-doc-field">
+                        尚無改善建議
+                    </div>
+                `}
+            </div>
+        </section>
+
+        <section class="inspection-doc-section">
+            <div class="inspection-doc-section-title">
+                五、權責單位改善回覆
+            </div>
+
+            <div class="inspection-doc-section-body">
+                <div style="font-weight:900; margin-bottom:6px;">
+                    改善後佐證照片
+                </div>
+
+                <div class="inspection-doc-empty-photo">
+                    改善後佐證照片黏貼／檢附區
+                </div>
+
+                <div style="margin-top:12px; font-weight:900;">
+                    改善內容說明：
+                </div>
+
+                <div style="height:65px; border-bottom:1px solid #94a3b8;"></div>
+
+                <div style="height:32px; border-bottom:1px solid #94a3b8;"></div>
+            </div>
+
+            <div class="inspection-doc-signature-grid">
+                <div>
+                    <strong>改善日期：</strong>
+                </div>
+
+                <div>
+                    <strong>負責單位：</strong>
+                </div>
+
+                <div>
+                    <strong>改善負責人：</strong>
+                </div>
+
+                <div>
+                    <strong>負責單位主管簽名：</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="inspection-doc-section">
+            <div class="inspection-doc-section-title">
+                六、複查結果
+            </div>
+
+            <div class="inspection-doc-section-body">
+                □ 改善完成　
+                □ 持續追蹤　
+                □ 重新改善
+            </div>
+
+            <div class="inspection-doc-signature-grid">
+                <div>
+                    <strong>複查日期：</strong>
+                </div>
+
+                <div>
+                    <strong>複查人員：</strong>
+                </div>
+            </div>
+        </section>
+    `;
+}
+
+async function saveInspectionReport() {
+    if (!canEditData()) {
+        showToast(
+            "請先登入使用者或管理者權限，才能儲存改善單。",
+            "error"
+        );
+        return;
+    }
+
+    if (!currentInspectionDraft) {
+        showToast(
+            "目前沒有可儲存的改善單資料。",
+            "error"
+        );
+        return;
+    }
+
+    try {
+        const reportToSave = JSON.parse(
+            JSON.stringify(currentInspectionDraft)
+        );
+
+        const year =
+            String(reportToSave.inspectionDate || "")
+                .split("-")[0];
+
+        if (!year) {
+            showToast(
+                "無法判斷改善單年度。",
+                "error"
+            );
+            return;
+        }
+
+        reportToSave.year = Number(year);
+        reportToSave.yearFolder =
+            reportToSave.yearFolder || `${year} 年度`;
+
+        const isExistingReport =
+            Number.isInteger(reportToSave.id);
+
+        if (!isExistingReport) {
+            reportToSave.caseNo =
+                await generateFormalInspectionNo(year);
+
+            reportToSave.createdAt =
+                reportToSave.createdAt || Date.now();
+        }
+
+        reportToSave.updatedAt = Date.now();
+
+        const tx = db.transaction(
+            ["inspectionReports"],
+            "readwrite"
+        );
+
+        const store =
+            tx.objectStore("inspectionReports");
+
+        let request;
+
+        if (isExistingReport) {
+            request = store.put(reportToSave);
+        } else {
+            delete reportToSave.id;
+            request = store.add(reportToSave);
+        }
+
+        request.onsuccess = event => {
+            if (!isExistingReport) {
+                reportToSave.id = event.target.result;
+            }
+
+            currentInspectionDraft = reportToSave;
+
+            document.getElementById(
+                "inspection-case-no"
+            ).value = reportToSave.caseNo;
+
+            renderInspectionDocument(
+                currentInspectionDraft
+            );
+        };
+
+        tx.oncomplete = () => {
+            showToast("改善單已儲存完成。");
+        };
+
+        tx.onerror = () => {
+            showToast(
+                "改善單儲存失敗，請重新操作。",
+                "error"
+            );
+        };
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            `改善單儲存失敗：${error.message}`,
+            "error"
+        );
+    }
+}
+
+function printInspectionDocument() {
+    if (!currentInspectionDraft) {
+        showToast("目前沒有可列印的改善單資料。", "error");
+        return;
+    }
+
+    const documentElement =
+        document.getElementById("inspection-document-preview");
+
+    if (!documentElement || !documentElement.innerHTML.trim()) {
+        showToast("改善單預覽內容尚未建立。", "error");
+        return;
+    }
+
+    const printWindow = window.open(
+        "",
+        "_blank",
+        "width=1000,height=850"
+    );
+
+    if (!printWindow) {
+        showToast(
+            "瀏覽器已阻擋列印視窗，請允許彈出式視窗後再試。",
+            "error"
+        );
+        return;
+    }
+
+    const safeTitle = escapeInspectionHtml(
+        currentInspectionDraft.caseNo || "缺失改善通知單"
+    );
+
+    printWindow.document.open();
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="zh-TW">
+        <head>
+            <meta charset="UTF-8">
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            >
+
+            <title>${safeTitle}</title>
+
+            <style>
+@page {
+    size: A4;
+    margin: 10mm 10mm 15mm 10mm;
+
+    @bottom-center {
+        content: "第 " counter(page) " 頁 / 共 " counter(pages) " 頁";
+        font-size: 10px;
+        color: #64748b;
+    }
+}
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                html,
+                body {
+                    margin: 0;
+                    padding: 0;
+                    background: #ffffff;
+                    color: #111827;
+                    font-family:
+                        "Noto Sans TC",
+                        "Microsoft JhengHei",
+                        sans-serif;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+
+                body {
+                    width: 100%;
+                }
+
+                .inspection-document {
+                    width: 190mm;
+                    min-height: 277mm;
+                    margin: 0 auto;
+                    color: #111827;
+                }
+
+                .inspection-doc-header {
+                    border: 2px solid #0f172a;
+                }
+
+                .inspection-doc-title {
+                    padding: 10px 12px;
+                    border-bottom: 1px solid #0f172a;
+                    font-size: 21px;
+                    font-weight: 900;
+                    letter-spacing: 0.06em;
+                    text-align: center;
+                }
+
+                .inspection-doc-meta {
+                    display: grid;
+                    grid-template-columns:
+                        repeat(2, minmax(0, 1fr));
+                }
+
+                .inspection-doc-meta > div {
+                    min-height: 38px;
+                    padding: 8px 10px;
+                    border-right: 1px solid #0f172a;
+                    border-bottom: 1px solid #0f172a;
+                    font-size: 12px;
+                    line-height: 1.45;
+                }
+
+                .inspection-doc-meta > div:nth-child(even) {
+                    border-right: none;
+                }
+
+                .inspection-doc-section {
+                    margin-top: 10px;
+                    border: 1px solid #0f172a;
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                }
+
+                .inspection-doc-section-title {
+                    padding: 7px 10px;
+                    background: #e2e8f0;
+                    border-bottom: 1px solid #0f172a;
+                    font-size: 13px;
+                    font-weight: 900;
+                    letter-spacing: 0.04em;
+                }
+
+                .inspection-doc-section-body {
+                    padding: 10px;
+                    font-size: 12px;
+                    line-height: 1.65;
+                }
+
+                .inspection-doc-photo {
+                    display: block;
+                    width: 100%;
+                    max-height: 100mm;
+                    margin: 0 auto;
+                    border: 1px solid #cbd5e1;
+                    background: #ffffff;
+                    object-fit: contain;
+                }
+
+                .inspection-doc-empty-photo {
+                    height: 90mm;
+                    border: 1px dashed #94a3b8;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #64748b;
+                    background: #f8fafc;
+                    font-size: 13px;
+                    font-weight: 700;
+                }
+
+                .inspection-doc-field {
+                    min-height: 44px;
+                    padding: 8px 10px;
+                    border-bottom: 1px solid #cbd5e1;
+                    font-size: 12px;
+                    line-height: 1.65;
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                }
+
+                .inspection-doc-field:last-child {
+                    border-bottom: none;
+                }
+
+                .inspection-doc-signature-grid {
+                    display: grid;
+                    grid-template-columns:
+                        repeat(2, minmax(0, 1fr));
+                    border-top: 1px solid #0f172a;
+                }
+
+                .inspection-doc-signature-grid > div {
+                    min-height: 58px;
+                    padding: 8px 10px;
+                    border-right: 1px solid #0f172a;
+                    font-size: 12px;
+                }
+
+                .inspection-doc-signature-grid > div:nth-child(even) {
+                    border-right: none;
+                }
+
+                strong {
+                    font-weight: 800;
+                }
+
+                @media print {
+                    html,
+                    body {
+                        width: 100%;
+                        height: auto;
+                    }
+
+                    .inspection-document {
+                        width: 100%;
+                        min-height: auto;
+                        margin: 0;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <article class="inspection-document">
+                ${documentElement.innerHTML}
+            </article>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+
+    const executePrint = () => {
+        printWindow.focus();
+
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
+    };
+
+    if (printWindow.document.readyState === "complete") {
+        executePrint();
+    } else {
+        printWindow.onload = executePrint;
+    }
 }
 
 function getReportTitle() {
@@ -2241,6 +3842,22 @@ if (!canUploadImage()) {
             handleFile(e.dataTransfer.files[0]);
         });
 
+function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            resolve(reader.result);
+        };
+
+        reader.onerror = () => {
+            reject(reader.error);
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
 function resizeImageToBase64(file, maxWidth = 1280, quality = 0.72) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2420,12 +4037,539 @@ tx.oncomplete = () => {
             }
         };
 
-        elements.historyBtn.onclick = () => {
-            showModal('history-modal');
-            loadHistory();
-        };
+elements.historyBtn.onclick = () => {
+    showModal("history-modal");
+    switchHistoryTab("hazard");
+};
+
+document
+    .getElementById("history-hazard-tab")
+    .onclick = () => {
+        switchHistoryTab("hazard");
+    };
+
+document
+    .getElementById("history-inspection-tab")
+    .onclick = () => {
+        switchHistoryTab("inspection");
+    };
+
+document
+    .getElementById("inspection-year-filter")
+    .onchange = () => {
+        document.getElementById(
+            "inspection-unit-filter"
+        ).value = "全部";
+
+        loadInspectionHistory();
+    };
+
+document
+    .getElementById("inspection-unit-filter")
+    .onchange = loadInspectionHistory;
 
         elements.historyCatFilter.onchange = loadHistory;
+
+let currentHistoryTab = "hazard";
+
+function switchHistoryTab(tabName) {
+    currentHistoryTab = tabName;
+
+    const hazardPanel =
+        document.getElementById("hazard-history-panel");
+
+    const inspectionPanel =
+        document.getElementById("inspection-history-panel");
+
+    const hazardTab =
+        document.getElementById("history-hazard-tab");
+
+    const inspectionTab =
+        document.getElementById("history-inspection-tab");
+
+    const isHazard = tabName === "hazard";
+
+    hazardPanel.classList.toggle("hidden", !isHazard);
+    inspectionPanel.classList.toggle("hidden", isHazard);
+
+    hazardTab.classList.toggle("bg-white", isHazard);
+    hazardTab.classList.toggle("text-blue-700", isHazard);
+    hazardTab.classList.toggle("shadow-sm", isHazard);
+    hazardTab.classList.toggle("text-slate-500", !isHazard);
+
+    inspectionTab.classList.toggle("bg-white", !isHazard);
+    inspectionTab.classList.toggle("text-emerald-700", !isHazard);
+    inspectionTab.classList.toggle("shadow-sm", !isHazard);
+    inspectionTab.classList.toggle("text-slate-500", isHazard);
+
+    if (isHazard) {
+        loadHistory();
+    } else {
+        loadInspectionHistory();
+    }
+
+    initIcons();
+}
+
+async function getInspectionAttachments(inspectionReportId) {
+    if (!Number.isInteger(inspectionReportId)) {
+        return [];
+    }
+
+    const tx = db.transaction(
+        ["inspectionAttachments"],
+        "readonly"
+    );
+
+    const store =
+        tx.objectStore("inspectionAttachments");
+
+    const index =
+        store.index("inspectionReportId");
+
+    return await new Promise((resolve, reject) => {
+        const request =
+            index.getAll(inspectionReportId);
+
+        request.onsuccess = () => {
+            const result = request.result || [];
+
+            result.sort((a, b) =>
+                Number(b.uploadedAt || 0) -
+                Number(a.uploadedAt || 0)
+            );
+
+            resolve(result);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+
+async function renderInspectionAttachmentList() {
+    const list =
+        document.getElementById(
+            "inspection-attachment-list"
+        );
+
+    if (!list) return;
+
+    if (
+        !currentInspectionDraft ||
+        !Number.isInteger(currentInspectionDraft.id)
+    ) {
+        list.innerHTML = `
+            <div class="text-center text-slate-400 text-sm py-8">
+                請先儲存改善單後再上傳附件
+            </div>
+        `;
+        return;
+    }
+
+    let attachments = [];
+
+    try {
+        attachments =
+            await getInspectionAttachments(
+                currentInspectionDraft.id
+            );
+    } catch (error) {
+        console.error(error);
+
+        list.innerHTML = `
+            <div class="text-center text-red-500 text-sm py-8">
+                附件讀取失敗
+            </div>
+        `;
+        return;
+    }
+
+    if (attachments.length === 0) {
+        list.innerHTML = `
+            <div class="text-center text-slate-400 text-sm py-8">
+                目前尚無附件
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = attachments.map(file => {
+        const uploadDate = new Date(
+            file.uploadedAt
+        ).toLocaleString("zh-TW");
+
+        const icon =
+            file.mimeType === "application/pdf"
+                ? "file-text"
+                : "image";
+
+        return `
+            <div class="border border-slate-200 rounded-xl bg-white p-3">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                            <i data-lucide="${icon}" class="w-4 h-4 text-slate-600"></i>
+                        </div>
+
+                        <div class="min-w-0">
+                            <div class="text-xs font-black text-slate-800 break-all">
+                                ${escapeInspectionHtml(file.fileName)}
+                            </div>
+
+                            <div class="text-[10px] text-emerald-700 font-bold mt-1">
+                                ${escapeInspectionHtml(file.attachmentType)}
+                            </div>
+
+                            <div class="text-[10px] text-slate-400 mt-1">
+                                ${escapeInspectionHtml(uploadDate)}
+                            </div>
+
+                            ${
+                                file.note
+                                    ? `
+                                        <div class="text-[11px] text-slate-500 mt-1">
+                                            ${escapeInspectionHtml(file.note)}
+                                        </div>
+                                    `
+                                    : ""
+                            }
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button
+                            type="button"
+                            onclick="openInspectionAttachment(${file.id})"
+                            class="text-blue-600 hover:text-blue-800 text-xs"
+                            title="查看附件"
+                        >
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+
+                        ${
+                            canDeleteData()
+                                ? `
+                                    <button
+                                        type="button"
+                                        onclick="deleteInspectionAttachment(${file.id})"
+                                        class="text-red-500 hover:text-red-700 text-xs"
+                                        title="刪除附件"
+                                    >
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                `
+                                : ""
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    initIcons();
+}
+
+async function getAllInspectionReports() {
+    const tx = db.transaction(
+        ["inspectionReports"],
+        "readonly"
+    );
+
+    return await new Promise((resolve, reject) => {
+        const request =
+            tx.objectStore("inspectionReports").getAll();
+
+        request.onsuccess = () => {
+            resolve(request.result || []);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+
+async function loadInspectionHistory() {
+    const listContainer =
+        document.getElementById("inspection-history-list");
+
+    const yearFilter =
+        document.getElementById("inspection-year-filter");
+
+const unitFilter =
+    document.getElementById("inspection-unit-filter");
+
+if (!listContainer || !yearFilter || !unitFilter) return;
+
+    let reports = [];
+
+    try {
+        reports = await getAllInspectionReports();
+    } catch (error) {
+        console.error(error);
+
+        listContainer.innerHTML = `
+            <div class="text-center py-10 text-red-500 text-sm">
+                無法讀取稽查改善報告資料
+            </div>
+        `;
+
+        return;
+    }
+
+    reports.sort((a, b) =>
+        Number(b.updatedAt || b.createdAt || 0) -
+        Number(a.updatedAt || a.createdAt || 0)
+    );
+
+    const years = [
+        ...new Set(
+            reports
+                .map(report => String(report.year || ""))
+                .filter(Boolean)
+        )
+    ].sort((a, b) => Number(b) - Number(a));
+
+    const currentYear = yearFilter.value;
+
+    yearFilter.innerHTML =
+        '<option value="全部">全部年度</option>';
+
+    years.forEach(year => {
+        const option = document.createElement("option");
+        option.value = year;
+        option.textContent = `${year} 年度`;
+        yearFilter.appendChild(option);
+    });
+
+    if (
+        [...yearFilter.options].some(option =>
+            option.value === currentYear
+        )
+    ) {
+        yearFilter.value = currentYear;
+    }
+
+    const selectedYear = yearFilter.value;
+
+    const yearFiltered =
+        selectedYear === "全部"
+            ? reports
+            : reports.filter(report =>
+                String(report.year) === selectedYear
+            );
+
+const units = [
+    ...new Set(
+        yearFiltered
+            .map(report =>
+                String(report.inspectedUnit || "").trim()
+            )
+            .filter(Boolean)
+    )
+].sort((a, b) =>
+    a.localeCompare(b, "zh-TW")
+);
+
+const currentUnit = unitFilter.value;
+
+unitFilter.innerHTML =
+    '<option value="全部">全部受稽查單位</option>';
+
+units.forEach(unit => {
+    const option = document.createElement("option");
+    option.value = unit;
+    option.textContent = unit;
+    unitFilter.appendChild(option);
+});
+
+if (
+    [...unitFilter.options].some(option =>
+        option.value === currentUnit
+    )
+) {
+    unitFilter.value = currentUnit;
+}
+
+const selectedUnit = unitFilter.value;
+
+const filteredReports = yearFiltered.filter(report =>
+    selectedUnit === "全部" ||
+    String(report.inspectedUnit || "") === selectedUnit
+);
+
+    listContainer.innerHTML = "";
+
+    if (filteredReports.length === 0) {
+        listContainer.innerHTML = `
+            <div class="text-center py-12 text-slate-400">
+                目前尚無稽查改善報告
+            </div>
+        `;
+
+        return;
+    }
+
+    const groupedByYear = {};
+
+filteredReports.forEach(report => {
+    const year =
+        String(report.year || "未分類年度");
+
+    const unit =
+        String(
+            report.inspectedUnit ||
+            "未分類受稽查單位"
+        );
+
+    if (!groupedByYear[year]) {
+        groupedByYear[year] = {};
+    }
+
+    if (!groupedByYear[year][unit]) {
+        groupedByYear[year][unit] = [];
+    }
+
+    groupedByYear[year][unit].push(report);
+});
+
+    Object.keys(groupedByYear)
+        .sort((a, b) => Number(b) - Number(a))
+        .forEach(year => {
+            const yearSection =
+                document.createElement("section");
+
+            yearSection.className =
+                "border border-slate-200 rounded-xl overflow-hidden bg-slate-50";
+
+const unitHtml = Object.keys(
+    groupedByYear[year]
+).sort((a, b) =>
+    a.localeCompare(b, "zh-TW")
+).map(unit => {
+    const caseHtml =
+        groupedByYear[year][unit]
+                        .map(report => {
+                            const date =
+                                formatInspectionDisplayDate(
+                                    report.inspectionDate
+                                );
+
+                            return `
+                                <div class="bg-white border border-slate-200 rounded-lg p-3">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <div class="text-[10px] font-black text-emerald-700">
+                                                ${escapeInspectionHtml(report.caseNo)}
+                                            </div>
+
+                                            <div class="font-bold text-slate-800 mt-1 break-words">
+                                                ${escapeInspectionHtml(report.title)}
+                                            </div>
+
+<div class="text-[11px] text-slate-500 mt-1">
+    ${escapeInspectionHtml(date)}
+    ・
+    ${escapeInspectionHtml(report.area || "未填寫區域位置")}
+</div>
+                                        </div>
+
+                                        <span class="shrink-0 text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-1 rounded-full">
+                                            ${escapeInspectionHtml(report.status || "待改善")}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onclick="previewInspectionHistory(${report.id})"
+                                        class="mt-3 w-full border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg py-1.5 text-xs font-bold"
+                                    >
+                                        查看改善單
+                                    </button>
+                                </div>
+                            `;
+                        })
+                        .join("");
+
+                return `
+                    <div class="border-t border-slate-200 p-3">
+                        <div class="text-xs font-black text-slate-600 mb-2 flex items-center gap-1.5">
+<i data-lucide="building-2" class="w-3.5 h-3.5"></i>
+${escapeInspectionHtml(unit)}
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${caseHtml}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            yearSection.innerHTML = `
+                <div class="px-4 py-3 bg-slate-100 font-black text-slate-800 flex items-center gap-2">
+                    <i data-lucide="folder" class="w-4 h-4 text-amber-500"></i>
+                    ${escapeInspectionHtml(year)} 年度
+                </div>
+
+                ${unitHtml}
+            `;
+
+            listContainer.appendChild(yearSection);
+        });
+
+    initIcons();
+}
+
+window.previewInspectionHistory = async id => {
+    const tx = db.transaction(
+        ["inspectionReports"],
+        "readonly"
+    );
+
+    const report = await new Promise(resolve => {
+        const request =
+            tx.objectStore("inspectionReports").get(id);
+
+        request.onsuccess = () => {
+            resolve(request.result || null);
+        };
+
+        request.onerror = () => {
+            resolve(null);
+        };
+    });
+
+    if (!report) {
+        showToast(
+            "找不到這份改善單資料。",
+            "error"
+        );
+        return;
+    }
+
+    currentInspectionDraft =
+        JSON.parse(JSON.stringify(report));
+
+    renderInspectionDocument(
+        currentInspectionDraft
+    );
+
+    Array.from(
+        elements.modalOverlay.children
+    ).forEach(child => {
+        child.classList.add("hidden");
+    });
+
+    elements.modalOverlay.classList.remove("hidden");
+
+    document
+        .getElementById("inspection-preview-modal")
+        .classList.remove("hidden");
+
+    initIcons();
+};
 
 async function loadHistory() {
     const filter = elements.historyCatFilter.value;
@@ -3047,6 +5191,89 @@ closeModals();
 
 document.getElementById('add-hazard-manual').onclick = () => {
     startManualAnnotation();
+};
+
+document.getElementById("inspection-date").addEventListener("change", (event) => {
+    updateInspectionYearFromDate();
+
+    const isExistingInspection =
+        currentInspectionDraft &&
+        Number.isInteger(currentInspectionDraft.id);
+
+    if (!isExistingInspection) {
+        document.getElementById("inspection-case-no").value =
+            generateTemporaryInspectionNo(event.target.value);
+    }
+});
+
+document.getElementById('create-inspection-btn').onclick = () => {
+    openInspectionCreateModal();
+};
+
+document.getElementById('preview-inspection-btn').onclick = () => {
+    const draft = buildInspectionDraftFromForm();
+
+    if (!draft) return;
+
+    currentInspectionDraft = draft;
+
+    renderInspectionDocument(currentInspectionDraft);
+
+    Array.from(elements.modalOverlay.children).forEach(child => {
+        child.classList.add("hidden");
+    });
+
+    elements.modalOverlay.classList.remove("hidden");
+
+    document
+        .getElementById("inspection-preview-modal")
+        .classList.remove("hidden");
+
+    initIcons();
+};
+
+document.getElementById('back-to-inspection-edit-btn').onclick = () => {
+    if (!canEditData()) {
+        showToast(
+            "預覽者只能查看及列印改善單，無法編輯。",
+            "error"
+        );
+        return;
+    }
+
+    if (!currentInspectionDraft) {
+        showToast(
+            "目前沒有可編輯的改善單資料。",
+            "error"
+        );
+        return;
+    }
+
+    fillInspectionFormFromDraft(currentInspectionDraft);
+
+    Array.from(elements.modalOverlay.children).forEach(child => {
+        child.classList.add("hidden");
+    });
+
+    elements.modalOverlay.classList.remove("hidden");
+
+    document
+        .getElementById("inspection-create-modal")
+        .classList.remove("hidden");
+
+    initIcons();
+};
+
+document.getElementById(
+    'save-inspection-btn'
+).onclick = () => {
+    saveInspectionReport();
+};
+
+document.getElementById(
+    'print-inspection-preview-btn'
+).onclick = () => {
+    printInspectionDocument();
 };
 
 document.getElementById('undo-photo-action').onclick = () => {
