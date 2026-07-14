@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap');
@@ -851,6 +852,21 @@ body.is-admin .suggestion-action-buttons {
     border: 2px solid #0f172a;
 }
 
+.inspection-doc-company {
+    margin: 0 0 8px;
+    padding: 0 8px;
+
+    color: #0f172a;
+    font-size: 19px;
+    line-height: 1.35;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-align: center;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
 .inspection-doc-title {
     font-size: 22px;
     font-weight: 900;
@@ -902,15 +918,19 @@ body.is-admin .suggestion-action-buttons {
 .inspection-doc-photo {
     display: block;
     width: 100%;
-    max-height: 100mm;
+    height: 120mm;
+    max-height: 120mm;
+
     object-fit: contain;
+    object-position: center;
+
     margin: 0 auto;
     border: 1px solid #cbd5e1;
     background: #ffffff;
 }
 
 .inspection-doc-empty-photo {
-    height: 90mm;
+    height: 110mm;
     border: 1px dashed #94a3b8;
     display: flex;
     align-items: center;
@@ -941,6 +961,1074 @@ body.is-admin .suggestion-action-buttons {
 
 .inspection-doc-signature-grid > div:last-child {
     border-right: none;
+}
+
+@media screen and (max-width: 768px) {
+    #toast {
+        left: 12px !important;
+        right: 12px !important;
+        bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+        width: auto !important;
+        max-width: none !important;
+        justify-content: center;
+    }
+}
+
+#inspection-attachment-drop-zone {
+    height: 42px !important;
+    min-height: 42px !important;
+    border: 1px dashed #cbd5e1 !important;
+    background: #ffffff;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+}
+
+#inspection-attachment-drop-zone:hover {
+    border-color: #818cf8 !important;
+    background: #f5f3ff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+}
+
+#inspection-attachment-drop-zone.drag-over {
+    border-color: #6366f1 !important;
+    background: #eef2ff !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    transform: translateY(-1px);
+}
+
+#inspection-attachment-drop-zone.has-files {
+    border-color: #86efac !important;
+    background: #f0fdf4;
+}
+
+#inspection-attachment-drop-zone.has-files:hover {
+    border-color: #4ade80 !important;
+    background: #ecfdf5;
+}
+
+.attachment-drop-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #6366f1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#inspection-attachment-drop-zone.has-files .attachment-drop-icon {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.attachment-symbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.attachment-file-type-symbol {
+    width: 30px;
+    height: 30px;
+}
+
+.attachment-file-type-pdf {
+    color: #ef4444;
+}
+
+.attachment-file-type-jpg {
+    color: #3b82f6;
+}
+
+.attachment-file-type-png {
+    color: #06b6d4;
+}
+
+.attachment-symbol svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* 歷史改善單圖卡：附件類型圖示 */
+.history-attachment-file-button {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition:
+        transform 0.18s ease,
+        filter 0.18s ease;
+}
+
+.history-attachment-file-button:hover {
+    transform: translateY(-1px) scale(1.07);
+    filter: brightness(0.96);
+}
+
+.history-attachment-file-symbol {
+    width: 22px !important;
+    height: 22px !important;
+}
+
+.history-attachment-order {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 2px;
+    border-radius: 999px;
+    background: #334155;
+    color: #ffffff;
+    font-size: 8px;
+    line-height: 13px;
+    text-align: center;
+    font-weight: 900;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.28);
+    pointer-events: none;
+}
+
+/* ===== 稽查改善報告：年度資料夾標籤 ===== */
+
+.inspection-year-tabs {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 2px 8px;
+    scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.inspection-year-tabs::-webkit-scrollbar {
+    height: 5px;
+}
+
+.inspection-year-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.inspection-year-tabs::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+}
+
+.inspection-year-tab {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid #dbe4f0;
+    border-radius: 11px;
+    background: #f8fafc;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+}
+
+.inspection-year-tab:hover {
+    border-color: #fbbf24;
+    background: #fffbeb;
+    color: #92400e;
+    transform: translateY(-1px);
+}
+
+.inspection-year-tab.active {
+    border-color: #f59e0b;
+    background:
+        linear-gradient(
+            180deg,
+            #fffbeb 0%,
+            #fef3c7 100%
+        );
+    color: #92400e;
+    box-shadow:
+        0 0 0 2px rgba(245, 158, 11, 0.12),
+        0 7px 16px rgba(146, 64, 14, 0.10);
+}
+
+.inspection-year-tab-icon {
+    width: 15px;
+    height: 15px;
+    color: #d97706;
+    flex-shrink: 0;
+}
+
+.inspection-year-tab-count {
+    min-width: 20px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 9px;
+    line-height: 18px;
+    text-align: center;
+    font-weight: 900;
+}
+
+.inspection-year-tab.active
+.inspection-year-tab-count {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+@media screen and (max-width: 768px) {
+    .inspection-year-tabs {
+        margin-left: -2px;
+        margin-right: -2px;
+        padding-bottom: 7px;
+    }
+
+    .inspection-year-tab {
+        min-height: 36px;
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+}
+
+/* 手機 / 桌機共用：附件檔案預覽視窗 */
+.file-preview-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: min(22px, 3vw);
+    padding-top: calc(min(22px, 3vw) + env(safe-area-inset-top));
+    padding-bottom: calc(min(22px, 3vw) + env(safe-area-inset-bottom));
+    background:
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.22), transparent 32%),
+        radial-gradient(circle at 80% 10%, rgba(14, 165, 233, 0.14), transparent 28%),
+        rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(12px);
+}
+
+.file-preview-modal.hidden {
+    display: none;
+}
+
+.file-preview-shell {
+    width: min(1180px, 100%);
+    height: min(860px, 100%);
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96));
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow: 0 30px 90px rgba(2, 6, 23, 0.48);
+}
+
+.file-preview-header {
+    flex-shrink: 0;
+    min-height: 60px;
+    padding: 12px 16px;
+    background: rgba(15, 23, 42, 0.94);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.file-preview-title-wrap {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-preview-badge {
+    flex-shrink: 0;
+    min-width: 42px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.16);
+    border: 1px solid rgba(147, 197, 253, 0.28);
+    color: #bfdbfe;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-align: center;
+}
+
+.file-preview-title {
+    color: #f8fafc;
+    font-size: 14px;
+    font-weight: 800;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.file-preview-close {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+}
+
+.file-preview-close:hover {
+    background: rgba(248, 113, 113, 0.18);
+    color: #fecaca;
+    transform: scale(1.04);
+}
+
+.file-preview-toolbar {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    background: rgba(15, 23, 42, 0.86);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.file-preview-toolbar.hidden {
+    display: none;
+}
+
+.file-preview-tool-btn {
+    min-height: 36px;
+    padding: 8px 13px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    font-size: 12px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.18s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.file-preview-tool-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+}
+
+.file-preview-toolbar,
+.file-preview-tool-btn,
+.file-preview-close {
+    touch-action: manipulation;
+}
+
+.file-preview-zoom-pill {
+    min-width: 70px;
+    background: rgba(37, 99, 235, 0.28);
+    color: #dbeafe;
+    border: 1px solid rgba(147, 197, 253, 0.24);
+}
+
+.file-preview-loading {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 148px;
+    padding: 12px 16px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.86);
+    color: #e2e8f0;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 18px 45px rgba(2, 6, 23, 0.36);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.file-preview-loading.hidden {
+    display: none;
+}
+
+.file-preview-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(226, 232, 240, 0.35);
+    border-top-color: #bfdbfe;
+    border-radius: 999px;
+    animation: filePreviewSpin 0.8s linear infinite;
+}
+
+@keyframes filePreviewSpin {
+    to { transform: rotate(360deg); }
+}
+
+.file-preview-body {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding: 18px;
+    background:
+        linear-gradient(45deg, rgba(148, 163, 184, 0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(148, 163, 184, 0.05) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(148, 163, 184, 0.05) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.05) 75%),
+        rgba(2, 6, 23, 0.28);
+    background-size: 26px 26px;
+    background-position: 0 0, 0 13px, 13px -13px, -13px 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: manipulation;
+}
+
+#file-preview-stage {
+    min-width: 100%;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#file-preview-image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 20px 50px rgba(2, 6, 23, 0.34);
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+#pdf-preview-pages {
+    width: max-content;
+    min-width: min(100%, 280px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 18px;
+    margin: 0 auto;
+    padding: 2px 0 18px;
+}
+
+.pdf-preview-page-shell {
+    position: relative;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 20px 50px rgba(2, 6, 23, 0.34);
+    overflow: hidden;
+    contain: layout paint;
+    will-change: width, height;
+}
+
+.pdf-preview-page-number {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.72);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    pointer-events: none;
+}
+
+.pdf-preview-page-canvas {
+    display: block;
+    background: #ffffff;
+    transform-origin: top left;
+}
+
+#file-preview-frame {
+    width: 100%;
+    height: 100%;
+    min-height: 620px;
+    border: 0;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(2, 6, 23, 0.34);
+}
+
+.file-preview-hint {
+    flex-shrink: 0;
+    padding: 8px 14px 10px;
+    background: rgba(15, 23, 42, 0.92);
+    border-top: 1px solid rgba(148, 163, 184, 0.16);
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+#file-preview-image.hidden,
+#file-preview-frame.hidden,
+#pdf-preview-pages.hidden {
+    display: none !important;
+}
+
+body.file-preview-open {
+    overflow: hidden;
+}
+
+@media screen and (max-width: 900px) {
+    .file-preview-modal {
+        padding: 0;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .file-preview-shell {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .file-preview-header {
+        min-height: 56px;
+        padding: 9px 12px;
+    }
+
+    .file-preview-title {
+        font-size: 13px;
+    }
+
+    .file-preview-toolbar {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding: 8px 10px;
+        scrollbar-width: none;
+    }
+
+    .file-preview-toolbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .file-preview-tool-btn {
+        min-height: 34px;
+        padding: 7px 11px;
+        font-size: 11px;
+    }
+
+    .file-preview-tool-btn span:not(#file-preview-zoom-label) {
+        display: none;
+    }
+
+    .file-preview-body {
+        padding: 10px;
+    }
+
+    .file-preview-hint {
+        display: none;
+    }
+
+    .pdf-preview-page-shell,
+    #file-preview-image,
+    #file-preview-frame {
+        border-radius: 12px;
+    }
+}
+
+        .link-icon-btn:active:not(:disabled) {
+            transform: scale(0.9);
+        }
+        .link-icon-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.3;
+        }
+
+        #drop-zone.drag-over {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+        }
+
+
+        #compliance-basis-drop-zone.drag-over {
+            border-color: #6366f1;
+            background-color: #eef2ff;
+            transform: scale(1.01);
+        }
+
+        .legal-duty-tooltip-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .legal-duty-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            border: 1px solid #f59e0b;
+            background: #fffbeb;
+            color: #b45309;
+            font-size: 10px;
+            line-height: 1;
+            font-weight: 900;
+            cursor: help;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .legal-duty-trigger:hover,
+        .legal-duty-trigger:focus {
+            background: #f59e0b;
+            color: #ffffff;
+            outline: none;
+            box-shadow: 0 8px 18px rgba(245, 158, 11, 0.25);
+        }
+
+        .legal-duty-panel {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            width: min(360px, 82vw);
+            padding: 14px 15px;
+            border-radius: 18px;
+            background: #0f172a;
+            color: #f8fafc;
+            box-shadow: 0 20px 35px rgba(15, 23, 42, 0.32);
+            opacity: 0;
+            transform: translateY(-4px) scale(0.98);
+            pointer-events: none;
+            transition: all 0.18s ease;
+            z-index: 80;
+        }
+
+        .legal-duty-panel::before {
+            content: "";
+            position: absolute;
+            right: 22px;
+            top: -7px;
+            width: 14px;
+            height: 14px;
+            background: #0f172a;
+            transform: rotate(45deg);
+        }
+
+        .legal-duty-tooltip-wrap:hover .legal-duty-panel,
+        .legal-duty-tooltip-wrap:focus-within .legal-duty-panel,
+        .legal-duty-tooltip-wrap.is-open .legal-duty-panel {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .auxiliary-tooltip-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .auxiliary-tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid #38bdf8;
+            background: #f0f9ff;
+            color: #0369a1;
+            font-size: 10px;
+            line-height: 1;
+            font-weight: 900;
+            cursor: help;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .auxiliary-tooltip-trigger:hover,
+        .auxiliary-tooltip-trigger:focus {
+            background: #0ea5e9;
+            color: #ffffff;
+            outline: none;
+            box-shadow: 0 8px 18px rgba(14, 165, 233, 0.22);
+        }
+
+        .auxiliary-tooltip-panel {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 10px);
+            width: min(380px, 82vw);
+            padding: 14px 15px;
+            border-radius: 18px;
+            background: #0f172a;
+            color: #f8fafc;
+            box-shadow: 0 20px 35px rgba(15, 23, 42, 0.32);
+            opacity: 0;
+            transform: translateY(-4px) scale(0.98);
+            pointer-events: none;
+            transition: all 0.18s ease;
+            z-index: 80;
+        }
+
+        .auxiliary-tooltip-panel::before {
+            content: "";
+            position: absolute;
+            left: 24px;
+            top: -7px;
+            width: 14px;
+            height: 14px;
+            background: #0f172a;
+            transform: rotate(45deg);
+        }
+
+        .auxiliary-tooltip-wrap:hover .auxiliary-tooltip-panel,
+        .auxiliary-tooltip-wrap:focus-within .auxiliary-tooltip-panel,
+        .auxiliary-tooltip-wrap.is-open .auxiliary-tooltip-panel {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+.budget-input {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    outline: none;
+    background: #ffffff;
+    color: #1e293b;
+}
+
+.budget-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
+}
+
+.budget-input:disabled {
+    border-color: transparent;
+    background: transparent;
+    color: #334155;
+    opacity: 1;
+    padding-left: 0;
+}
+
+.budget-money-cell {
+    font-weight: 900;
+    color: #4338ca;
+    text-align: left;
+}
+
+.budget-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.budget-table {
+    width: 100%;
+    min-width: 1000px;
+    table-layout: fixed;
+}
+
+.budget-table .table-header-cell,
+.budget-table .table-cell {
+    padding: 0.65rem 0.55rem;
+    font-size: 0.78rem;
+    word-break: break-word;
+}
+
+.budget-index-header,
+.budget-index-cell {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.budget-index-inner {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.budget-index-actions {
+    margin-top: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.budget-index-number {
+    text-align: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.budget-date-header,
+.budget-date-cell {
+    text-align: left !important;
+    vertical-align: middle !important;
+}
+
+.budget-date-header {
+    padding-left: 0.75rem !important;
+}
+
+.budget-date-field,
+.budget-date-display {
+    width: 100%;
+    text-align: left;
+}
+
+.budget-date-field {
+    padding-left: 10px !important;
+    padding-right: 6px !important;
+}
+
+.budget-date-field:disabled {
+    padding-left: 10px !important;
+    padding-right: 6px !important;
+}
+
+.budget-date-display {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    white-space: nowrap;
+}
+
+.budget-type-header {
+    text-align: left !important;
+    padding-left: 0.65rem !important;
+}
+
+.budget-type-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 7px;
+    transform: translateX(2px);
+}
+
+.budget-type-cell {
+    text-align: left !important;
+    padding-left: 0.9rem !important;
+}
+
+.budget-fee-header {
+    text-align: left !important;
+    padding-left: 0.55rem !important;
+    padding-right: 0 !important;
+}
+
+.budget-fee-cell {
+    text-align: left;
+}
+
+.budget-fee-cell .budget-money-cell {
+    text-align: left;
+    padding-left: 0.55rem;
+    padding-right: 0.35rem;
+}
+
+.budget-fee-cell .budget-money-cell:disabled {
+    padding-left: 0.55rem;
+    padding-right: 0.35rem;
+}
+
+.budget-type-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 900;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.budget-type-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    accent-color: #4f46e5;
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    cursor: pointer;
+}
+
+.budget-type-option input[type="checkbox"]:disabled {
+    opacity: 0.95;
+    cursor: default;
+}
+
+.budget-summary-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.budget-summary-card p[id^="budget-summary-"] {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.report-tab-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+.report-tab-btn {
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #64748b;
+    background: #f8fafc;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.report-tab-btn.active {
+    color: #4f46e5;
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 -2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.report-tab-panel {
+    display: none;
+}
+
+.report-tab-panel.active {
+    display: block;
+}
+
+.inspection-year-section-header {
+    min-height: 52px;
+    padding: 9px 12px 9px 14px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #dbe4f0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.inspection-year-section-title {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.inspection-year-unit-filter-wrap {
+    width: min(320px, 46%);
+    min-width: 230px;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.inspection-year-unit-filter {
+    width: 100%;
+    height: 34px;
+    padding: 5px 30px 5px 10px;
+
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 9px !important;
+
+    background-color: #ffffff !important;
+    color: #475569;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.inspection-year-unit-filter:hover {
+    border-color: #94a3b8 !important;
+}
+
+.inspection-year-unit-filter:focus {
+    border-color: #60a5fa !important;
+    box-shadow:
+        0 0 0 3px
+        rgba(59, 130, 246, 0.12) !important;
+}
+
+@media screen and (max-width: 768px) {
+    .inspection-year-section-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .inspection-year-unit-filter-wrap {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .inspection-year-unit-filter {
+        height: 36px;
+    }
 }
 
 @media print {
@@ -1476,6 +2564,73 @@ h2 {
     </p>
 </footer>
 
+<!-- 檔案預覽 Modal：-->
+<div id="file-preview-modal"
+     class="file-preview-modal hidden"
+     onclick="closeFilePreviewByBackdrop(event)">
+    <div class="file-preview-shell" onclick="event.stopPropagation()">
+        <div class="file-preview-header">
+            <div class="file-preview-title-wrap">
+                <span id="file-preview-badge" class="file-preview-badge">FILE</span>
+                <div class="min-w-0">
+                    <div id="file-preview-title" class="file-preview-title">附件預覽</div>
+                    <div id="file-preview-subtitle" class="text-[11px] text-slate-400 font-bold mt-1">附件內容</div>
+                </div>
+            </div>
+
+            <button type="button"
+                    class="file-preview-close"
+                    onclick="closeFilePreviewModal()"
+                    aria-label="關閉附件預覽">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+<div id="file-preview-toolbar" class="file-preview-toolbar">
+    <button type="button" class="file-preview-tool-btn" onclick="zoomFilePreviewBy(-0.15)">
+        <i data-lucide="zoom-out" class="w-4 h-4"></i>
+        <span>縮小</span>
+    </button>
+
+    <button type="button" class="file-preview-tool-btn file-preview-zoom-pill" onclick="fitFilePreviewToScreen()">
+        <span id="file-preview-zoom-label">100%</span>
+    </button>
+
+    <button type="button" class="file-preview-tool-btn" onclick="zoomFilePreviewBy(0.15)">
+        <i data-lucide="zoom-in" class="w-4 h-4"></i>
+        <span>放大</span>
+    </button>
+
+    <button type="button" class="file-preview-tool-btn" onclick="rotateFilePreviewBy(90)">
+        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+        <span>旋轉</span>
+    </button>
+
+    <button type="button" class="file-preview-tool-btn" onclick="fitFilePreviewToScreen()">
+        <i data-lucide="maximize" class="w-4 h-4"></i>
+        <span>適合畫面</span>
+    </button>
+</div>
+
+        <div id="file-preview-body" class="file-preview-body">
+            <div id="file-preview-loading" class="file-preview-loading hidden">
+                <span class="file-preview-spinner"></span>
+                <span id="file-preview-loading-text">載入中...</span>
+            </div>
+
+            <div id="file-preview-stage">
+                <iframe id="file-preview-frame" class="hidden" title="附件 PDF 預覽"></iframe>
+                <img id="file-preview-image" class="hidden" alt="附件預覽">
+                <div id="pdf-preview-pages" class="hidden" aria-label="PDF 預覽頁面"></div>
+            </div>
+        </div>
+
+<div class="file-preview-hint">
+    可使用 Ctrl + 滑鼠滾輪、工具列按鈕縮放，並可使用旋轉功能調整方向
+</div>
+    </div>
+</div>
+
     <!-- Modals -->
     <div id="modal-overlay" onclick="closeModalsOutside(event)" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-[500] p-4">
 <div id="login-modal" onclick="event.stopPropagation()" class="w-full max-w-sm mx-4 overflow-hidden rounded-2xl bg-white shadow-xl border border-slate-200 scale-in-center hidden">
@@ -1630,6 +2785,19 @@ h2 {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="md:col-span-2">
+    <label class="block text-xs font-bold text-slate-600 mb-1">
+        公司名稱
+    </label>
+
+    <input
+        id="inspection-company-name"
+        type="text"
+        autocomplete="organization"
+        class="w-full p-2.5 border rounded text-sm font-bold"
+        placeholder="請輸入公司完整名稱"
+    >
+</div>            
             <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">
                     案件編號
@@ -1812,12 +2980,30 @@ h2 {
             返回編輯
         </button>
 
+<button
+    id="inspection-preview-login-btn"
+    type="button"
+    class="user-only h-9 text-xs font-bold
+           text-indigo-700 bg-indigo-50
+           border border-indigo-200
+           px-3 rounded-lg
+           hover:bg-indigo-100
+           flex items-center justify-center gap-1.5"
+>
+    <i
+        data-lucide="lock-keyhole"
+        class="w-4 h-4"
+    ></i>
+
+    權限登入
+</button>        
+
 <div class="flex items-center gap-2">
-    <button
-        id="inspection-attachments-btn"
-        type="button"
-        class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-lg hover:bg-emerald-100 flex items-center gap-1.5"
-    >
+<button
+    id="inspection-attachments-btn"
+    type="button"
+    class="h-9 text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-3 rounded-lg hover:bg-amber-200 flex items-center justify-center gap-1.5"
+>
         <i data-lucide="paperclip" class="w-4 h-4"></i>
         改善回覆
     </button>
@@ -1825,7 +3011,7 @@ h2 {
     <button
         id="save-inspection-btn"
         type="button"
-        class="text-xs font-bold text-white bg-emerald-600 px-3 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-1.5"
+        class="h-9 text-xs font-bold text-white bg-emerald-600 px-3 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-1.5"
     >
         <i data-lucide="save" class="w-4 h-4"></i>
         儲存改善單
@@ -1834,7 +3020,7 @@ h2 {
     <button
         id="print-inspection-preview-btn"
         type="button"
-        class="text-xs font-bold text-white bg-slate-800 px-3 py-2 rounded-lg hover:bg-slate-700 flex items-center gap-1.5"
+        class="h-9 text-xs font-bold text-white bg-slate-800 px-3 py-2 rounded-lg hover:bg-slate-700 flex items-center gap-1.5"
     >
         <i data-lucide="printer" class="w-4 h-4"></i>
         列印改善單
@@ -1868,7 +3054,7 @@ h2 {
 
         <div class="pr-10">
             <div class="flex items-center gap-2.5">
-                <i data-lucide="folder-paperclip" class="w-5 h-5 text-emerald-300"></i>
+                <i data-lucide="paperclip" class="w-5 h-5 text-indigo-300"></i>
                 <h3 class="text-lg font-black tracking-wide">
                     改善回覆附件
                 </h3>
@@ -1881,26 +3067,63 @@ h2 {
     </div>
 
     <div class="p-5 overflow-y-auto">
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4">
-            <div class="text-xs text-slate-500">
-                案件編號
-            </div>
+<div class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 
-            <div
-                id="attachment-case-no"
-                class="text-sm font-black text-slate-800 mt-1"
-            >
-                -
+        <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold text-slate-500">
+                    案件編號：
+                </span>
+
+                <span
+                    id="attachment-case-no"
+                    class="text-sm font-black text-slate-800"
+                >
+                    -
+                </span>
+
+                <span
+                    id="attachment-case-status-badge"
+                    class="text-[10px] font-black px-2.5 py-1 rounded-full
+                           bg-amber-50 text-amber-700
+                           border border-amber-200"
+                >
+                    待改善
+                </span>
             </div>
 
             <div
                 id="attachment-case-title"
-                class="text-xs text-slate-500 mt-1"
+                class="text-xs text-slate-500 mt-1.5 truncate"
             >
                 -
             </div>
         </div>
 
+        <div class="editor-only shrink-0">
+            <button
+                id="toggle-inspection-complete-btn"
+                type="button"
+                class="text-xs font-bold px-3 py-2 rounded-lg
+                       bg-emerald-50 text-emerald-700
+                       border border-emerald-200
+                       hover:bg-emerald-100
+                       flex items-center justify-center gap-1.5"
+            >
+                <i
+                    data-lucide="circle-check-big"
+                    class="w-3.5 h-3.5"
+                ></i>
+
+                <span id="toggle-inspection-complete-text">
+                    標記改善完成
+                </span>
+            </button>
+        </div>
+
+    </div>
+</div>
         <div
             id="attachment-upload-panel"
             class="editor-only rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-4"
@@ -1922,18 +3145,53 @@ h2 {
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">
-                        選擇檔案
-                    </label>
+<div>
+    <label class="block text-xs font-bold text-slate-600 mb-1">
+        選擇檔案
+    </label>
 
-                    <input
-                        id="inspection-attachment-file"
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                        class="w-full p-2 border rounded text-sm bg-white"
-                    >
-                </div>
+    <div
+        id="inspection-attachment-drop-zone"
+        class="h-[42px] px-3
+               border border-dashed border-slate-300
+               rounded-lg cursor-pointer
+               flex items-center gap-2
+               text-left select-none"
+        onclick="document.getElementById('inspection-attachment-file').click()"
+        title="點擊選擇檔案，或將檔案拖曳至此"
+    >
+        <input
+            id="inspection-attachment-file"
+            type="file"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+            class="hidden"
+        >
+
+        <span class="attachment-drop-icon">
+            <i
+                data-lucide="file-up"
+                class="w-4 h-4"
+            ></i>
+        </span>
+
+        <div class="min-w-0 flex-1 leading-tight">
+            <div
+                id="inspection-attachment-selection-text"
+                class="text-[11px] font-black text-slate-600 truncate"
+            >
+                點擊或拖曳檔案
+            </div>
+
+            <div
+                id="inspection-attachment-selection-hint"
+                class="text-[9px] text-slate-400 truncate mt-0.5"
+            >
+                PDF、JPG、PNG｜單檔上限 10 MB
+            </div>
+        </div>
+    </div>
+</div>
             </div>
 
             <div class="mt-3">
@@ -1949,14 +3207,27 @@ h2 {
                 >
             </div>
 
-            <button
-                id="upload-inspection-attachment-btn"
-                type="button"
-                class="mt-3 w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm font-black hover:bg-emerald-700 flex items-center justify-center gap-2"
-            >
-                <i data-lucide="upload" class="w-4 h-4"></i>
-                上傳改善回覆
-            </button>
+<button
+    id="upload-inspection-attachment-btn"
+    type="button"
+    disabled
+    class="mt-3 w-full
+           bg-emerald-600 text-white
+           py-2.5 rounded-xl text-sm font-black
+           hover:bg-emerald-700
+           disabled:bg-slate-300
+           disabled:text-slate-500
+           disabled:cursor-not-allowed
+           disabled:transform-none
+           flex items-center justify-center gap-2"
+>
+    <i data-lucide="upload" class="w-4 h-4"></i>
+
+    <span id="upload-inspection-attachment-text">
+        上傳所選附件
+    </span>
+</button>
+
         </div>
 
         <div>
@@ -1973,7 +3244,18 @@ h2 {
                     目前尚無附件
                 </div>
             </div>
-        </div>
+        <button
+            id="back-to-inspection-preview-btn"
+            type="button"
+            class="mt-5 w-full bg-slate-100 text-slate-600 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200"
+        >
+            返回改善單
+        </button>
+
+                </div>
+            </div>
+        </div>    
+
         <div id="edit-hazard-modal" class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl hidden">
             <h3 id="hazard-modal-title" class="font-bold mb-4">編輯危害項目</h3>
             <div class="space-y-3">
@@ -2102,38 +3384,52 @@ h2 {
         >
         </div>
     </div>
+<div
+    id="inspection-history-panel"
+    class="hidden flex flex-col min-h-0 flex-grow"
+>
+    <div class="mb-4 shrink-0">
+
+        <!-- 年度資料夾標籤 -->
+        <div
+            id="inspection-year-tabs"
+            class="inspection-year-tabs"
+            role="tablist"
+            aria-label="稽查改善報告年度"
+        ></div>
+
+        <!-- 儲存目前選取年度 -->
+        <select
+            id="inspection-year-filter"
+            class="hidden"
+            aria-hidden="true"
+            tabindex="-1"
+        ></select>
+
+    </div>
 
     <div
-        id="inspection-history-panel"
-        class="hidden flex flex-col min-h-0 flex-grow"
+        id="inspection-history-list"
+        class="overflow-y-auto flex-grow min-h-0 space-y-4 p-1"
     >
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            <select
-                id="inspection-year-filter"
-                class="p-2 border rounded text-sm bg-slate-50"
-            >
-                <option value="全部">全部年度</option>
-            </select>
-
-            <select
-                id="inspection-unit-filter"
-                class="p-2 border rounded text-sm bg-slate-50"
-            >
-                <option value="全部">全部受稽查單位</option>
-            </select>
-        </div>
-
-        <div
-            id="inspection-history-list"
-            class="overflow-y-auto flex-grow space-y-4 p-1"
-        >
-        </div>
     </div>
 </div>
 </div>
-<div id="toast" class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-[300] bg-white text-slate-900 px-5 py-3 rounded-xl shadow-2xl font-bold flex items-center space-x-3">
-    <span id="toast-icon" class="text-green-500">✓</span>
-    <span id="toast-msg">操作成功</span>
+</div>
+<div
+    id="toast"
+    class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-[900]
+           min-w-[260px] max-w-[calc(100vw-24px)]
+           bg-slate-900/95 text-white
+           border border-slate-700
+           px-5 py-3 rounded-xl
+           shadow-[0_20px_55px_rgba(15,23,42,0.48)]
+           backdrop-blur-md
+           font-bold flex items-center space-x-3
+           pointer-events-none"
+>
+    <span id="toast-icon" class="text-green-400 text-lg">✓</span>
+    <span id="toast-msg" class="text-sm">操作成功</span>
 </div>
 
     <script>
@@ -2160,8 +3456,28 @@ let annotationMode = null; // null / "manual" / "edit-box"
 let pendingManualBox = null;
 let previewReports = null;
 let previewCategories = null;
+
+let previewInspectionReports = null;
+let previewInspectionAttachments = null;
 let hazardUndoStack = [];
 let currentInspectionDraft = null;
+let pendingInspectionAttachmentFiles = [];
+
+/*
+ * 從其他 Modal 開啟登入時，
+ * 記錄登入完成後要返回的視窗。
+ */
+let loginReturnModalId = null;
+
+/*
+ * 個別年度目前選取的受稽查單位。
+ * 例如：
+ * {
+ *     "2026": "製造電子部",
+ *     "2025": "全部"
+ * }
+ */
+let inspectionUnitFilterByYear = {};
 
 function pushUndoState() {
     if (!currentReportData) return;
@@ -2181,6 +3497,14 @@ function pushUndoState() {
 
 function isPreviewDataActive() {
     return !canImportData() && Array.isArray(previewReports);
+}
+
+function isInspectionPreviewDataActive() {
+    return (
+        !canImportData() &&
+        Array.isArray(previewInspectionReports) &&
+        Array.isArray(previewInspectionAttachments)
+    );
 }
 
 function initIcons() {
@@ -2289,89 +3613,111 @@ function canManageCategory() {
 }
 
 const initDB = () => {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open("SafetySystemDB", 3);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains("settings")) db.createObjectStore("settings");
-                    if (!db.objectStoreNames.contains("categories")) db.createObjectStore("categories", { keyPath: "id", autoIncrement: true });
-                    if (!db.objectStoreNames.contains("reports")) db.createObjectStore("reports", { keyPath: "id", autoIncrement: true });
-if (!db.objectStoreNames.contains("inspectionReports")) {
-    const inspectionStore = db.createObjectStore(
-        "inspectionReports",
-        {
-            keyPath: "id",
-            autoIncrement: true
-        }
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(
+            "SafetySystemDB",
+            3
+        );
 
-if (!db.objectStoreNames.contains("inspectionAttachments")) {
-    const attachmentStore = db.createObjectStore(
-        "inspectionAttachments",
-        {
-            keyPath: "id",
-            autoIncrement: true
-        }
-    );
+        request.onupgradeneeded = event => {
+            const database = event.target.result;
 
-    attachmentStore.createIndex(
-        "inspectionReportId",
-        "inspectionReportId",
-        {
-            unique: false
-        }
-    );
+            if (!database.objectStoreNames.contains("settings")) {
+                database.createObjectStore("settings");
+            }
 
-    attachmentStore.createIndex(
-        "caseNo",
-        "caseNo",
-        {
-            unique: false
-        }
-    );
+            if (!database.objectStoreNames.contains("categories")) {
+                database.createObjectStore(
+                    "categories",
+                    {
+                        keyPath: "id",
+                        autoIncrement: true
+                    }
+                );
+            }
 
-    attachmentStore.createIndex(
-        "uploadedAt",
-        "uploadedAt",
-        {
-            unique: false
-        }
-    );
-}
+            if (!database.objectStoreNames.contains("reports")) {
+                database.createObjectStore(
+                    "reports",
+                    {
+                        keyPath: "id",
+                        autoIncrement: true
+                    }
+                );
+            }
 
-    );
+            if (!database.objectStoreNames.contains("inspectionReports")) {
+                const inspectionStore =
+                    database.createObjectStore(
+                        "inspectionReports",
+                        {
+                            keyPath: "id",
+                            autoIncrement: true
+                        }
+                    );
 
-    inspectionStore.createIndex(
-        "year",
-        "year",
-        {
-            unique: false
-        }
-    );
+                inspectionStore.createIndex(
+                    "year",
+                    "year",
+                    { unique: false }
+                );
 
-    inspectionStore.createIndex(
-        "area",
-        "area",
-        {
-            unique: false
-        }
-    );
+                inspectionStore.createIndex(
+                    "area",
+                    "area",
+                    { unique: false }
+                );
 
-    inspectionStore.createIndex(
-        "caseNo",
-        "caseNo",
-        {
-            unique: true
-        }
-    );
-}                    
-                };
-                request.onsuccess = (e) => {
-                    db = e.target.result;
-                    checkInitConfig().then(resolve);
-                };
-                request.onerror = reject;
-            });
+                inspectionStore.createIndex(
+                    "caseNo",
+                    "caseNo",
+                    { unique: true }
+                );
+            }
+
+            if (!database.objectStoreNames.contains("inspectionAttachments")) {
+                const attachmentStore =
+                    database.createObjectStore(
+                        "inspectionAttachments",
+                        {
+                            keyPath: "id",
+                            autoIncrement: true
+                        }
+                    );
+
+                attachmentStore.createIndex(
+                    "inspectionReportId",
+                    "inspectionReportId",
+                    { unique: false }
+                );
+
+                attachmentStore.createIndex(
+                    "caseNo",
+                    "caseNo",
+                    { unique: false }
+                );
+
+                attachmentStore.createIndex(
+                    "uploadedAt",
+                    "uploadedAt",
+                    { unique: false }
+                );
+            }
         };
+
+        request.onsuccess = event => {
+            db = event.target.result;
+
+            checkInitConfig()
+                .then(resolve)
+                .catch(reject);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+};
 
 async function checkInitConfig() {
     const tx = db.transaction(["settings"], "readwrite");
@@ -2467,15 +3813,150 @@ reportNameInput: document.getElementById('report-name-input'),
 createInspectionBtn: document.getElementById('create-inspection-btn'),
         };
 
-        function closeModals() {
-            elements.modalOverlay.classList.add('hidden');
-            Array.from(elements.modalOverlay.children).forEach(c => c.classList.add('hidden'));
+function showOnlyOverlayModal(id) {
+    Array.from(
+        elements.modalOverlay.children
+    ).forEach(child => {
+        child.classList.add("hidden");
+    });
+
+    elements.modalOverlay.classList.remove(
+        "hidden"
+    );
+
+    const targetModal =
+        document.getElementById(id);
+
+    if (targetModal) {
+        targetModal.classList.remove("hidden");
+    }
+
+    initIcons();
+}
+
+function closeModals() {
+    loginReturnModalId = null;
+
+    elements.modalOverlay.classList.add(
+        "hidden"
+    );
+
+    Array.from(
+        elements.modalOverlay.children
+    ).forEach(child => {
+        child.classList.add("hidden");
+    });
+}
+
+/*
+ * 從其他視窗開啟登入。
+ */
+function openLoginFromModal(returnModalId) {
+    loginReturnModalId =
+        returnModalId || null;
+
+    elements.pwdInput.value = "";
+
+    const loginError =
+        document.getElementById(
+            "login-error"
+        );
+
+    if (loginError) {
+        loginError.classList.add("hidden");
+    }
+
+    showOnlyOverlayModal(
+        "login-modal"
+    );
+
+    setTimeout(() => {
+        elements.pwdInput.focus();
+    }, 100);
+}
+
+/*
+ * 取消登入時，返回原本視窗。
+ */
+function closeLoginFlow() {
+    const returnModalId =
+        loginReturnModalId;
+
+    loginReturnModalId = null;
+
+    if (
+        returnModalId &&
+        document.getElementById(
+            returnModalId
+        )
+    ) {
+        showOnlyOverlayModal(
+            returnModalId
+        );
+
+        return;
+    }
+
+    closeModals();
+}
+
+/*
+ * 登入成功後，返回原本視窗。
+ */
+function finishSuccessfulLogin() {
+    const returnModalId =
+        loginReturnModalId;
+
+    loginReturnModalId = null;
+
+    if (
+        returnModalId &&
+        document.getElementById(
+            returnModalId
+        )
+    ) {
+        if (
+            returnModalId ===
+                "inspection-preview-modal" &&
+            currentInspectionDraft
+        ) {
+            renderInspectionDocument(
+                currentInspectionDraft
+            );
         }
 
-function closeModalsOutside(event) {
-    if (event.target === elements.modalOverlay) {
-        closeModals();
+        showOnlyOverlayModal(
+            returnModalId
+        );
+
+        return;
     }
+
+    closeModals();
+}
+
+function closeModalsOutside(event) {
+    if (
+        event.target !==
+        elements.modalOverlay
+    ) {
+        return;
+    }
+
+    const loginModalIsOpen =
+        elements.loginModal &&
+        !elements.loginModal.classList
+            .contains("hidden");
+
+    if (
+        loginModalIsOpen &&
+        loginReturnModalId
+    ) {
+        closeLoginFlow();
+        return;
+    }
+
+    closeModals();
 }
 
 function showModal(id) {
@@ -2512,7 +3993,13 @@ function showModal(id) {
     initIcons();
 }
 
-        elements.adminLoginBtn.onclick = () => showModal('login-modal');
+        elements.adminLoginBtn.onclick = () => {
+    loginReturnModalId = null;
+
+    showModal(
+        "login-modal"
+    );
+};
 document.getElementById('permission-settings-btn').onclick = () => {
     showModal('pwd-modal');
 };        
@@ -2523,6 +4010,9 @@ document.getElementById('logout-btn').onclick = () => {
 document.body.classList.remove('is-editor');
 previewReports = null;
 previewCategories = null;
+
+previewInspectionReports = null;
+previewInspectionAttachments = null;
 
 updateUIVisibility();
 updateDataActionButtons();
@@ -2568,10 +4058,17 @@ return;
         isAdmin = true;
         isEditor = true;
 
-        document.body.classList.add('is-admin');
-document.body.classList.remove('is-editor');
-        closeModals();
-        elements.pwdInput.value = "";
+document.body.classList.add(
+    "is-admin"
+);
+
+document.body.classList.remove(
+    "is-editor"
+);
+
+finishSuccessfulLogin();
+
+elements.pwdInput.value = "";
 
 updateUIVisibility();
 updateDataActionButtons();
@@ -2590,10 +4087,17 @@ return;
         isAdmin = false;
         isEditor = true;
 
-document.body.classList.remove('is-admin');
-document.body.classList.add('is-editor');
-closeModals();
-        elements.pwdInput.value = "";
+document.body.classList.remove(
+    "is-admin"
+);
+
+document.body.classList.add(
+    "is-editor"
+);
+
+finishSuccessfulLogin();
+
+elements.pwdInput.value = "";
 
 updateUIVisibility();
 updateDataActionButtons();
@@ -2731,11 +4235,23 @@ function updateUIVisibility() {
         elements.saveReportBtn.classList.add('hidden');
     }
 
-    if (elements.reportNameInput) {
-        elements.reportNameInput.readOnly = !isAdmin;
-        elements.reportNameInput.classList.toggle('bg-slate-50', !isAdmin);
-        elements.reportNameInput.classList.toggle('bg-white', isAdmin);
-    }
+if (elements.reportNameInput) {
+    const canEditReportTitle =
+        canEditData();
+
+    elements.reportNameInput.readOnly =
+        !canEditReportTitle;
+
+    elements.reportNameInput.classList.toggle(
+        'bg-slate-50',
+        !canEditReportTitle
+    );
+
+    elements.reportNameInput.classList.toggle(
+        'bg-white',
+        canEditReportTitle
+    );
+}
 
 if (elements.createInspectionBtn) {
     const canCreateInspection =
@@ -2775,6 +4291,29 @@ function formatDateInputValue(date = new Date()) {
     return `${year}-${month}-${day}`;
 }
 
+function formatInspectionYearText(
+    value,
+    inspectionDate = ""
+) {
+    const valueMatch =
+        String(value || "")
+            .match(/\d{4}/);
+
+    if (valueMatch) {
+        return `${valueMatch[0]}年`;
+    }
+
+    const dateMatch =
+        String(inspectionDate || "")
+            .match(/^\d{4}/);
+
+    if (dateMatch) {
+        return `${dateMatch[0]}年`;
+    }
+
+    return "";
+}
+
 function updateInspectionYearFromDate() {
     const dateInput = document.getElementById("inspection-date");
     const yearInput = document.getElementById("inspection-year");
@@ -2788,8 +4327,11 @@ function updateInspectionYearFromDate() {
         return;
     }
 
-    const year = dateValue.split("-")[0];
-    yearInput.value = `${year} 年度`;
+const year =
+    dateValue.split("-")[0];
+
+yearInput.value =
+    `${year}年`;
 }
 
 function generateTemporaryInspectionNo(dateValue = "") {
@@ -2843,7 +4385,36 @@ async function generateFormalInspectionNo(year) {
     return `${yearPrefix}${String(nextNumber).padStart(3, "0")}`;
 }
 
-function openInspectionCreateModal() {
+async function findInspectionBySourceReportId(sourceReportId) {
+    if (!Number.isInteger(sourceReportId)) {
+        return null;
+    }
+
+    const tx = db.transaction(
+        ["inspectionReports"],
+        "readonly"
+    );
+
+    const reports = await new Promise((resolve, reject) => {
+        const request =
+            tx.objectStore("inspectionReports").getAll();
+
+        request.onsuccess = () => {
+            resolve(request.result || []);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+
+    return reports.find(report =>
+        Number(report.sourceReportId) ===
+        Number(sourceReportId)
+    ) || null;
+}
+
+async function openInspectionCreateModal() {
     if (!canEditData()) {
         return showToast(
             "請先登入使用者或管理者權限，才能開立改善單。",
@@ -2868,9 +4439,87 @@ function openInspectionCreateModal() {
         );
     }
 
+if (Number.isInteger(currentReportId)) {
+    try {
+        const existingInspection =
+            await findInspectionBySourceReportId(
+                currentReportId
+            );
+
+        if (existingInspection) {
+            const openExisting = confirm(
+                "此危害識別報告已經開立改善單：\n\n" +
+                `${existingInspection.caseNo}\n\n` +
+                "是否直接開啟原改善單？"
+            );
+
+            if (!openExisting) {
+                return;
+            }
+
+            currentInspectionDraft =
+                JSON.parse(
+                    JSON.stringify(existingInspection)
+                );
+
+            renderInspectionDocument(
+                currentInspectionDraft
+            );
+
+            Array.from(
+                elements.modalOverlay.children
+            ).forEach(child => {
+                child.classList.add("hidden");
+            });
+
+            elements.modalOverlay.classList.remove(
+                "hidden"
+            );
+
+            document
+                .getElementById(
+                    "inspection-preview-modal"
+                )
+                .classList.remove("hidden");
+
+            initIcons();
+            return;
+        }
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "改善單對應資料檢查失敗，請重新操作。",
+            "error"
+        );
+        return;
+    }
+}    
+
 currentInspectionDraft = null;
 
-    const now = new Date();
+/* 新開立改善單時，清除上一筆行政資料 */
+document.getElementById(
+    "inspection-company-name"
+).value = "";
+
+document.getElementById(
+    "inspection-area"
+).value = "";
+
+document.getElementById(
+    "inspection-unit"
+).value = "";
+
+document.getElementById(
+    "inspection-inspector"
+).value = "";
+
+document.getElementById(
+    "inspection-due-date"
+).value = "";
+
+const now = new Date();
 
 const inspectionDateInput =
     document.getElementById("inspection-date");
@@ -2908,19 +4557,25 @@ updateInspectionYearFromDate();
 function fillInspectionFormFromDraft(draft) {
     if (!draft) return;
 
+    document.getElementById(
+    "inspection-company-name"
+).value =
+    draft.companyName || "";
+
     document.getElementById("inspection-case-no").value =
         draft.caseNo || "";
 
     document.getElementById("inspection-date").value =
         draft.inspectionDate || "";
 
-    document.getElementById("inspection-year").value =
+document.getElementById(
+    "inspection-year"
+).value =
+    formatInspectionYearText(
         draft.yearFolder ||
-        (
-            draft.inspectionDate
-                ? `${draft.inspectionDate.split("-")[0]} 年度`
-                : ""
-        );
+        draft.year,
+        draft.inspectionDate
+    );
 
     document.getElementById("inspection-area").value =
         draft.area || "";
@@ -2959,6 +4614,11 @@ function fillInspectionFormFromDraft(draft) {
 }
 
 function buildInspectionDraftFromForm() {
+    const companyName =
+    document.getElementById(
+        "inspection-company-name"
+    ).value.trim();
+    
     const caseNo =
         document.getElementById("inspection-case-no").value.trim();
 
@@ -2982,6 +4642,21 @@ function buildInspectionDraftFromForm() {
 
     const title =
         document.getElementById("inspection-title").value.trim();
+
+if (!companyName) {
+    showToast(
+        "請輸入公司名稱。",
+        "error"
+    );
+
+    document
+        .getElementById(
+            "inspection-company-name"
+        )
+        .focus();
+
+    return null;
+}
 
     if (!inspectionDate) {
         showToast("請選擇稽查日期。", "error");
@@ -3038,7 +4713,13 @@ const existingDraft =
         : null;
 
 return {
-    id: existingDraft ? existingDraft.id : null,
+    id:
+        existingDraft
+            ? existingDraft.id
+            : null,
+
+    companyName,
+
     caseNo:
         existingDraft
             ? existingDraft.caseNo
@@ -3147,9 +4828,21 @@ function renderInspectionDocument(draft) {
         `;
     }).join("");
 
-    preview.innerHTML = `
-        <div class="inspection-doc-header">
-            <div class="inspection-doc-title">
+preview.innerHTML = `
+    ${
+        draft.companyName
+            ? `
+                <div class="inspection-doc-company">
+                    ${escapeInspectionHtml(
+                        draft.companyName
+                    )}
+                </div>
+            `
+            : ""
+    }
+
+    <div class="inspection-doc-header">
+        <div class="inspection-doc-title">
                 職業安全衛生現場稽查缺失改善通知單
             </div>
 
@@ -3160,8 +4853,14 @@ function renderInspectionDocument(draft) {
                 </div>
 
                 <div>
-                    <strong>年度資料夾：</strong>
-                    ${escapeInspectionHtml(draft.yearFolder)}
+<strong>年度：</strong>
+${escapeInspectionHtml(
+    formatInspectionYearText(
+        draft.yearFolder ||
+        draft.year,
+        draft.inspectionDate
+    )
+)}
                 </div>
 
                 <div>
@@ -3353,8 +5052,13 @@ async function saveInspectionReport() {
         }
 
         reportToSave.year = Number(year);
-        reportToSave.yearFolder =
-            reportToSave.yearFolder || `${year} 年度`;
+reportToSave.yearFolder =
+    formatInspectionYearText(
+        reportToSave.yearFolder ||
+        reportToSave.year,
+        reportToSave.inspectionDate
+    ) ||
+    `${year}年`;
 
         const isExistingReport =
             Number.isInteger(reportToSave.id);
@@ -3513,6 +5217,21 @@ function printInspectionDocument() {
                     border: 2px solid #0f172a;
                 }
 
+.inspection-doc-company {
+    margin: 0 0 6px;
+    padding: 0 6px;
+
+    color: #0f172a;
+    font-size: 18px;
+    line-height: 1.35;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-align: center;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
                 .inspection-doc-title {
                     padding: 10px 12px;
                     border-bottom: 1px solid #0f172a;
@@ -3563,18 +5282,22 @@ function printInspectionDocument() {
                     line-height: 1.65;
                 }
 
-                .inspection-doc-photo {
-                    display: block;
-                    width: 100%;
-                    max-height: 100mm;
-                    margin: 0 auto;
-                    border: 1px solid #cbd5e1;
-                    background: #ffffff;
-                    object-fit: contain;
-                }
+.inspection-doc-photo {
+    display: block;
+    width: 100%;
+    height: 120mm;
+    max-height: 120mm;
+
+    margin: 0 auto;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+
+    object-fit: contain;
+    object-position: center;
+}
 
                 .inspection-doc-empty-photo {
-                    height: 90mm;
+                    height: 110mm;
                     border: 1px dashed #94a3b8;
                     display: flex;
                     align-items: center;
@@ -3680,7 +5403,7 @@ function getReportTitle() {
 }
 
 async function syncCurrentReportTitleToHistory() {
-    if (!isAdmin) return;
+    if (!canEditData()) return;
     if (!currentReportId) return;
     if (!elements.reportNameInput) return;
 
@@ -4054,20 +5777,6 @@ document
         switchHistoryTab("inspection");
     };
 
-document
-    .getElementById("inspection-year-filter")
-    .onchange = () => {
-        document.getElementById(
-            "inspection-unit-filter"
-        ).value = "全部";
-
-        loadInspectionHistory();
-    };
-
-document
-    .getElementById("inspection-unit-filter")
-    .onchange = loadInspectionHistory;
-
         elements.historyCatFilter.onchange = loadHistory;
 
 let currentHistoryTab = "hazard";
@@ -4111,9 +5820,91 @@ function switchHistoryTab(tabName) {
     initIcons();
 }
 
-async function getInspectionAttachments(inspectionReportId) {
+async function getInspectionAttachmentById(id) {
+    if (!Number.isInteger(id)) {
+        return null;
+    }
+
+    if (isInspectionPreviewDataActive()) {
+        return (
+            previewInspectionAttachments.find(
+                attachment =>
+                    Number(attachment.id) ===
+                    Number(id)
+            ) || null
+        );
+    }
+
+    const tx = db.transaction(
+        ["inspectionAttachments"],
+        "readonly"
+    );
+
+    return await new Promise((resolve, reject) => {
+        const request =
+            tx.objectStore(
+                "inspectionAttachments"
+            ).get(id);
+
+        request.onsuccess = () => {
+            resolve(request.result || null);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+
+async function getAllInspectionAttachments() {
+    if (isInspectionPreviewDataActive()) {
+        return [
+            ...previewInspectionAttachments
+        ];
+    }
+
+    const tx = db.transaction(
+        ["inspectionAttachments"],
+        "readonly"
+    );
+
+    return await new Promise((resolve, reject) => {
+        const request =
+            tx.objectStore(
+                "inspectionAttachments"
+            ).getAll();
+
+        request.onsuccess = () => {
+            resolve(request.result || []);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+
+async function getInspectionAttachments(
+    inspectionReportId
+) {
     if (!Number.isInteger(inspectionReportId)) {
         return [];
+    }
+
+    if (isInspectionPreviewDataActive()) {
+        return previewInspectionAttachments
+            .filter(
+                attachment =>
+                    Number(
+                        attachment.inspectionReportId
+                    ) ===
+                    Number(inspectionReportId)
+            )
+            .sort(
+                (a, b) =>
+                    Number(b.uploadedAt || 0) -
+                    Number(a.uploadedAt || 0)
+            );
     }
 
     const tx = db.transaction(
@@ -4122,21 +5913,27 @@ async function getInspectionAttachments(inspectionReportId) {
     );
 
     const store =
-        tx.objectStore("inspectionAttachments");
+        tx.objectStore(
+            "inspectionAttachments"
+        );
 
     const index =
-        store.index("inspectionReportId");
+        store.index(
+            "inspectionReportId"
+        );
 
     return await new Promise((resolve, reject) => {
         const request =
             index.getAll(inspectionReportId);
 
         request.onsuccess = () => {
-            const result = request.result || [];
+            const result =
+                request.result || [];
 
-            result.sort((a, b) =>
-                Number(b.uploadedAt || 0) -
-                Number(a.uploadedAt || 0)
+            result.sort(
+                (a, b) =>
+                    Number(b.uploadedAt || 0) -
+                    Number(a.uploadedAt || 0)
             );
 
             resolve(result);
@@ -4146,6 +5943,499 @@ async function getInspectionAttachments(inspectionReportId) {
             reject(request.error);
         };
     });
+}
+
+function updateInspectionCompletionUI() {
+    const badge =
+        document.getElementById(
+            "attachment-case-status-badge"
+        );
+
+    const buttonText =
+        document.getElementById(
+            "toggle-inspection-complete-text"
+        );
+
+    if (!badge || !buttonText) {
+        return;
+    }
+
+    const isCompleted =
+        currentInspectionDraft?.status ===
+        "改善完成";
+
+    badge.innerText =
+        isCompleted
+            ? "改善完成"
+            : "待改善";
+
+    badge.className =
+        isCompleted
+            ? "text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200"
+            : "text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200";
+
+    buttonText.innerText =
+        isCompleted
+            ? "恢復待改善"
+            : "標記改善完成";
+}
+
+async function toggleInspectionCompletionStatus() {
+    if (!canEditData()) {
+        showToast(
+            "請先登入使用者或管理者權限，才能更新改善狀態。",
+            "error"
+        );
+        return;
+    }
+
+    if (
+        !currentInspectionDraft ||
+        !Number.isInteger(currentInspectionDraft.id)
+    ) {
+        showToast(
+            "找不到可更新的改善單資料。",
+            "error"
+        );
+        return;
+    }
+
+    const isCurrentlyCompleted =
+        currentInspectionDraft.status ===
+        "改善完成";
+
+    const nextStatus =
+        isCurrentlyCompleted
+            ? "待改善"
+            : "改善完成";
+
+    const reportToSave = {
+        ...currentInspectionDraft,
+
+        status:
+            nextStatus,
+
+        completedAt:
+            nextStatus === "改善完成"
+                ? Date.now()
+                : null,
+
+        updatedAt:
+            Date.now()
+    };
+
+    try {
+        const tx = db.transaction(
+            ["inspectionReports"],
+            "readwrite"
+        );
+
+        tx.objectStore(
+            "inspectionReports"
+        ).put(reportToSave);
+
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+
+            tx.onerror = () => {
+                reject(
+                    tx.error ||
+                    new Error("改善狀態更新失敗")
+                );
+            };
+
+            tx.onabort = () => {
+                reject(
+                    tx.error ||
+                    new Error("改善狀態更新已中止")
+                );
+            };
+        });
+
+        currentInspectionDraft =
+            reportToSave;
+
+        renderInspectionDocument(
+            currentInspectionDraft
+        );
+
+        updateInspectionCompletionUI();
+
+        if (
+            typeof currentHistoryTab !== "undefined" &&
+            currentHistoryTab === "inspection"
+        ) {
+            await loadInspectionHistory();
+        }
+
+        showToast(
+            nextStatus === "改善完成"
+                ? "此案件已標記為改善完成。"
+                : "此案件已恢復為待改善。"
+        );
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "改善狀態更新失敗，請重新操作。",
+            "error"
+        );
+    }
+}
+
+async function openInspectionAttachmentsModal() {
+    if (
+        !currentInspectionDraft ||
+        !Number.isInteger(currentInspectionDraft.id)
+    ) {
+        showToast(
+            "請先儲存改善單，再使用改善回覆附件功能。",
+            "error"
+        );
+        return;
+    }
+
+    document.getElementById(
+        "attachment-case-no"
+    ).innerText =
+        currentInspectionDraft.caseNo || "-";
+
+    document.getElementById(
+        "attachment-case-title"
+    ).innerText =
+        currentInspectionDraft.title || "-";
+
+    updateInspectionCompletionUI();    
+
+clearPendingInspectionAttachmentFiles();
+
+const noteInput =
+    document.getElementById(
+        "attachment-note"
+    );
+
+if (noteInput) {
+    noteInput.value = "";
+}
+
+    Array.from(
+        elements.modalOverlay.children
+    ).forEach(child => {
+        child.classList.add("hidden");
+    });
+
+    elements.modalOverlay.classList.remove("hidden");
+
+    document
+        .getElementById(
+            "inspection-attachments-modal"
+        )
+        .classList.remove("hidden");
+
+    await renderInspectionAttachmentList();
+
+    initIcons();
+}
+
+function formatInspectionAttachmentFileSize(size) {
+    const bytes = Number(size || 0);
+
+    if (!bytes) {
+        return "大小未知";
+    }
+
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(
+        bytes /
+        1024 /
+        1024
+    ).toFixed(1)} MB`;
+}
+
+function validatePendingInspectionAttachmentFiles(fileList) {
+    const files =
+        Array.from(fileList || []);
+
+    if (files.length === 0) {
+        return [];
+    }
+
+    const allowedTypes = new Set([
+        "application/pdf",
+        "image/jpeg",
+        "image/jpg",
+        "image/png"
+    ]);
+
+    const allowedFileName =
+        /\.(pdf|jpe?g|png)$/i;
+
+    const maxFileSize =
+        10 * 1024 * 1024;
+
+    for (const file of files) {
+        const validType =
+            allowedTypes.has(
+                String(file.type || "")
+                    .toLowerCase()
+            ) ||
+            allowedFileName.test(
+                String(file.name || "")
+            );
+
+        if (!validType) {
+            showToast(
+                `「${file.name}」格式不支援，僅限 PDF、JPG、JPEG、PNG。`,
+                "error"
+            );
+
+            return null;
+        }
+
+        if (file.size > maxFileSize) {
+            showToast(
+                `「${file.name}」超過 10 MB，請縮小檔案後重新選擇。`,
+                "error"
+            );
+
+            return null;
+        }
+    }
+
+    return files;
+}
+
+function updateInspectionAttachmentSelectionUI() {
+    const dropZone =
+        document.getElementById(
+            "inspection-attachment-drop-zone"
+        );
+
+    const text =
+        document.getElementById(
+            "inspection-attachment-selection-text"
+        );
+
+    const hint =
+        document.getElementById(
+            "inspection-attachment-selection-hint"
+        );
+
+    const uploadButton =
+        document.getElementById(
+            "upload-inspection-attachment-btn"
+        );
+
+    const uploadButtonText =
+        document.getElementById(
+            "upload-inspection-attachment-text"
+        );
+
+    const files =
+        pendingInspectionAttachmentFiles;
+
+    const hasFiles =
+        files.length > 0;
+
+    if (dropZone) {
+        dropZone.classList.toggle(
+            "has-files",
+            hasFiles
+        );
+
+        dropZone.title =
+            hasFiles
+                ? files
+                    .map(file => file.name)
+                    .join("\n")
+                : "點擊選擇檔案，或將檔案拖曳至此";
+    }
+
+    if (!hasFiles) {
+        if (text) {
+            text.innerText =
+                "點擊或拖曳檔案";
+        }
+
+        if (hint) {
+            hint.innerText =
+                "PDF、JPG、PNG｜可複選｜單檔上限 10 MB";
+        }
+
+        if (uploadButton) {
+            uploadButton.disabled = true;
+        }
+
+        if (uploadButtonText) {
+            uploadButtonText.innerText =
+                "上傳所選附件";
+        }
+
+        return;
+    }
+
+    const totalSize =
+        files.reduce(
+            (total, file) =>
+                total +
+                Number(file.size || 0),
+            0
+        );
+
+    if (text) {
+        text.innerText =
+            files.length === 1
+                ? files[0].name
+                : `已選擇 ${files.length} 個檔案`;
+    }
+
+    if (hint) {
+        hint.innerText =
+            `${formatInspectionAttachmentFileSize(
+                totalSize
+            )}・待確認上傳`;
+    }
+
+    if (uploadButton) {
+        uploadButton.disabled = false;
+    }
+
+    if (uploadButtonText) {
+        uploadButtonText.innerText =
+            "上傳所選附件";
+    }
+}
+
+function clearPendingInspectionAttachmentFiles() {
+    pendingInspectionAttachmentFiles = [];
+
+    const fileInput =
+        document.getElementById(
+            "inspection-attachment-file"
+        );
+
+    if (fileInput) {
+        fileInput.value = "";
+    }
+
+    updateInspectionAttachmentSelectionUI();
+}
+
+function setPendingInspectionAttachmentFiles(fileList) {
+    const files =
+        validatePendingInspectionAttachmentFiles(
+            fileList
+        );
+
+    if (!files) {
+        clearPendingInspectionAttachmentFiles();
+        return false;
+    }
+
+    pendingInspectionAttachmentFiles =
+        files;
+
+    updateInspectionAttachmentSelectionUI();
+
+    return files.length > 0;
+}
+
+function getInspectionAttachmentTypeMeta(file) {
+    const mimeType =
+        String(file?.mimeType || "")
+            .toLowerCase();
+
+    const fileName =
+        String(file?.fileName || "")
+            .toLowerCase();
+
+    const isPdf =
+        mimeType === "application/pdf" ||
+        fileName.endsWith(".pdf");
+
+    const isPng =
+        mimeType === "image/png" ||
+        fileName.endsWith(".png");
+
+    const isJpg =
+        mimeType === "image/jpeg" ||
+        mimeType === "image/jpg" ||
+        fileName.endsWith(".jpg") ||
+        fileName.endsWith(".jpeg");
+
+    if (isPdf) {
+        return {
+            label: "PDF 檔案",
+            iconHtml: `
+                <span
+                    class="attachment-symbol attachment-file-type-symbol attachment-file-type-pdf"
+                    aria-hidden="true"
+                >
+                    <svg viewBox="0 0 48 48" focusable="false">
+                        <path
+                            fill="currentColor"
+                            d="M12 4h16l8 8v28a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z"
+                        />
+                        <path
+                            fill="#ffffff"
+                            opacity=".9"
+                            d="M28 4v8h8l-8-8Z"
+                        />
+                        <path
+                            fill="#ffffff"
+                            d="M15 31h18v4H15v-4Zm0-8h18v4H15v-4Zm0-8h10v4H15v-4Z"
+                        />
+                    </svg>
+                </span>
+            `
+        };
+    }
+
+    const colorClass =
+        isPng
+            ? "attachment-file-type-png"
+            : "attachment-file-type-jpg";
+
+    return {
+        label:
+            isPng
+                ? "PNG 圖片"
+                : isJpg
+                    ? "JPG 圖片"
+                    : "圖片檔案",
+
+        iconHtml: `
+            <span
+                class="attachment-symbol attachment-file-type-symbol ${colorClass}"
+                aria-hidden="true"
+            >
+                <svg viewBox="0 0 48 48" focusable="false">
+                    <path
+                        fill="currentColor"
+                        d="M8 10a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V10Z"
+                    />
+                    <path
+                        fill="#ffffff"
+                        opacity=".9"
+                        d="M15 34h20L28 24l-5 6-4-5-4 9Z"
+                    />
+                    <circle
+                        cx="18"
+                        cy="17"
+                        r="4"
+                        fill="#ffffff"
+                    />
+                </svg>
+            </span>
+        `
+    };
 }
 
 async function renderInspectionAttachmentList() {
@@ -4196,22 +6486,25 @@ async function renderInspectionAttachmentList() {
     }
 
     list.innerHTML = attachments.map(file => {
-        const uploadDate = new Date(
-            file.uploadedAt
-        ).toLocaleString("zh-TW");
+        const uploadDate =
+            new Date(
+                file.uploadedAt
+            ).toLocaleString("zh-TW");
 
-        const icon =
-            file.mimeType === "application/pdf"
-                ? "file-text"
-                : "image";
+        const fileSizeText =
+            formatInspectionAttachmentFileSize(
+                file.fileSize
+            );
+
+        const fileMeta =
+            getInspectionAttachmentTypeMeta(file);
 
         return `
-            <div class="border border-slate-200 rounded-xl bg-white p-3">
+            <div class="border border-slate-200 rounded-xl bg-white p-3 hover:border-blue-300 hover:bg-blue-50/30 transition">
                 <div class="flex items-start justify-between gap-3">
+
                     <div class="flex items-start gap-3 min-w-0">
-                        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                            <i data-lucide="${icon}" class="w-4 h-4 text-slate-600"></i>
-                        </div>
+                        ${fileMeta.iconHtml}
 
                         <div class="min-w-0">
                             <div class="text-xs font-black text-slate-800 break-all">
@@ -4220,16 +6513,20 @@ async function renderInspectionAttachmentList() {
 
                             <div class="text-[10px] text-emerald-700 font-bold mt-1">
                                 ${escapeInspectionHtml(file.attachmentType)}
+                                ・
+                                ${escapeInspectionHtml(fileMeta.label)}
                             </div>
 
                             <div class="text-[10px] text-slate-400 mt-1">
                                 ${escapeInspectionHtml(uploadDate)}
+                                ・
+                                ${escapeInspectionHtml(fileSizeText)}
                             </div>
 
                             ${
                                 file.note
                                     ? `
-                                        <div class="text-[11px] text-slate-500 mt-1">
+                                        <div class="text-[11px] text-slate-500 mt-1 leading-relaxed">
                                             ${escapeInspectionHtml(file.note)}
                                         </div>
                                     `
@@ -4242,10 +6539,11 @@ async function renderInspectionAttachmentList() {
                         <button
                             type="button"
                             onclick="openInspectionAttachment(${file.id})"
-                            class="text-blue-600 hover:text-blue-800 text-xs"
-                            title="查看附件"
+                            class="bg-white border border-blue-200 text-blue-500 text-xs p-1.5 rounded hover:bg-blue-50 hover:text-blue-700 transition"
+                            title="預覽附件"
+                            aria-label="預覽附件"
                         >
-                            <i data-lucide="eye" class="w-4 h-4"></i>
+                            <i class="fas fa-magnifying-glass"></i>
                         </button>
 
                         ${
@@ -4254,10 +6552,11 @@ async function renderInspectionAttachmentList() {
                                     <button
                                         type="button"
                                         onclick="deleteInspectionAttachment(${file.id})"
-                                        class="text-red-500 hover:text-red-700 text-xs"
+                                        class="bg-white border border-red-200 text-red-500 text-xs p-1.5 rounded hover:bg-red-50 transition"
                                         title="刪除附件"
+                                        aria-label="刪除附件"
                                     >
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 `
                                 : ""
@@ -4271,7 +6570,921 @@ async function renderInspectionAttachmentList() {
     initIcons();
 }
 
+async function uploadInspectionAttachment() {
+    if (!canEditData()) {
+        showToast(
+            "請先登入使用者或管理者權限，才能上傳改善回覆。",
+            "error"
+        );
+        return;
+    }
+
+    if (
+        !currentInspectionDraft ||
+        !Number.isInteger(currentInspectionDraft.id)
+    ) {
+        showToast(
+            "請先儲存改善單，再上傳改善回覆。",
+            "error"
+        );
+        return;
+    }
+
+const typeInput =
+    document.getElementById(
+        "attachment-type"
+    );
+
+const noteInput =
+    document.getElementById(
+        "attachment-note"
+    );
+
+const files =
+    validatePendingInspectionAttachmentFiles(
+        pendingInspectionAttachmentFiles
+    );
+
+if (!files) {
+    clearPendingInspectionAttachmentFiles();
+    return;
+}
+
+if (files.length === 0) {
+    showToast(
+        "請先選擇要上傳的附件。",
+        "error"
+    );
+    return;
+}
+
+    try {
+const preparedAttachments = [];
+const uploadBatchTime = Date.now();
+
+for (const file of files) {
+            const fileData =
+                await readFileAsDataUrl(file);
+
+            preparedAttachments.push({
+                inspectionReportId:
+                    currentInspectionDraft.id,
+
+                caseNo:
+                    currentInspectionDraft.caseNo,
+
+                fileName:
+                    file.name,
+
+                mimeType:
+                    file.type,
+
+                fileSize:
+                    file.size,
+
+                fileData,
+
+                attachmentType:
+                    typeInput?.value ||
+                    "單位改善回覆",
+
+                note:
+                    noteInput?.value.trim() ||
+                    "",
+
+uploadedAt:
+    uploadBatchTime +
+    preparedAttachments.length
+            });
+        }
+
+        const tx = db.transaction(
+            ["inspectionAttachments"],
+            "readwrite"
+        );
+
+        const store =
+            tx.objectStore(
+                "inspectionAttachments"
+            );
+
+        preparedAttachments.forEach(attachment => {
+            store.add(attachment);
+        });
+
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+
+            tx.onerror = () => {
+                reject(
+                    tx.error ||
+                    new Error("附件上傳失敗")
+                );
+            };
+
+            tx.onabort = () => {
+                reject(
+                    tx.error ||
+                    new Error("附件上傳已中止")
+                );
+            };
+        });
+
+clearPendingInspectionAttachmentFiles();
+
+if (noteInput) {
+    noteInput.value = "";
+}
+
+        showToast(
+            preparedAttachments.length > 1
+                ? `${preparedAttachments.length} 個改善回覆附件已上傳完成。`
+                : "改善回覆附件已上傳完成。"
+        );
+
+        await renderInspectionAttachmentList();
+
+        if (
+            typeof currentHistoryTab !== "undefined" &&
+            currentHistoryTab === "inspection"
+        ) {
+            await loadInspectionHistory();
+        }
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "附件讀取或上傳失敗，請重新選擇檔案。",
+            "error"
+        );
+    }
+}
+
+let filePreviewMode = '';
+let filePreviewScale = 1;
+let filePreviewDefaultScale = 1;
+let filePreviewRotation = 0;
+let imagePreviewScale = 1;
+let imagePreviewDefaultScale = 1;
+let filePreviewObjectUrl = '';
+let filePreviewTouchDistance = null;
+let filePreviewTouchScale = 1;
+let filePreviewPdfDocument = null;
+let filePreviewPdfRenderSerial = 0;
+let filePreviewPdfAppliedRelativeScale = 1;
+let filePreviewGesturesReady = false;
+let filePreviewPdfJsLoadingPromise = null;
+let filePreviewPdfRenderTimer = null;
+let filePreviewPdfScaleFrame = null;
+
+function dataUrlToBlobUrl(dataUrl) {
+    const parts = String(dataUrl || '').split(',');
+    const mimeMatch = parts[0].match(/data:(.*?);base64/);
+    const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+    const binary = atob(parts[1] || '');
+    const length = binary.length;
+    const bytes = new Uint8Array(length);
+
+    for (let i = 0; i < length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    const blob = new Blob([bytes], { type: mime });
+    return URL.createObjectURL(blob);
+}
+
+function dataUrlToUint8Array(dataUrl) {
+    const base64 = String(dataUrl || '').split(',')[1] || '';
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes;
+}
+
+function clampPreviewScale(value, min = 0.25, max = 4) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function getFilePreviewElements() {
+    return {
+        modal: document.getElementById('file-preview-modal'),
+        title: document.getElementById('file-preview-title'),
+        subtitle: document.getElementById('file-preview-subtitle'),
+        badge: document.getElementById('file-preview-badge'),
+        toolbar: document.getElementById('file-preview-toolbar'),
+        zoomLabel: document.getElementById('file-preview-zoom-label'),
+        loading: document.getElementById('file-preview-loading'),
+        loadingText: document.getElementById('file-preview-loading-text'),
+        body: document.getElementById('file-preview-body'),
+        frame: document.getElementById('file-preview-frame'),
+        image: document.getElementById('file-preview-image'),
+        pdfPages: document.getElementById('pdf-preview-pages')
+    };
+}
+
+function setFilePreviewLoading(isLoading, message = '載入中.', delay = 1000) {
+    const { loading, loadingText } = getFilePreviewElements();
+    if (!loading) return;
+
+    if (setFilePreviewLoading._timer) {
+        clearTimeout(setFilePreviewLoading._timer);
+        setFilePreviewLoading._timer = null;
+    }
+
+    if (!isLoading) {
+        loading.classList.add('hidden');
+        return;
+    }
+
+    loading.classList.add('hidden');
+
+    setFilePreviewLoading._timer = setTimeout(() => {
+        setFilePreviewLoading._timer = null;
+
+        if (loadingText) loadingText.innerText = message;
+        loading.classList.remove('hidden');
+    }, delay);
+}
+
+function updateFilePreviewZoomLabel() {
+    const { zoomLabel } = getFilePreviewElements();
+    if (!zoomLabel) return;
+
+    const baseScale = filePreviewDefaultScale || 1;
+    const relativeScale = Math.round((filePreviewScale / baseScale) * 100);
+    zoomLabel.innerText = `${relativeScale}%`;
+}
+
+function revokeCurrentPreviewObjectUrl() {
+    if (filePreviewObjectUrl) {
+        URL.revokeObjectURL(filePreviewObjectUrl);
+        filePreviewObjectUrl = null;
+    }
+}
+
+function resetFilePreviewContent() {
+    const { frame, image, pdfPages, toolbar } = getFilePreviewElements();
+
+    filePreviewPdfRenderSerial++;
+    if (filePreviewPdfRenderTimer) {
+        clearTimeout(filePreviewPdfRenderTimer);
+        filePreviewPdfRenderTimer = null;
+    }
+
+    if (filePreviewPdfScaleFrame) {
+        cancelAnimationFrame(filePreviewPdfScaleFrame);
+        filePreviewPdfScaleFrame = null;
+    }
+
+    if (filePreviewPdfDocument && typeof filePreviewPdfDocument.destroy === 'function') {
+        try { filePreviewPdfDocument.destroy(); } catch (err) { console.warn('PDF preview cleanup skipped', err); }
+    }
+
+filePreviewMode = '';
+filePreviewPdfDocument = null;
+filePreviewScale = 1;
+filePreviewDefaultScale = 1;
+filePreviewRotation = 0;
+imagePreviewScale = 1;
+imagePreviewDefaultScale = 1;
+filePreviewTouchDistance = null;
+filePreviewTouchScale = 1;
+filePreviewPdfAppliedRelativeScale = 1;
+
+    revokeCurrentPreviewObjectUrl();
+
+if (frame) {
+    frame.removeAttribute('src');
+    frame.classList.add('hidden');
+    frame.style.width = '';
+    frame.style.height = '';
+    frame.style.minWidth = '';
+    frame.style.minHeight = '';
+    frame.style.transform = '';
+    frame.style.transformOrigin = '';
+}
+
+if (image) {
+    image.onload = null;
+    image.onerror = null;
+    image.removeAttribute('src');
+    image.classList.add('hidden');
+    image.style.width = '';
+    image.style.height = '';
+    image.style.transform = '';
+    image.style.transformOrigin = '';
+    image.style.margin = '';
+}
+
+if (pdfPages) {
+    pdfPages.innerHTML = '';
+    pdfPages.classList.add('hidden');
+    pdfPages.style.gap = '';
+    pdfPages.style.transform = '';
+}
+
+    if (toolbar) toolbar.classList.add('hidden');
+    setFilePreviewLoading(false);
+    updateFilePreviewZoomLabel();
+}
+
+function getImageFitPreviewScale(image) {
+    const { body } = getFilePreviewElements();
+    const naturalWidth = image?.naturalWidth || 1;
+    const naturalHeight = image?.naturalHeight || 1;
+    const availableWidth = Math.max(260, (body?.clientWidth || window.innerWidth) - 36);
+    const availableHeight = Math.max(260, (body?.clientHeight || window.innerHeight) - 36);
+const fitScale = Math.min(availableWidth / naturalWidth, availableHeight / naturalHeight, 1);
+
+return clampPreviewScale(fitScale, 0.15, 1);
+}
+
+function applyPreviewImageScale() {
+    const { image } = getFilePreviewElements();
+    if (!image || !image.naturalWidth || !image.naturalHeight) return;
+
+    const displayWidth = Math.max(1, Math.round(image.naturalWidth * filePreviewScale));
+    const displayHeight = Math.max(1, Math.round(image.naturalHeight * filePreviewScale));
+    const isSideways = Math.abs(filePreviewRotation % 180) === 90;
+
+    image.style.width = `${displayWidth}px`;
+    image.style.height = `${displayHeight}px`;
+    image.style.transform = `rotate(${filePreviewRotation}deg)`;
+    image.style.transformOrigin = 'center center';
+
+    if (isSideways) {
+        const horizontalMargin = Math.max(0, (displayHeight - displayWidth) / 2);
+        const verticalMargin = Math.max(0, (displayWidth - displayHeight) / 2);
+        image.style.margin = `${verticalMargin}px ${horizontalMargin}px`;
+    } else {
+        image.style.margin = '';
+    }
+
+    imagePreviewScale = filePreviewScale;
+    imagePreviewDefaultScale = filePreviewDefaultScale;
+    updateFilePreviewZoomLabel();
+}
+
+function applyPreviewFrameScale() {
+    const { frame } = getFilePreviewElements();
+    if (!frame) return;
+
+    const relativeScale = filePreviewScale / (filePreviewDefaultScale || 1);
+    frame.style.width = `${Math.max(100, Math.round(100 * relativeScale))}%`;
+    frame.style.height = `${Math.max(100, Math.round(100 * relativeScale))}%`;
+    frame.style.minWidth = `${Math.max(100, Math.round(100 * relativeScale))}%`;
+    frame.style.minHeight = `${Math.max(620, Math.round(620 * relativeScale))}px`;
+    frame.style.transform = `rotate(${filePreviewRotation}deg)`;
+    frame.style.transformOrigin = 'center center';
+
+    updateFilePreviewZoomLabel();
+}
+
+function applyPreviewPdfScale(options = {}) {
+    const { body, pdfPages } = getFilePreviewElements();
+    if (!pdfPages) return;
+
+    const preserveScroll = options.preserveScroll !== false;
+    const baseScale = filePreviewDefaultScale || 1;
+    const relativeScale = Math.max(0.05, filePreviewScale / baseScale);
+    const previousRelativeScale = filePreviewPdfAppliedRelativeScale || 1;
+
+    let anchorX = null;
+    let anchorY = null;
+
+    if (preserveScroll && body) {
+        anchorX = (body.scrollLeft + (body.clientWidth / 2)) / previousRelativeScale;
+        anchorY = (body.scrollTop + (body.clientHeight / 2)) / previousRelativeScale;
+    }
+
+    pdfPages.style.gap = `${Math.max(10, Math.round(18 * relativeScale))}px`;
+
+    pdfPages.querySelectorAll('.pdf-preview-page-shell').forEach(shell => {
+        const baseWidth = Number(shell.dataset.baseWidth || shell.offsetWidth || 1);
+        const baseHeight = Number(shell.dataset.baseHeight || shell.offsetHeight || 1);
+        const scaledWidth = Math.max(1, Math.round(baseWidth * relativeScale));
+        const scaledHeight = Math.max(1, Math.round(baseHeight * relativeScale));
+
+        shell.style.width = `${scaledWidth}px`;
+        shell.style.height = `${scaledHeight}px`;
+
+        const canvas = shell.querySelector('.pdf-preview-page-canvas');
+        if (canvas) {
+            canvas.style.width = `${scaledWidth}px`;
+            canvas.style.height = `${scaledHeight}px`;
+        }
+
+        const badge = shell.querySelector('.pdf-preview-page-number');
+        if (badge) {
+            const badgeScale = Math.max(0.72, Math.min(1, 1 / relativeScale));
+            badge.style.transform = `scale(${badgeScale})`;
+            badge.style.transformOrigin = 'top right';
+        }
+    });
+
+    filePreviewPdfAppliedRelativeScale = relativeScale;
+    updateFilePreviewZoomLabel();
+
+    if (preserveScroll && body && Number.isFinite(anchorX) && Number.isFinite(anchorY)) {
+        body.scrollLeft = Math.max(0, (anchorX * relativeScale) - (body.clientWidth / 2));
+        body.scrollTop = Math.max(0, (anchorY * relativeScale) - (body.clientHeight / 2));
+    }
+}
+
+function schedulePreviewPdfScaleApply() {
+    updateFilePreviewZoomLabel();
+
+    if (filePreviewPdfScaleFrame) return;
+
+    filePreviewPdfScaleFrame = requestAnimationFrame(() => {
+        filePreviewPdfScaleFrame = null;
+        applyPreviewPdfScale({ preserveScroll: true });
+    });
+}
+
+function setFilePreviewScale(nextScale) {
+    filePreviewScale = clampPreviewScale(nextScale);
+
+    if (filePreviewMode === 'image') {
+        applyPreviewImageScale();
+    } else if (filePreviewMode === 'pdf') {
+        schedulePreviewPdfScaleApply();
+    } else if (filePreviewMode === 'pdf-frame') {
+        applyPreviewFrameScale();
+    } else {
+        updateFilePreviewZoomLabel();
+    }
+}
+
+function zoomFilePreviewBy(delta) {
+    const stepBase = filePreviewDefaultScale || 1;
+    setFilePreviewScale(filePreviewScale + (stepBase * delta));
+}
+
+function rotateFilePreviewBy(degrees = 90) {
+    filePreviewRotation = (filePreviewRotation + degrees) % 360;
+
+    if (filePreviewMode === 'image') {
+        applyPreviewImageScale();
+    } else if (filePreviewMode === 'pdf') {
+        renderPdfPreviewPages();
+    } else if (filePreviewMode === 'pdf-frame') {
+        applyPreviewFrameScale();
+    }
+
+    updateFilePreviewZoomLabel();
+}
+
+function fitFilePreviewToScreen() {
+    setFilePreviewScale(filePreviewDefaultScale || 1);
+
+    const { body } = getFilePreviewElements();
+    if (body && filePreviewMode !== 'pdf') {
+        body.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+}
+
+function zoomPreviewImage(delta) {
+    zoomFilePreviewBy(delta);
+}
+
+function resetPreviewImageZoom() {
+    fitFilePreviewToScreen();
+}
+
+function ensureFilePreviewGestures() {
+    if (filePreviewGesturesReady) return;
+    const { body } = getFilePreviewElements();
+    if (!body) return;
+
+    body.addEventListener('wheel', function(event) {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomFilePreviewBy(event.deltaY < 0 ? 0.12 : -0.12);
+    }, { passive: false });
+
+    body.addEventListener('touchstart', function(event) {
+        if (event.touches.length !== 2) return;
+        filePreviewTouchDistance = getTouchDistance(event.touches);
+        filePreviewTouchScale = filePreviewScale;
+    }, { passive: true });
+
+    body.addEventListener('touchmove', function(event) {
+        if (event.touches.length !== 2 || !filePreviewTouchDistance) return;
+        event.preventDefault();
+        const currentDistance = getTouchDistance(event.touches);
+        const ratio = currentDistance / filePreviewTouchDistance;
+        setFilePreviewScale(filePreviewTouchScale * ratio);
+    }, { passive: false });
+
+    body.addEventListener('touchend', function(event) {
+        if (event.touches.length < 2) {
+            filePreviewTouchDistance = null;
+            filePreviewTouchScale = filePreviewScale;
+        }
+    });
+
+    filePreviewGesturesReady = true;
+}
+
+function getTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function ensurePdfJsLoaded() {
+    if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        return Promise.resolve(window.pdfjsLib);
+    }
+
+    if (filePreviewPdfJsLoadingPromise) return filePreviewPdfJsLoadingPromise;
+
+    filePreviewPdfJsLoadingPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        script.async = true;
+        script.onload = () => {
+            if (!window.pdfjsLib) {
+                reject(new Error('PDF.js 載入失敗'));
+                return;
+            }
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            resolve(window.pdfjsLib);
+        };
+        script.onerror = () => reject(new Error('PDF.js 載入失敗'));
+        document.head.appendChild(script);
+    });
+
+    return filePreviewPdfJsLoadingPromise;
+}
+
+function queuePdfPreviewRender() {
+    if (filePreviewMode !== 'pdf' || !filePreviewPdfDocument) return;
+    schedulePreviewPdfScaleApply();
+}
+
+async function renderPdfPreviewPages() {
+    const { pdfPages } = getFilePreviewElements();
+    if (!pdfPages || !filePreviewPdfDocument) return;
+
+    const renderSerial = ++filePreviewPdfRenderSerial;
+    const pdf = filePreviewPdfDocument;
+    const scale = filePreviewScale;
+    const outputScale = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2.5);
+
+    pdfPages.innerHTML = '';
+    pdfPages.style.gap = '';
+    filePreviewPdfAppliedRelativeScale = 1;
+    pdfPages.classList.remove('hidden');
+
+    try {
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+            if (renderSerial !== filePreviewPdfRenderSerial) return;
+
+            const page = await pdf.getPage(pageNumber);
+            if (renderSerial !== filePreviewPdfRenderSerial) return;
+
+            const viewport = page.getViewport({ scale, rotation: filePreviewRotation });
+            const pageWidth = Math.floor(viewport.width);
+            const pageHeight = Math.floor(viewport.height);
+            const pageShell = document.createElement('div');
+            pageShell.className = 'pdf-preview-page-shell';
+            pageShell.dataset.baseWidth = String(pageWidth);
+            pageShell.dataset.baseHeight = String(pageHeight);
+            pageShell.style.width = `${pageWidth}px`;
+            pageShell.style.height = `${pageHeight}px`;
+
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-preview-page-canvas';
+            canvas.dataset.baseWidth = String(pageWidth);
+            canvas.dataset.baseHeight = String(pageHeight);
+            canvas.width = Math.floor(viewport.width * outputScale);
+            canvas.height = Math.floor(viewport.height * outputScale);
+            canvas.style.width = `${pageWidth}px`;
+            canvas.style.height = `${pageHeight}px`;
+
+            const pageBadge = document.createElement('div');
+            pageBadge.className = 'pdf-preview-page-number';
+            pageBadge.innerText = `${pageNumber} / ${pdf.numPages}`;
+
+            pageShell.appendChild(canvas);
+            pageShell.appendChild(pageBadge);
+            pdfPages.appendChild(pageShell);
+
+            const context = canvas.getContext('2d');
+            await page.render({
+                canvasContext: context,
+                viewport,
+                transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null
+            }).promise;
+        }
+    } catch (err) {
+        if (renderSerial === filePreviewPdfRenderSerial) {
+            console.warn('PDF preview render failed', err);
+        }
+    } finally {
+        if (renderSerial === filePreviewPdfRenderSerial) {
+            applyPreviewPdfScale({ preserveScroll: false });
+            setFilePreviewLoading(false);
+            updateFilePreviewZoomLabel();
+        }
+    }
+}
+
+async function openPdfPreview(file) {
+    const { body, frame, image, pdfPages, toolbar } = getFilePreviewElements();
+
+    filePreviewMode = 'pdf';
+    const previewSerial = filePreviewPdfRenderSerial;
+
+    if (frame) frame.classList.add('hidden');
+    if (image) image.classList.add('hidden');
+    if (pdfPages) pdfPages.classList.remove('hidden');
+    if (toolbar) toolbar.classList.remove('hidden');
+
+    setFilePreviewLoading(true, 'PDF 載入中.', 1000);
+
+    try {
+        const pdfjsLib = await ensurePdfJsLoaded();
+        if (previewSerial !== filePreviewPdfRenderSerial || filePreviewMode !== 'pdf') return;
+
+        const pdfBytes = dataUrlToUint8Array(file.data);
+        const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+        if (previewSerial !== filePreviewPdfRenderSerial || filePreviewMode !== 'pdf') {
+            if (pdf && typeof pdf.destroy === 'function') pdf.destroy();
+            return;
+        }
+        filePreviewPdfDocument = pdf;
+
+        const firstPage = await pdf.getPage(1);
+        if (previewSerial !== filePreviewPdfRenderSerial || filePreviewMode !== 'pdf') return;
+
+const firstViewport = firstPage.getViewport({ scale: 1 });
+const availableWidth = Math.max(280, (body?.clientWidth || window.innerWidth) - 44);
+
+// 桌機預設略縮小，手機維持原本適合寬度
+const isDesktopPreview = window.matchMedia('(min-width: 901px)').matches;
+const initialPdfScaleRatio = isDesktopPreview ? 0.70 : 1;
+
+filePreviewDefaultScale = clampPreviewScale(
+    (availableWidth / firstViewport.width) * initialPdfScaleRatio,
+    0.35,
+    1.7
+);
+
+filePreviewScale = filePreviewDefaultScale;
+updateFilePreviewZoomLabel();
+
+await renderPdfPreviewPages();
+    } catch (err) {
+        if (previewSerial !== filePreviewPdfRenderSerial || filePreviewMode !== 'pdf') return;
+        console.warn('PDF.js preview unavailable, falling back to browser PDF viewer', err);
+        openPdfPreviewFallback(file);
+    }
+}
+
+function openPdfPreviewFallback(file) {
+    const { frame, image, pdfPages, toolbar } = getFilePreviewElements();
+
+    filePreviewMode = 'pdf-frame';
+    revokeCurrentPreviewObjectUrl();
+    filePreviewObjectUrl = dataUrlToBlobUrl(file.data);
+
+    if (pdfPages) {
+        pdfPages.innerHTML = '';
+        pdfPages.classList.add('hidden');
+    }
+
+    if (image) image.classList.add('hidden');
+
+    if (frame) {
+        frame.src = filePreviewObjectUrl;
+        frame.classList.remove('hidden');
+    }
+
+    filePreviewDefaultScale = 1;
+    filePreviewScale = 1;
+    applyPreviewFrameScale();
+    if (toolbar) toolbar.classList.remove('hidden');
+    setFilePreviewLoading(false);
+}
+
+function openImagePreview(file) {
+    const { frame, image, pdfPages, toolbar } = getFilePreviewElements();
+
+    filePreviewMode = 'image';
+    if (frame) frame.classList.add('hidden');
+    if (pdfPages) {
+        pdfPages.innerHTML = '';
+        pdfPages.classList.add('hidden');
+    }
+    if (toolbar) toolbar.classList.remove('hidden');
+
+    if (!image) return;
+
+    setFilePreviewLoading(true, '圖片載入中...');
+    image.classList.remove('hidden');
+image.onload = () => {
+    const baseImageScale = getImageFitPreviewScale(image);
+    const isDesktopPreview = window.matchMedia('(min-width: 901px)').matches;
+
+    /*
+     * 附件圖片預覽初始比例：
+     * 1. 手機版：維持適合畫面，避免超出與誤觸。
+     * 2. 桌機版：保留略放大，避免圖片太小。
+     * 3. 不再使用 1.6 倍，避免開啟後跳到 160% 以上造成操作不穩。
+     */
+    filePreviewDefaultScale = baseImageScale;
+    filePreviewScale = isDesktopPreview
+        ? Math.min(baseImageScale * 1.25, 1.25)
+        : baseImageScale;
+
+    applyPreviewImageScale();
+    setFilePreviewLoading(false);
+};
+    image.onerror = () => {
+        setFilePreviewLoading(false);
+        alert('圖片預覽載入失敗，請確認檔案是否完整。');
+    };
+    image.src = file.data;
+}
+
+function viewFileDirectly(file, subtitleText = '') {
+    const { modal, title, subtitle, badge, toolbar } = getFilePreviewElements();
+    if (!modal || !file) return;
+
+    resetFilePreviewContent();
+
+    const fileName = file.name || '附件預覽';
+    const fileType = String(file.type || '').toLowerCase();
+
+    if (title) title.innerText = fileName;
+
+    if (subtitle) {
+        subtitle.innerText = subtitleText ? `${subtitleText} 的相關附件` : '附件內容';
+    }
+
+    if (badge) {
+        if (fileType === 'application/pdf') {
+            badge.innerText = 'PDF';
+        } else if (fileType.includes('png')) {
+            badge.innerText = 'PNG';
+        } else if (fileType.includes('jpg') || fileType.includes('jpeg')) {
+            badge.innerText = 'JPG';
+        } else {
+            badge.innerText = 'FILE';
+        }
+    }
+
+    if (toolbar) toolbar.classList.remove('hidden');
+
+    document.body.classList.add('file-preview-open');
+    modal.classList.remove('hidden');
+
+    ensureFilePreviewGestures();
+    updateFilePreviewZoomLabel();
+    initIcons();
+
+    if (fileType === 'application/pdf') {
+        openPdfPreview(file);
+    } else if (fileType === 'image/png' || fileType === 'image/jpeg' || fileType === 'image/jpg') {
+        openImagePreview(file);
+    } else {
+        setFilePreviewLoading(false);
+        alert('此附件格式不支援預覽。');
+        closeFilePreviewModal();
+    }
+}
+
+function closeFilePreviewModal() {
+    const { modal } = getFilePreviewElements();
+    resetFilePreviewContent();
+
+    if (modal) modal.classList.add('hidden');
+    document.body.classList.remove('file-preview-open');
+}
+
+function closeFilePreviewByBackdrop(event) {
+    if (event && event.target && event.target.id === 'file-preview-modal') {
+        closeFilePreviewModal();
+    }
+}
+
+window.openInspectionAttachment = async id => {
+    try {
+        const attachment =
+            await getInspectionAttachmentById(id);
+
+        if (!attachment?.fileData) {
+            showToast(
+                "找不到附件資料。",
+                "error"
+            );
+            return;
+        }
+
+        const previewFile = {
+            name:
+                attachment.fileName ||
+                "附件預覽",
+
+            type:
+                attachment.mimeType ||
+                "application/octet-stream",
+
+            data:
+                attachment.fileData
+        };
+
+const subtitle =
+    attachment.caseNo ||
+    currentInspectionDraft?.caseNo ||
+    "稽查改善報告";
+
+        viewFileDirectly(
+            previewFile,
+            subtitle
+        );
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "附件預覽失敗。",
+            "error"
+        );
+    }
+};
+
+window.deleteInspectionAttachment = async id => {
+    if (!canDeleteData()) {
+        showToast(
+            "附件刪除功能僅限管理者使用。",
+            "error"
+        );
+        return;
+    }
+
+    const confirmed = confirm(
+        "確定要刪除此附件嗎？\n\n" +
+        "刪除後將無法復原。"
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const tx = db.transaction(
+            ["inspectionAttachments"],
+            "readwrite"
+        );
+
+        tx.objectStore(
+            "inspectionAttachments"
+        ).delete(id);
+
+tx.oncomplete = async () => {
+    showToast(
+        "附件已刪除。"
+    );
+
+    await renderInspectionAttachmentList();
+
+    if (
+        typeof currentHistoryTab !== "undefined" &&
+        currentHistoryTab === "inspection"
+    ) {
+        await loadInspectionHistory();
+    }
+};
+
+        tx.onerror = () => {
+            showToast(
+                "附件刪除失敗，請重新操作。",
+                "error"
+            );
+        };
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "附件刪除失敗。",
+            "error"
+        );
+    }
+};
+
 async function getAllInspectionReports() {
+    if (isInspectionPreviewDataActive()) {
+        return [
+            ...previewInspectionReports
+        ];
+    }
+
     const tx = db.transaction(
         ["inspectionReports"],
         "readonly"
@@ -4279,7 +7492,9 @@ async function getAllInspectionReports() {
 
     return await new Promise((resolve, reject) => {
         const request =
-            tx.objectStore("inspectionReports").getAll();
+            tx.objectStore(
+                "inspectionReports"
+            ).getAll();
 
         request.onsuccess = () => {
             resolve(request.result || []);
@@ -4291,114 +7506,369 @@ async function getAllInspectionReports() {
     });
 }
 
+async function getInspectionReportById(id) {
+    if (!Number.isInteger(id)) {
+        return null;
+    }
+
+    if (isInspectionPreviewDataActive()) {
+        return (
+            previewInspectionReports.find(
+                report =>
+                    Number(report.id) ===
+                    Number(id)
+            ) || null
+        );
+    }
+
+    const tx = db.transaction(
+        ["inspectionReports"],
+        "readonly"
+    );
+
+    return await new Promise((resolve, reject) => {
+        const request =
+            tx.objectStore(
+                "inspectionReports"
+            ).get(id);
+
+        request.onsuccess = () => {
+            resolve(request.result || null);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+
+function setInspectionYearUnitFilter(
+    year,
+    unit
+) {
+    const yearKey =
+        String(year || "");
+
+    if (!yearKey) {
+        return;
+    }
+
+    inspectionUnitFilterByYear[yearKey] =
+        unit || "全部";
+
+    loadInspectionHistory();
+}
+
+function renderInspectionYearTabs(
+    reports,
+    selectedYear
+) {
+    const container =
+        document.getElementById(
+            "inspection-year-tabs"
+        );
+
+    const yearFilter =
+        document.getElementById(
+            "inspection-year-filter"
+        );
+
+if (
+    !container ||
+    !yearFilter
+) {
+    return;
+}
+
+    const yearCounts =
+        reports.reduce(
+            (result, report) => {
+                const year =
+                    String(
+                        report.year || ""
+                    ).trim();
+
+                if (!year) {
+                    return result;
+                }
+
+                result[year] =
+                    Number(
+                        result[year] || 0
+                    ) + 1;
+
+                return result;
+            },
+            {}
+        );
+
+    const years =
+        Object.keys(yearCounts)
+            .sort(
+                (a, b) =>
+                    Number(b) -
+                    Number(a)
+            );
+
+    const tabItems = [
+        {
+            value: "全部",
+            label: "全部年度",
+            count: reports.length
+        },
+
+        ...years.map(year => ({
+            value: year,
+            label: `${year} 年度`,
+            count: yearCounts[year]
+        }))
+    ];
+
+    container.innerHTML =
+        tabItems.map(item => {
+            const isActive =
+                item.value === selectedYear;
+
+            return `
+                <button
+                    type="button"
+                    class="
+                        inspection-year-tab
+                        ${isActive ? "active" : ""}
+                    "
+                    data-year="${escapeInspectionHtml(item.value)}"
+                    role="tab"
+                    aria-selected="${isActive ? "true" : "false"}"
+                    title="查看 ${escapeInspectionHtml(item.label)}改善單"
+                >
+                    <i
+                        data-lucide="${isActive ? "folder-open" : "folder"}"
+                        class="inspection-year-tab-icon"
+                    ></i>
+
+                    <span>
+                        ${escapeInspectionHtml(item.label)}
+                    </span>
+
+                    <span class="inspection-year-tab-count">
+                        ${item.count}
+                    </span>
+                </button>
+            `;
+        }).join("");
+
+    container
+        .querySelectorAll(
+            ".inspection-year-tab"
+        )
+        .forEach(button => {
+            button.onclick = () => {
+                const nextYear =
+                    button.dataset.year ||
+                    "全部";
+
+                if (
+                    yearFilter.value ===
+                    nextYear
+                ) {
+                    return;
+                }
+
+yearFilter.value =
+    nextYear;
+
+loadInspectionHistory();
+            };
+        });
+
+    const activeButton =
+        container.querySelector(
+            ".inspection-year-tab.active"
+        );
+
+    if (activeButton) {
+        requestAnimationFrame(() => {
+            const targetLeft =
+                activeButton.offsetLeft -
+                (
+                    container.clientWidth -
+                    activeButton.offsetWidth
+                ) / 2;
+
+            container.scrollTo({
+                left:
+                    Math.max(
+                        0,
+                        targetLeft
+                    ),
+
+                behavior: "smooth"
+            });
+        });
+    }
+
+    initIcons();
+}
+
 async function loadInspectionHistory() {
     const listContainer =
         document.getElementById("inspection-history-list");
 
-    const yearFilter =
-        document.getElementById("inspection-year-filter");
-
-const unitFilter =
-    document.getElementById("inspection-unit-filter");
-
-if (!listContainer || !yearFilter || !unitFilter) return;
-
-    let reports = [];
-
-    try {
-        reports = await getAllInspectionReports();
-    } catch (error) {
-        console.error(error);
-
-        listContainer.innerHTML = `
-            <div class="text-center py-10 text-red-500 text-sm">
-                無法讀取稽查改善報告資料
-            </div>
-        `;
-
-        return;
-    }
-
-    reports.sort((a, b) =>
-        Number(b.updatedAt || b.createdAt || 0) -
-        Number(a.updatedAt || a.createdAt || 0)
+const yearFilter =
+    document.getElementById(
+        "inspection-year-filter"
     );
 
-    const years = [
-        ...new Set(
-            reports
-                .map(report => String(report.year || ""))
-                .filter(Boolean)
-        )
-    ].sort((a, b) => Number(b) - Number(a));
+const yearTabs =
+    document.getElementById(
+        "inspection-year-tabs"
+    );
 
-    const currentYear = yearFilter.value;
+if (
+    !listContainer ||
+    !yearFilter ||
+    !yearTabs
+) {
+    return;
+}
 
-    yearFilter.innerHTML =
-        '<option value="全部">全部年度</option>';
+let reports = [];
+let allAttachments = [];
 
-    years.forEach(year => {
-        const option = document.createElement("option");
-        option.value = year;
-        option.textContent = `${year} 年度`;
-        yearFilter.appendChild(option);
-    });
+try {
+    reports =
+        await getAllInspectionReports();
 
-    if (
-        [...yearFilter.options].some(option =>
-            option.value === currentYear
-        )
-    ) {
-        yearFilter.value = currentYear;
-    }
+    allAttachments =
+        await getAllInspectionAttachments();
+} catch (error) {
+    console.error(error);
 
-    const selectedYear = yearFilter.value;
+    listContainer.innerHTML = `
+        <div class="text-center py-10 text-red-500 text-sm">
+            無法讀取稽查改善報告資料
+        </div>
+    `;
 
-    const yearFiltered =
-        selectedYear === "全部"
-            ? reports
-            : reports.filter(report =>
-                String(report.year) === selectedYear
-            );
+    return;
+}
 
-const units = [
+/*
+ * 將全部改善回覆附件，
+ * 依照所屬的稽查改善報告 ID 分組。
+ */
+const attachmentsByReportId =
+    allAttachments.reduce(
+        (result, attachment) => {
+            const key =
+                String(
+                    attachment.inspectionReportId
+                );
+
+            if (!result[key]) {
+                result[key] = [];
+            }
+
+            result[key].push(attachment);
+
+            return result;
+        },
+        {}
+    );
+
+reports.sort((a, b) =>
+    Number(b.updatedAt || b.createdAt || 0) -
+    Number(a.updatedAt || a.createdAt || 0)
+);
+
+const years = [
     ...new Set(
-        yearFiltered
+        reports
             .map(report =>
-                String(report.inspectedUnit || "").trim()
+                String(
+                    report.year || ""
+                )
             )
             .filter(Boolean)
     )
-].sort((a, b) =>
-    a.localeCompare(b, "zh-TW")
+].sort(
+    (a, b) =>
+        Number(b) -
+        Number(a)
 );
 
-const currentUnit = unitFilter.value;
+const previousSelectedYear =
+    yearFilter.value;
 
-unitFilter.innerHTML =
-    '<option value="全部">全部受稽查單位</option>';
+/*
+ * 隱藏 select 仍用來保存目前選取年度。
+ */
+yearFilter.innerHTML = [
+    '<option value="全部">全部年度</option>',
 
-units.forEach(unit => {
-    const option = document.createElement("option");
-    option.value = unit;
-    option.textContent = unit;
-    unitFilter.appendChild(option);
-});
+    ...years.map(year => `
+        <option value="${escapeInspectionHtml(year)}">
+            ${escapeInspectionHtml(year)} 年度
+        </option>
+    `)
+].join("");
 
-if (
-    [...unitFilter.options].some(option =>
-        option.value === currentUnit
-    )
-) {
-    unitFilter.value = currentUnit;
+let selectedYear =
+    previousSelectedYear;
+
+/*
+ * 第一次進入時，隱藏 select 沒有選取值，
+ * 因此自動顯示最新年度。
+ */
+if (!selectedYear) {
+    selectedYear =
+        years[0] ||
+        "全部";
 }
 
-const selectedUnit = unitFilter.value;
+/*
+ * 原選取年份已沒有資料時，
+ * 自動切回目前最新年度。
+ */
+const validYearValues =
+    new Set([
+        "全部",
+        ...years
+    ]);
 
-const filteredReports = yearFiltered.filter(report =>
-    selectedUnit === "全部" ||
-    String(report.inspectedUnit || "") === selectedUnit
+if (
+    !validYearValues.has(
+        selectedYear
+    )
+) {
+    selectedYear =
+        years[0] ||
+        "全部";
+}
+
+yearFilter.value =
+    selectedYear;
+
+renderInspectionYearTabs(
+    reports,
+    selectedYear
 );
+
+const yearFiltered =
+    selectedYear === "全部"
+        ? reports
+        : reports.filter(report =>
+            String(report.year) ===
+            selectedYear
+        );
+
+/*
+ * 先保留目前年度內的全部案件。
+ * 個別單位篩選會在每個年度資料夾產生時處理。
+ */
+const filteredReports = [
+    ...yearFiltered
+];
 
     listContainer.innerHTML = "";
 
@@ -4444,20 +7914,135 @@ filteredReports.forEach(report => {
             yearSection.className =
                 "border border-slate-200 rounded-xl overflow-hidden bg-slate-50";
 
-const unitHtml = Object.keys(
-    groupedByYear[year]
-).sort((a, b) =>
-    a.localeCompare(b, "zh-TW")
-).map(unit => {
+const yearUnits =
+    Object.keys(
+        groupedByYear[year]
+    ).sort((a, b) =>
+        a.localeCompare(
+            b,
+            "zh-TW"
+        )
+    );
+
+let selectedYearUnit =
+    inspectionUnitFilterByYear[year] ||
+    "全部";
+
+/*
+ * 若原本選取的單位已經沒有資料，
+ * 自動切回全部受稽查單位。
+ */
+if (
+    selectedYearUnit !== "全部" &&
+    !yearUnits.includes(
+        selectedYearUnit
+    )
+) {
+    selectedYearUnit =
+        "全部";
+
+    inspectionUnitFilterByYear[year] =
+        "全部";
+}
+
+const yearUnitOptions = [
+    `
+        <option value="全部">
+            全部受稽查單位
+        </option>
+    `,
+
+    ...yearUnits.map(unit => `
+        <option
+            value="${escapeInspectionHtml(unit)}"
+            ${
+                selectedYearUnit === unit
+                    ? "selected"
+                    : ""
+            }
+        >
+            ${escapeInspectionHtml(unit)}
+        </option>
+    `)
+].join("");
+
+const visibleUnits =
+    selectedYearUnit === "全部"
+        ? yearUnits
+        : [selectedYearUnit];
+
+const unitHtml =
+    visibleUnits.map(unit => {
     const caseHtml =
         groupedByYear[year][unit]
                         .map(report => {
-                            const date =
-                                formatInspectionDisplayDate(
-                                    report.inspectionDate
-                                );
+const date =
+    formatInspectionDisplayDate(
+        report.inspectionDate
+    );
 
-                            return `
+const reportAttachments = [
+    ...(
+        attachmentsByReportId[
+            String(report.id)
+        ] ||
+        []
+    )
+].sort((a, b) =>
+    Number(a.uploadedAt || 0) -
+    Number(b.uploadedAt || 0)
+);
+
+const attachmentButtons =
+    reportAttachments
+        .map((file, index) => {
+            const uploadTime =
+                new Date(
+                    file.uploadedAt
+                ).toLocaleString("zh-TW");
+
+const fileMeta =
+    getInspectionAttachmentTypeMeta(file);
+
+const historyIconHtml =
+    fileMeta.iconHtml.replace(
+        "attachment-file-type-symbol",
+        "attachment-file-type-symbol history-attachment-file-symbol"
+    );
+
+const tooltip =
+    `第 ${index + 1} 筆附件｜` +
+    `${fileMeta.label}｜` +
+    `${uploadTime}｜` +
+    `${file.fileName || "附件"}`;
+
+return `
+<button
+    type="button"
+    onclick="event.stopPropagation(); openInspectionAttachment(${file.id})"
+    class="history-attachment-file-button"
+    title="${escapeInspectionHtml(tooltip)}"
+    aria-label="${escapeInspectionHtml(tooltip)}"
+>
+    ${historyIconHtml}
+
+    <span class="history-attachment-order">
+        ${index + 1}
+    </span>
+</button>
+            `;
+        })
+        .join("");
+
+const isCompleted =
+    report.status === "改善完成";
+
+const statusClass =
+    isCompleted
+        ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+        : "bg-amber-50 text-amber-700 border border-amber-200";
+
+return `
                                 <div class="bg-white border border-slate-200 rounded-lg p-3">
                                     <div class="flex items-start justify-between gap-3">
                                         <div class="min-w-0">
@@ -4476,18 +8061,50 @@ const unitHtml = Object.keys(
 </div>
                                         </div>
 
-                                        <span class="shrink-0 text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-1 rounded-full">
-                                            ${escapeInspectionHtml(report.status || "待改善")}
-                                        </span>
+<div class="shrink-0 flex flex-col items-end gap-2">
+    <span
+        class="text-[10px] font-bold px-2 py-1 rounded-full ${statusClass}"
+    >
+        ${escapeInspectionHtml(report.status || "待改善")}
+    </span>
+
+    ${
+        attachmentButtons
+            ? `
+                <div class="flex flex-wrap justify-end gap-1.5 max-w-[150px]">
+                    ${attachmentButtons}
+                </div>
+            `
+            : ""
+    }
+</div>
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        onclick="previewInspectionHistory(${report.id})"
-                                        class="mt-3 w-full border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg py-1.5 text-xs font-bold"
-                                    >
-                                        查看改善單
-                                    </button>
+<div class="mt-3 flex items-center gap-2">
+    <button
+        type="button"
+        onclick="previewInspectionHistory(${report.id})"
+        class="flex-1 border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg py-1.5 text-xs font-bold"
+    >
+        查看改善單
+    </button>
+
+    ${
+        canDeleteData()
+            ? `
+<button
+    type="button"
+    onclick="deleteInspectionReport(${report.id})"
+    class="bg-white border border-red-200 text-red-500 text-xs p-1.5 rounded hover:bg-red-50 transition"
+    title="刪除改善單"
+    aria-label="刪除改善單"
+>
+    <i class="fas fa-trash"></i>
+</button>
+            `
+            : ""
+    }
+</div>
                                 </div>
                             `;
                         })
@@ -4495,10 +8112,9 @@ const unitHtml = Object.keys(
 
                 return `
                     <div class="border-t border-slate-200 p-3">
-                        <div class="text-xs font-black text-slate-600 mb-2 flex items-center gap-1.5">
-<i data-lucide="building-2" class="w-3.5 h-3.5"></i>
-${escapeInspectionHtml(unit)}
-                        </div>
+<div class="text-xs font-black text-slate-600 mb-2">
+    ${escapeInspectionHtml(unit)}
+</div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             ${caseHtml}
@@ -4507,14 +8123,44 @@ ${escapeInspectionHtml(unit)}
                 `;
             }).join("");
 
-            yearSection.innerHTML = `
-                <div class="px-4 py-3 bg-slate-100 font-black text-slate-800 flex items-center gap-2">
-                    <i data-lucide="folder" class="w-4 h-4 text-amber-500"></i>
-                    ${escapeInspectionHtml(year)} 年度
-                </div>
+yearSection.innerHTML = `
+    <div class="inspection-year-section-header">
 
-                ${unitHtml}
-            `;
+        <div class="inspection-year-section-title">
+            <i
+                data-lucide="folder"
+                class="w-4 h-4 text-amber-500"
+            ></i>
+
+            <span>
+                ${escapeInspectionHtml(year)} 年度
+            </span>
+        </div>
+
+        <div class="inspection-year-unit-filter-wrap">
+            <i
+                data-lucide="list-filter"
+                class="w-4 h-4 text-slate-400"
+            ></i>
+
+            <select
+                class="inspection-year-unit-filter"
+                onchange="
+                    setInspectionYearUnitFilter(
+                        '${escapeInspectionHtml(year)}',
+                        this.value
+                    )
+                "
+                aria-label="${escapeInspectionHtml(year)} 年度受稽查單位篩選"
+            >
+                ${yearUnitOptions}
+            </select>
+        </div>
+
+    </div>
+
+    ${unitHtml}
+`;
 
             listContainer.appendChild(yearSection);
         });
@@ -4522,24 +8168,120 @@ ${escapeInspectionHtml(unit)}
     initIcons();
 }
 
-window.previewInspectionHistory = async id => {
-    const tx = db.transaction(
-        ["inspectionReports"],
-        "readonly"
+window.deleteInspectionReport = async id => {
+    if (!canDeleteData()) {
+        showToast(
+            "此功能僅限管理者使用。",
+            "error"
+        );
+        return;
+    }
+
+    if (!Number.isInteger(id)) {
+        showToast(
+            "改善單資料識別錯誤。",
+            "error"
+        );
+        return;
+    }
+
+    const confirmed = confirm(
+        "確定要刪除這份稽查改善報告嗎？\n\n" +
+        "此操作會一併刪除該案件的改善回覆附件，且無法復原。"
     );
 
-    const report = await new Promise(resolve => {
-        const request =
-            tx.objectStore("inspectionReports").get(id);
+    if (!confirmed) return;
 
-        request.onsuccess = () => {
-            resolve(request.result || null);
-        };
+    try {
+        const attachmentTx = db.transaction(
+            ["inspectionAttachments"],
+            "readwrite"
+        );
 
-        request.onerror = () => {
-            resolve(null);
-        };
-    });
+        const attachmentStore =
+            attachmentTx.objectStore(
+                "inspectionAttachments"
+            );
+
+        const attachmentIndex =
+            attachmentStore.index(
+                "inspectionReportId"
+            );
+
+        const attachmentKeys =
+            await new Promise((resolve, reject) => {
+                const request =
+                    attachmentIndex.getAllKeys(id);
+
+                request.onsuccess = () => {
+                    resolve(request.result || []);
+                };
+
+                request.onerror = () => {
+                    reject(request.error);
+                };
+            });
+
+        attachmentKeys.forEach(key => {
+            attachmentStore.delete(key);
+        });
+
+        await new Promise((resolve, reject) => {
+            attachmentTx.oncomplete = resolve;
+            attachmentTx.onerror = () =>
+                reject(attachmentTx.error);
+            attachmentTx.onabort = () =>
+                reject(attachmentTx.error);
+        });
+
+        const reportTx = db.transaction(
+            ["inspectionReports"],
+            "readwrite"
+        );
+
+        reportTx
+            .objectStore("inspectionReports")
+            .delete(id);
+
+        await new Promise((resolve, reject) => {
+            reportTx.oncomplete = resolve;
+            reportTx.onerror = () =>
+                reject(reportTx.error);
+            reportTx.onabort = () =>
+                reject(reportTx.error);
+        });
+
+        if (
+            currentInspectionDraft &&
+            currentInspectionDraft.id === id
+        ) {
+            currentInspectionDraft = null;
+        }
+
+        showToast(
+            "稽查改善報告及其附件已刪除。"
+        );
+
+        loadInspectionHistory();
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "稽查改善報告刪除失敗，請重新操作。",
+            "error"
+        );
+    }
+};
+
+window.previewInspectionHistory = async id => {
+    let report = null;
+
+    try {
+        report =
+            await getInspectionReportById(id);
+    } catch (error) {
+        console.error(error);
+    }
 
     if (!report) {
         showToast(
@@ -5232,6 +8974,14 @@ document.getElementById('preview-inspection-btn').onclick = () => {
     initIcons();
 };
 
+document.getElementById(
+    "inspection-preview-login-btn"
+).onclick = () => {
+    openLoginFromModal(
+        "inspection-preview-modal"
+    );
+};
+
 document.getElementById('back-to-inspection-edit-btn').onclick = () => {
     if (!canEditData()) {
         showToast(
@@ -5259,6 +9009,148 @@ document.getElementById('back-to-inspection-edit-btn').onclick = () => {
 
     document
         .getElementById("inspection-create-modal")
+        .classList.remove("hidden");
+
+    initIcons();
+};
+
+document.getElementById(
+    "inspection-attachments-btn"
+).onclick = () => {
+    openInspectionAttachmentsModal();
+};
+
+document.getElementById(
+    "toggle-inspection-complete-btn"
+).onclick = () => {
+    toggleInspectionCompletionStatus();
+};
+
+document.getElementById(
+    "upload-inspection-attachment-btn"
+).onclick = () => {
+    uploadInspectionAttachment();
+};
+
+const inspectionAttachmentFileInput =
+    document.getElementById(
+        "inspection-attachment-file"
+    );
+
+const inspectionAttachmentDropZone =
+    document.getElementById(
+        "inspection-attachment-drop-zone"
+    );
+
+if (
+    inspectionAttachmentFileInput &&
+    inspectionAttachmentDropZone
+) {
+    /*
+     * 點擊選擇檔案：
+     * 只暫存，不立即上傳。
+     */
+    inspectionAttachmentFileInput.addEventListener(
+        "change",
+        event => {
+            setPendingInspectionAttachmentFiles(
+                event.target.files
+            );
+        }
+    );
+
+    /*
+     * 檔案拖曳經過上傳框。
+     */
+    inspectionAttachmentDropZone.addEventListener(
+        "dragover",
+        event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!canEditData()) return;
+
+            if (event.dataTransfer) {
+                event.dataTransfer.dropEffect =
+                    "copy";
+            }
+
+            inspectionAttachmentDropZone
+                .classList
+                .add("drag-over");
+        }
+    );
+
+    inspectionAttachmentDropZone.addEventListener(
+        "dragleave",
+        event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            inspectionAttachmentDropZone
+                .classList
+                .remove("drag-over");
+        }
+    );
+
+    /*
+     * 拖曳放下檔案：
+     * 只暫存，不立即上傳。
+     */
+    inspectionAttachmentDropZone.addEventListener(
+        "drop",
+        event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            inspectionAttachmentDropZone
+                .classList
+                .remove("drag-over");
+
+            if (!canEditData()) {
+                showToast(
+                    "預覽者無法上傳改善回覆附件。",
+                    "error"
+                );
+                return;
+            }
+
+            const files =
+                event.dataTransfer?.files;
+
+            if (files?.length) {
+                setPendingInspectionAttachmentFiles(
+                    files
+                );
+            }
+        }
+    );
+}
+
+document.getElementById(
+    "back-to-inspection-preview-btn"
+).onclick = () => {
+    if (!currentInspectionDraft) {
+        closeModals();
+        return;
+    }
+
+    renderInspectionDocument(
+        currentInspectionDraft
+    );
+
+    Array.from(
+        elements.modalOverlay.children
+    ).forEach(child => {
+        child.classList.add("hidden");
+    });
+
+    elements.modalOverlay.classList.remove("hidden");
+
+    document
+        .getElementById(
+            "inspection-preview-modal"
+        )
         .classList.remove("hidden");
 
     initIcons();
@@ -5436,102 +9328,395 @@ elements.printReportBtn.onclick = () => {
 
         elements.analyzeBtn.onclick = analyzeImage;
         
-        // 資料庫匯出匯入
-document.getElementById('export-db').onclick = async () => {
-if (!canExportData()) {
-    showToast("請先登入使用者或管理者權限，才能匯出資料。", "error");
-    return;
+// =====================================================
+// 統一資料匯出／匯入／載入預覽
+// =====================================================
+
+async function getAllStoreRecords(storeName) {
+    const tx = db.transaction(
+        [storeName],
+        "readonly"
+    );
+
+    return await new Promise((resolve, reject) => {
+        const request =
+            tx.objectStore(storeName).getAll();
+
+        request.onsuccess = () => {
+            resolve(request.result || []);
+        };
+
+        request.onerror = () => {
+            reject(
+                request.error ||
+                new Error(
+                    `無法讀取 ${storeName}`
+                )
+            );
+        };
+    });
 }
 
-    const data = {
-        version: "hazard-system-json-v2",
-        exportType: "unified-data",
-        exportedAt: new Date().toISOString(),
-        reports: await new Promise(r => {
-            const tx = db.transaction(["reports"], "readonly");
-            const req = tx.objectStore("reports").getAll();
-            req.onsuccess = () => r(req.result);
-        }),
-        categories: await new Promise(r => {
-            const tx = db.transaction(["categories"], "readonly");
-            const req = tx.objectStore("categories").getAll();
-            req.onsuccess = () => r(req.result);
-        })
-    };
+document.getElementById(
+    "export-db"
+).onclick = async () => {
+    if (!canExportData()) {
+        showToast(
+            "請先登入使用者或管理者權限，才能匯出資料。",
+            "error"
+        );
+        return;
+    }
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `職安危害識別HIS__${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
+    try {
+        const [
+            reports,
+            categories,
+            inspectionReports,
+            inspectionAttachments
+        ] = await Promise.all([
+            getAllStoreRecords("reports"),
+            getAllStoreRecords("categories"),
+            getAllStoreRecords(
+                "inspectionReports"
+            ),
+            getAllStoreRecords(
+                "inspectionAttachments"
+            )
+        ]);
+
+        const data = {
+            version:
+                "hazard-system-json-v3",
+
+            exportType:
+                "unified-data",
+
+            exportedAt:
+                new Date().toISOString(),
+
+            reports,
+            categories,
+            inspectionReports,
+            inspectionAttachments
+        };
+
+        const blob = new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        link.href = url;
+
+        link.download =
+            `職安危害識別HIS__${formatDateInputValue(
+                new Date()
+            )}.json`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 1000);
+
+        showToast(
+            "統一資料已匯出完成。"
+        );
+    } catch (error) {
+        console.error(error);
+
+        showToast(
+            "資料匯出失敗，請重新操作。",
+            "error"
+        );
+    }
 };
 
-document.getElementById('import-db').onclick = () => {
-    document.getElementById('db-file-input').click();
+document.getElementById(
+    "import-db"
+).onclick = () => {
+    document
+        .getElementById(
+            "db-file-input"
+        )
+        .click();
 };
-document.getElementById('db-file-input').onchange = (e) => {
-    const file = e.target.files[0];
+
+document.getElementById(
+    "db-file-input"
+).onchange = event => {
+    const file =
+        event.target.files?.[0];
+
     if (!file) return;
 
-    const reader = new FileReader();
+    const reader =
+        new FileReader();
 
-    reader.onload = async (ev) => {
+    reader.onload = async loadEvent => {
         try {
-            const data = JSON.parse(ev.target.result);
-if (!confirm("載入預覽將覆蓋目前所有紀錄，確定要繼續嗎？")) {
-    return;
-}            
+            const data =
+                JSON.parse(
+                    loadEvent.target.result
+                );
 
-            if (!Array.isArray(data.reports) || !Array.isArray(data.categories)) {
-                throw new Error("資料格式不正確");
+            if (
+                !Array.isArray(data.reports) ||
+                !Array.isArray(data.categories)
+            ) {
+                throw new Error(
+                    "資料格式不正確"
+                );
             }
 
-            // 預覽者：只載入預覽，不寫入 IndexedDB
-            if (!canImportData()) {
-previewReports = data.reports;
-previewCategories = data.categories;
+            const hasInspectionBundle =
+                Array.isArray(
+                    data.inspectionReports
+                ) &&
+                Array.isArray(
+                    data.inspectionAttachments
+                );
 
-refreshCategories();
-loadHistory();
+            const incomingInspectionReports =
+                hasInspectionBundle
+                    ? data.inspectionReports
+                    : [];
 
-alert("預覽資料載入成功！");
-return;
+            const incomingInspectionAttachments =
+                hasInspectionBundle
+                    ? data.inspectionAttachments
+                    : [];
+
+            const isPreviewMode =
+                !canImportData();
+
+            let confirmMessage = "";
+
+            if (isPreviewMode) {
+                confirmMessage =
+                    "確定要載入這份預覽資料嗎？\n\n" +
+                    "預覽資料只會暫時顯示於目前瀏覽器，" +
+                    "不會寫入正式資料庫；重新整理或關閉後即失效。";
+            } else if (hasInspectionBundle) {
+                confirmMessage =
+                    "此操作將覆蓋目前所有正式資料，包含：\n\n" +
+                    "・危害識別報告\n" +
+                    "・報告分類\n" +
+                    "・稽查改善報告\n" +
+                    "・改善回覆附件\n\n" +
+                    "確定要繼續嗎？";
+            } else {
+                confirmMessage =
+                    "這是舊版備份檔，未包含稽查改善報告及附件。\n\n" +
+                    "本次只會覆蓋危害識別報告與報告分類，" +
+                    "現有稽查改善報告及附件將予以保留。\n\n" +
+                    "確定要繼續嗎？";
             }
 
-            // 使用者 / 管理者：正式載入資料
-            const txR = db.transaction(["reports"], "readwrite");
-            const reportStore = txR.objectStore("reports");
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            // =========================================
+            // 預覽者：只載入記憶體，不寫入 IndexedDB
+            // =========================================
+            if (isPreviewMode) {
+                previewReports =
+                    data.reports;
+
+                previewCategories =
+                    data.categories;
+
+                previewInspectionReports =
+                    incomingInspectionReports;
+
+                previewInspectionAttachments =
+                    incomingInspectionAttachments;
+
+                currentInspectionDraft =
+                    null;
+
+                await refreshCategories();
+                await loadHistory();
+
+                if (
+                    currentHistoryTab ===
+                    "inspection"
+                ) {
+                    await loadInspectionHistory();
+                }
+
+                updateUIVisibility();
+                updateDataActionButtons();
+
+                alert(
+                    hasInspectionBundle
+                        ? "預覽資料載入成功！\n\n危害識別報告、稽查改善報告及附件均可預覽。"
+                        : "預覽資料載入成功！\n\n此為舊版備份，未包含稽查改善報告與附件。"
+                );
+
+                return;
+            }
+
+            // =========================================
+            // 使用者／管理者：正式寫入 IndexedDB
+            // =========================================
+            const storeNames = [
+                "reports",
+                "categories"
+            ];
+
+            if (hasInspectionBundle) {
+                storeNames.push(
+                    "inspectionReports",
+                    "inspectionAttachments"
+                );
+            }
+
+            const tx = db.transaction(
+                storeNames,
+                "readwrite"
+            );
+
+            const reportStore =
+                tx.objectStore("reports");
+
             reportStore.clear();
-            data.reports.forEach(r => reportStore.add(r));
-await new Promise((resolve, reject) => {
-    txR.oncomplete = resolve;
-    txR.onerror = reject;
-});
-            const txC = db.transaction(["categories"], "readwrite");
-            const catStore = txC.objectStore("categories");
-            catStore.clear();
-            data.categories.forEach(c => catStore.add(c));
-await new Promise((resolve, reject) => {
-    txC.oncomplete = resolve;
-    txC.onerror = reject;
-});
-await refreshCategories();
-await loadHistory();
-updateUIVisibility();
-updateDataActionButtons();
 
-alert(isAdmin ? "資料匯入成功！" : "資料載入成功！");
+            data.reports.forEach(report => {
+                reportStore.put(report);
+            });
 
-        } catch (err) {
-            alert("無效的備份檔案");
+            const categoryStore =
+                tx.objectStore("categories");
+
+            categoryStore.clear();
+
+            data.categories.forEach(category => {
+                categoryStore.put(category);
+            });
+
+            if (hasInspectionBundle) {
+                const inspectionStore =
+                    tx.objectStore(
+                        "inspectionReports"
+                    );
+
+                inspectionStore.clear();
+
+                incomingInspectionReports.forEach(
+                    report => {
+                        inspectionStore.put(report);
+                    }
+                );
+
+                const attachmentStore =
+                    tx.objectStore(
+                        "inspectionAttachments"
+                    );
+
+                attachmentStore.clear();
+
+                incomingInspectionAttachments.forEach(
+                    attachment => {
+                        attachmentStore.put(
+                            attachment
+                        );
+                    }
+                );
+            }
+
+            await new Promise((resolve, reject) => {
+                tx.oncomplete = resolve;
+
+                tx.onerror = () => {
+                    reject(
+                        tx.error ||
+                        new Error(
+                            "正式資料寫入失敗"
+                        )
+                    );
+                };
+
+                tx.onabort = () => {
+                    reject(
+                        tx.error ||
+                        new Error(
+                            "正式資料寫入已中止"
+                        )
+                    );
+                };
+            });
+
+            previewReports = null;
+            previewCategories = null;
+            previewInspectionReports = null;
+            previewInspectionAttachments = null;
+
+            currentInspectionDraft = null;
+
+            await refreshCategories();
+            await loadHistory();
+
+            if (
+                currentHistoryTab ===
+                "inspection"
+            ) {
+                await loadInspectionHistory();
+            }
+
+            updateUIVisibility();
+            updateDataActionButtons();
+
+            alert(
+                isAdmin
+                    ? (
+                        hasInspectionBundle
+                            ? "資料匯入成功！\n\n危害識別報告、稽查改善報告及附件均已還原。"
+                            : "舊版資料匯入成功！\n\n現有稽查改善報告與附件已保留。"
+                    )
+                    : (
+                        hasInspectionBundle
+                            ? "資料載入成功！\n\n危害識別報告、稽查改善報告及附件均已載入。"
+                            : "舊版資料載入成功！\n\n現有稽查改善報告與附件已保留。"
+                    )
+            );
+        } catch (error) {
+            console.error(error);
+
+            alert(
+                "無效的備份檔案，或資料載入失敗。"
+            );
         }
+    };
+
+    reader.onerror = () => {
+        alert(
+            "無法讀取備份檔案，請重新選擇。"
+        );
     };
 
     reader.readAsText(file);
 
-    // 允許同一份檔案重複選取
-    e.target.value = "";
+    // 允許同一個檔案再次選取
+    event.target.value = "";
 };
 
 elements.canvas.addEventListener("click", (event) => {
@@ -5712,11 +9897,29 @@ window.addEventListener("resize", () => {
     drawHazardsOnImage();
 });
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
+document.addEventListener(
+    "keydown",
+    event => {
+        if (event.key !== "Escape") {
+            return;
+        }
+
+        const loginModalIsOpen =
+            elements.loginModal &&
+            !elements.loginModal.classList
+                .contains("hidden");
+
+        if (
+            loginModalIsOpen &&
+            loginReturnModalId
+        ) {
+            closeLoginFlow();
+            return;
+        }
+
         closeModals();
     }
-});
+);
 
 if (elements.reportNameInput) {
     elements.reportNameInput.addEventListener('change', syncCurrentReportTitleToHistory);
