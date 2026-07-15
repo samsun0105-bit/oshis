@@ -2102,6 +2102,15 @@ body.file-preview-open {
     height: 26px;
 }
 
+/*
+ * 桌機、平板、手機橫式及正式列印：
+ * 兩段標題維持同一排。
+ */
+.inspection-title-line-main,
+.inspection-title-line-sub {
+    display: inline;
+}
+
 @media screen and (max-width: 600px)
 and (orientation: portrait) {
 
@@ -3532,6 +3541,68 @@ and (orientation: portrait) {
 
         box-shadow: none !important;
     }
+
+    /*
+ * 手機直式：缺失改善通知單固定兩行表頭。
+ *
+ * 第一行：職業安全衛生現場稽查缺失
+ * 第二行：改善通知單
+ */
+#inspection-document-preview
+.inspection-doc-title {
+    padding: 5px 3px !important;
+
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.02em !important;
+
+    text-align: center !important;
+}
+
+/*
+ * 兩段標題各自固定成完整一行，
+ * 不讓瀏覽器在文字中間自行換行。
+ */
+#inspection-document-preview
+.inspection-doc-title
+.inspection-title-line-main,
+
+#inspection-document-preview
+.inspection-doc-title
+.inspection-title-line-sub {
+    display: block !important;
+
+    width: 100% !important;
+
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+}
+
+/*
+ * 第一行文字較長，
+ * 依手機寬度稍微自動縮放。
+ */
+#inspection-document-preview
+.inspection-title-line-main {
+    font-size:
+        clamp(
+            13px,
+            3.8vw,
+            15px
+        ) !important;
+}
+
+/*
+ * 第二行較短，可維持清楚、正式的字級。
+ */
+#inspection-document-preview
+.inspection-title-line-sub {
+    margin-top: 1px !important;
+
+    font-size: 15px !important;
+    letter-spacing: 0.08em !important;
+}
 
     /*
      * 避免表頭、欄位或長文字撐破文件寬度。
@@ -6207,9 +6278,15 @@ preview.innerHTML = `
     }
 
     <div class="inspection-doc-header">
-        <div class="inspection-doc-title">
-                職業安全衛生現場稽查缺失改善通知單
-            </div>
+<div class="inspection-doc-title">
+    <span class="inspection-title-line-main">
+        職業安全衛生現場稽查缺失
+    </span>
+
+    <span class="inspection-title-line-sub">
+        改善通知單
+    </span>
+</div>
 
             <div class="inspection-doc-meta">
 <div class="inspection-doc-meta-compact inspection-doc-meta-case">
