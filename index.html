@@ -3613,6 +3613,101 @@ and (orientation: portrait) {
     white-space: nowrap !important;
 }
 
+/*
+ * 手機直式：案件編號、稽查日期及改善期限
+ * 改為固定單排排列。
+ */
+#inspection-document-preview
+.inspection-doc-meta-compact {
+    flex-wrap: nowrap !important;
+
+    /*
+     * 縮小左右內距，
+     * 為案件編號及日期保留更多顯示空間。
+     */
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+
+    column-gap: 1px !important;
+
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/*
+ * 欄位名稱依手機寬度自動縮放：
+ * 320px 手機約為 10px，
+ * 375px 以上維持 12px。
+ */
+#inspection-document-preview
+.inspection-doc-meta-compact > strong {
+    flex: 0 0 auto !important;
+
+    font-size:
+        clamp(
+            10px,
+            3.2vw,
+            12px
+        ) !important;
+
+    line-height: 1.35 !important;
+
+    white-space: nowrap !important;
+}
+
+/*
+ * 三格內容共同設定。
+ */
+#inspection-document-preview
+.inspection-doc-meta-value {
+    display: inline-block !important;
+
+    min-width: 0 !important;
+
+    line-height: 1.35 !important;
+    white-space: nowrap !important;
+
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/*
+ * 案件編號依手機寬度自動縮放：
+ * 320px 手機約為 7.7px，
+ * 375px 以上維持 9px。
+ */
+#inspection-document-preview
+.inspection-doc-meta-case
+.inspection-doc-meta-value {
+    font-size:
+        clamp(
+            7px,
+            2.4vw,
+            9px
+        ) !important;
+
+    letter-spacing: -0.04em !important;
+}
+
+/*
+ * 稽查日期與改善期限：
+ * 320px 手機約為 8.6px，
+ * 375px 以上維持 10px。
+ */
+#inspection-document-preview
+.inspection-doc-meta-date
+.inspection-doc-meta-value {
+    font-size:
+        clamp(
+            8px,
+            2.7vw,
+            10px
+        ) !important;
+
+    letter-spacing: -0.02em !important;
+}
+
     /*
      * 照片寬度完整配合手機畫面，
      * 高度依圖片比例自動調整。
@@ -6117,10 +6212,13 @@ preview.innerHTML = `
             </div>
 
             <div class="inspection-doc-meta">
-                <div>
-                    <strong>案件編號：</strong>
-                    ${escapeInspectionHtml(draft.caseNo)}
-                </div>
+<div class="inspection-doc-meta-compact inspection-doc-meta-case">
+    <strong>案件編號：</strong>
+
+    <span class="inspection-doc-meta-value">
+        ${escapeInspectionHtml(draft.caseNo)}
+    </span>
+</div>
 
                 <div>
 <strong>年度：</strong>
@@ -6133,19 +6231,29 @@ ${escapeInspectionHtml(
 )}
                 </div>
 
-                <div>
-                    <strong>稽查日期：</strong>
-                    ${escapeInspectionHtml(
-                        formatInspectionDisplayDate(draft.inspectionDate)
-                    )}
-                </div>
+<div class="inspection-doc-meta-compact inspection-doc-meta-date">
+    <strong>稽查日期：</strong>
 
-                <div>
-                    <strong>改善期限：</strong>
-                    ${escapeInspectionHtml(
-                        formatInspectionDisplayDate(draft.dueDate)
-                    )}
-                </div>
+    <span class="inspection-doc-meta-value">
+        ${escapeInspectionHtml(
+            formatInspectionDisplayDate(
+                draft.inspectionDate
+            )
+        )}
+    </span>
+</div>
+
+<div class="inspection-doc-meta-compact inspection-doc-meta-date">
+    <strong>改善期限：</strong>
+
+    <span class="inspection-doc-meta-value">
+        ${escapeInspectionHtml(
+            formatInspectionDisplayDate(
+                draft.dueDate
+            )
+        )}
+    </span>
+</div>
 
                 <div>
                     <strong>區域位置：</strong>
