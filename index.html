@@ -3542,21 +3542,76 @@ and (orientation: portrait) {
         box-sizing: border-box;
     }
 
-    #inspection-document-preview
-    .inspection-doc-meta {
-        width: 100% !important;
+/*
+ * 手機直式表頭使用內容自動列高，
+ * 避免直橫切換後文字壓到下一格框線。
+ */
+#inspection-document-preview
+.inspection-doc-meta {
+    display: grid !important;
+    width: 100% !important;
 
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr)) !important;
-    }
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr)) !important;
 
-    #inspection-document-preview
-    .inspection-doc-meta > div {
-        min-width: 0 !important;
+    grid-auto-rows: max-content !important;
+    align-items: stretch !important;
 
-        overflow-wrap: anywhere !important;
-        word-break: break-word !important;
-    }
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+}
+
+#inspection-document-preview
+.inspection-doc-meta > div {
+    min-width: 0 !important;
+
+    /*
+     * 不再依賴舊版固定列高，
+     * 內容換行時格子會自動向下延伸。
+     */
+    width: auto !important;
+    height: auto !important;
+
+    min-height: 44px !important;
+    max-height: none !important;
+
+    padding: 8px 7px !important;
+
+    /*
+     * 欄位名稱與內容允許換行，
+     * 同時維持垂直置中。
+     */
+    display: flex !important;
+    align-items: center !important;
+    align-content: center !important;
+    flex-wrap: wrap !important;
+
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+
+    overflow: visible !important;
+    white-space: normal !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+}
+
+/*
+ * 案件編號、年度、稽查日期等欄位名稱
+ * 保持完整，不讓冒號單獨掉到下一行。
+ */
+#inspection-document-preview
+.inspection-doc-meta > div > strong {
+    flex: 0 0 auto !important;
+
+    font-size: 15px !important;
+    line-height: 1.45 !important;
+
+    white-space: nowrap !important;
+}
 
     /*
      * 照片寬度完整配合手機畫面，
@@ -3590,6 +3645,20 @@ and (orientation: portrait) {
         min-height: 160px !important;
         max-height: 215px !important;
     }
+}
+
+/* =========================================================
+   改善單預覽：內容已完整容納時關閉多餘水平滑動
+   真正超出畫面時仍保留左右滑動
+   ========================================================= */
+
+#inspection-preview-scroll.inspection-preview-fits-width {
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none !important;
+}
+
+#inspection-preview-scroll:not(.inspection-preview-fits-width) {
+    overscroll-behavior-x: contain;
 }
 
     </style>
@@ -5670,14 +5739,21 @@ if (Number.isInteger(currentReportId)) {
                 "hidden"
             );
 
-            document
-                .getElementById(
-                    "inspection-preview-modal"
-                )
-                .classList.remove("hidden");
+document
+    .getElementById(
+        "inspection-preview-modal"
+    )
+    .classList.remove("hidden");
 
-            initIcons();
-            return;
+initIcons();
+
+requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+        updateInspectionPreviewHorizontalScroll();
+    });
+});
+
+return;
         }
     } catch (error) {
         console.error(error);
@@ -6629,6 +6705,68 @@ strong,
     } else {
         printWindow.onload = executePrint;
     }
+}
+
+/*
+ * 判斷改善單預覽是否已完整容納於目前畫面。
+ *
+ * 已完整容納：
+ * 關閉多餘水平滑動，避免左右晃動。
+ *
+ * 尚未完整容納：
+ * 保留水平滑動，避免文件右側被裁切。
+ */
+function updateInspectionPreviewHorizontalScroll() {
+    const previewScroll =
+        document.getElementById("inspection-preview-scroll");
+
+    const previewDocument =
+        document.getElementById("inspection-document-preview");
+
+    if (!previewScroll || !previewDocument) {
+        return;
+    }
+
+    /*
+     * 先移除鎖定，讓瀏覽器重新計算實際寬度。
+     */
+    previewScroll.classList.remove(
+        "inspection-preview-fits-width"
+    );
+
+requestAnimationFrame(() => {
+    const availableWidth =
+        previewScroll.clientWidth;
+
+    /*
+     * scrollWidth 會同時計算：
+     * 文件寬度、預覽區左右內距及實際溢出寬度。
+     */
+    const requiredWidth =
+        previewScroll.scrollWidth;
+
+    /*
+     * 容許 3px 的手機瀏覽器小數像素誤差。
+     *
+     * 只有整個預覽內容真的已完整容納時，
+     * 才關閉水平滑動。
+     */
+    const fitsWidth =
+        requiredWidth <= availableWidth + 3;
+
+        previewScroll.classList.toggle(
+            "inspection-preview-fits-width",
+            fitsWidth
+        );
+
+        /*
+         * 已完整容納時回到最左側，
+         * 清除先前橫式滑動留下的位置。
+         */
+        if (fitsWidth) {
+            previewScroll.scrollLeft = 0;
+        }
+    });
 }
 
 function getReportTitle() {
@@ -9646,11 +9784,17 @@ window.previewInspectionHistory = async id => {
 
     elements.modalOverlay.classList.remove("hidden");
 
-    document
-        .getElementById("inspection-preview-modal")
-        .classList.remove("hidden");
+document
+    .getElementById("inspection-preview-modal")
+    .classList.remove("hidden");
 
-    initIcons();
+initIcons();
+
+requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+        updateInspectionPreviewHorizontalScroll();
+    });
+});
 };
 
 async function loadHistory() {
@@ -9756,9 +9900,24 @@ if (!canDeleteData()) return alert("此功能僅限管理者使用。");
 };
 
 elements.clearHistoryBtn.onclick = async () => {
-    if (confirm("確定要清空所有報告紀錄嗎？此動作無法還原！")) {
-        const tx = db.transaction(["reports"], "readwrite");
-        tx.objectStore("reports").clear();
+    if (!canDeleteData()) {
+        return alert("此功能僅限管理者使用。");
+    }
+
+    if (
+        confirm(
+            "確定要清空所有報告紀錄嗎？此動作無法還原！"
+        )
+    ) {
+        const tx =
+            db.transaction(
+                ["reports"],
+                "readwrite"
+            );
+
+        tx.objectStore(
+            "reports"
+        ).clear();
 
         tx.oncomplete = () => {
             currentReportId = null;
@@ -10333,12 +10492,21 @@ document.getElementById('preview-inspection-btn').onclick = () => {
 
     elements.modalOverlay.classList.remove("hidden");
 
-    document
-        .getElementById("inspection-preview-modal")
-        .classList.remove("hidden");
+document
+    .getElementById(
+        "inspection-preview-modal"
+    )
+    .classList.remove("hidden");
 
-    initIcons();
+initIcons();
+
+requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+        updateInspectionPreviewHorizontalScroll();
+    });
+});
 };
+
 
 document.getElementById('back-to-inspection-edit-btn').onclick = () => {
     if (!canEditData()) {
@@ -10505,13 +10673,19 @@ document.getElementById(
 
     elements.modalOverlay.classList.remove("hidden");
 
-    document
-        .getElementById(
-            "inspection-preview-modal"
-        )
-        .classList.remove("hidden");
+document
+    .getElementById(
+        "inspection-preview-modal"
+    )
+    .classList.remove("hidden");
 
-    initIcons();
+initIcons();
+
+requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+        updateInspectionPreviewHorizontalScroll();
+    });
+});
 };
 
 document.getElementById(
@@ -11279,9 +11453,96 @@ if (annotationMode === "edit-box" && selectedHazardIndex >= 0) {
     drawHazardsOnImage();
 }, { passive: false });
 
-window.addEventListener("resize", () => {
-    drawHazardsOnImage();
+/*
+ * 手機直橫切換後重新計算改善單預覽版面。
+ * 僅重新產生預覽 HTML，不修改資料、儲存或權限邏輯。
+ */
+let inspectionPreviewLayoutTimer = null;
+
+function scheduleInspectionPreviewLayoutRefresh() {
+    clearTimeout(inspectionPreviewLayoutTimer);
+
+    inspectionPreviewLayoutTimer = setTimeout(() => {
+        const previewModal =
+            document.getElementById("inspection-preview-modal");
+
+        const previewScroll =
+            document.getElementById("inspection-preview-scroll");
+
+        const previewDocument =
+            document.getElementById("inspection-document-preview");
+
+        /*
+         * 只有改善單預覽視窗正在顯示，
+         * 且確實有改善單資料時才執行。
+         */
+        if (
+            !previewModal ||
+            !previewDocument ||
+            previewModal.classList.contains("hidden") ||
+            !currentInspectionDraft
+        ) {
+            return;
+        }
+
+        /*
+         * 記錄目前上下閱讀位置，
+         * 重排後回到原本位置。
+         */
+        const previousScrollTop =
+            previewScroll
+                ? previewScroll.scrollTop
+                : 0;
+
+        /*
+         * 重新產生目前改善單畫面，
+         * 強制瀏覽器依最新直式／橫式寬度重新計算 Grid 列高。
+         */
+        renderInspectionDocument(
+            currentInspectionDraft
+        );
+
+        requestAnimationFrame(() => {
+    updateInspectionPreviewHorizontalScroll();
 });
+
+        requestAnimationFrame(() => {
+            if (!previewScroll) return;
+
+            /*
+             * 直式模式不保留橫式的左右捲動位置。
+             */
+            if (
+                window.matchMedia(
+                    "(orientation: portrait)"
+                ).matches
+            ) {
+                previewScroll.scrollLeft = 0;
+            }
+
+            previewScroll.scrollTop =
+                previousScrollTop;
+        });
+    }, 220);
+}
+
+window.addEventListener("resize", () => {
+    /*
+     * 保留原本危害框重繪功能。
+     */
+    drawHazardsOnImage();
+
+    /*
+     * 手機旋轉及視窗寬度改變時，
+     * 重新計算改善單預覽版面。
+     */
+    scheduleInspectionPreviewLayoutRefresh();
+});
+
+window.addEventListener(
+    "orientationchange",
+    scheduleInspectionPreviewLayoutRefresh
+);
 
 document.addEventListener(
     "keydown",
