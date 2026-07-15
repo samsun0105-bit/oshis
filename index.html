@@ -2126,19 +2126,6 @@ and (orientation: portrait) {
         gap: 10px !important;
     }
 
-    /*
-     * 避免手機原生 date input
-     * 使用內建最小寬度而超出視窗。
-     */
-    #inspection-date,
-    #inspection-due-date {
-        display: block;
-        inline-size: 100%;
-        min-inline-size: 0;
-        max-inline-size: 100%;
-        font-size: 16px !important;
-    }
-
     /* 目前帶入內容改為單排 */
     #inspection-summary-panel {
         padding: 10px !important;
@@ -3320,22 +3307,30 @@ and (orientation: portrait) {
  * 手機橫式寬度可能超過 768px，
  * 因此這裡使用 950px，才能同時涵蓋一般手機直式與橫式。
  */
-@media screen and (max-width: 950px) {
+/* ---------------------------------------------------------
+   手機直式及橫式：
+   開立缺失改善單所有輸入框尺寸統一
+   並修正日期框寬度與日期文字垂直置中
+   --------------------------------------------------------- */
 
+@media screen and (max-width: 1024px) {
+
+    /*
+     * 防止 Grid 子欄位受到日期輸入框
+     * 原生最小寬度影響。
+     */
     #inspection-form-grid > div {
+        width: 100% !important;
         min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     /*
-     * inspection-date：
-     * 稽查日期
-     *
-     * inspection-due-date：
-     * 程式內欄位名稱為改善期限，
-     * 也就是你所說的改善日期欄位。
+     * 手機模式下，開立改善單內所有 input
+     * 統一成完全相同的寬度、高度及內距。
      */
-    #inspection-date,
-    #inspection-due-date {
+    #inspection-form-grid input {
         display: block !important;
 
         width: 100% !important;
@@ -3350,42 +3345,143 @@ and (orientation: portrait) {
         min-height: 40px !important;
         max-height: 40px !important;
 
+        margin: 0 !important;
         padding: 0 10px !important;
 
         border-width: 1px !important;
 
         font-size: 14px !important;
-        line-height: normal !important;
+        line-height: 38px !important;
 
         box-sizing: border-box !important;
-
-        /*
-         * 保留手機原生日期選擇器，
-         * 不會影響日期選取功能。
-         */
-        appearance: auto !important;
-        -webkit-appearance: auto !important;
     }
 
     /*
-     * 修正 Safari／Chrome 手機版
-     * 日期文字容易偏上或寬度異常的情況。
+     * 取消手機瀏覽器原生日期框的外觀尺寸，
+     * 但 input type="date" 與日期選擇功能仍然保留。
+     */
+    #inspection-date,
+    #inspection-due-date {
+        position: relative !important;
+        overflow: hidden !important;
+
+        appearance: none !important;
+        -webkit-appearance: none !important;
+
+        text-align: left !important;
+        vertical-align: middle !important;
+
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        padding-left: 10px !important;
+        padding-right: 9px !important;
+
+        font-family:
+            "Noto Sans TC",
+            "Microsoft JhengHei",
+            sans-serif !important;
+    }
+
+    /*
+     * Chrome、Android 及部分 Safari：
+     * 日期輸入內容本體垂直置中。
+     */
+    #inspection-date::-webkit-datetime-edit,
+    #inspection-due-date::-webkit-datetime-edit {
+        display: flex !important;
+        align-items: center !important;
+
+        height: 38px !important;
+        min-height: 38px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        line-height: 38px !important;
+    }
+
+    /*
+     * 日期的年、月、日欄位包覆層垂直置中。
+     */
+    #inspection-date::-webkit-datetime-edit-fields-wrapper,
+    #inspection-due-date::-webkit-datetime-edit-fields-wrapper {
+        display: flex !important;
+        align-items: center !important;
+
+        height: 38px !important;
+        min-height: 38px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        line-height: 38px !important;
+    }
+
+    /*
+     * iPhone、iPad Safari 的日期文字區。
      */
     #inspection-date::-webkit-date-and-time-value,
     #inspection-due-date::-webkit-date-and-time-value {
-        min-height: 1.2em !important;
+        display: flex !important;
+        align-items: center !important;
+
+        height: 38px !important;
+        min-height: 38px !important;
+
+        margin: 0 !important;
         padding: 0 !important;
+
+        line-height: 38px !important;
         text-align: left !important;
     }
 
     /*
-     * 避免日期圖示本身的額外內距
-     * 撐大輸入框。
+     * 日期欄位的年、月、日各區塊維持正常高度，
+     * 避免文字偏向上方。
+     */
+    #inspection-date::-webkit-datetime-edit-year-field,
+    #inspection-date::-webkit-datetime-edit-month-field,
+    #inspection-date::-webkit-datetime-edit-day-field,
+    #inspection-due-date::-webkit-datetime-edit-year-field,
+    #inspection-due-date::-webkit-datetime-edit-month-field,
+    #inspection-due-date::-webkit-datetime-edit-day-field {
+        margin: 0 !important;
+        padding: 0 !important;
+
+        line-height: 38px !important;
+        vertical-align: middle !important;
+    }
+
+    /*
+     * 日期分隔符號也保持置中。
+     */
+    #inspection-date::-webkit-datetime-edit-text,
+    #inspection-due-date::-webkit-datetime-edit-text {
+        margin: 0 2px !important;
+        padding: 0 !important;
+
+        line-height: 38px !important;
+    }
+
+    /*
+     * 日期選擇圖示固定大小並垂直置中，
+     * 防止圖示內距把日期框撐長。
      */
     #inspection-date::-webkit-calendar-picker-indicator,
     #inspection-due-date::-webkit-calendar-picker-indicator {
-        margin: 0 !important;
+        display: block !important;
+
+        width: 18px !important;
+        height: 18px !important;
+
+        min-width: 18px !important;
+        max-width: 18px !important;
+
+        margin: 0 0 0 8px !important;
         padding: 0 !important;
+
+        opacity: 0.7;
+        cursor: pointer;
     }
 }
 
