@@ -3189,6 +3189,206 @@ and (orientation: portrait) {
     }
 }
 
+/* =========================================================
+   手機版改善回覆表頭與日期輸入框修正
+   僅調整畫面排版，不修改任何功能、資料或邏輯
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   1. 手機直式：改善回覆附件表頭重新排列
+   --------------------------------------------------------- */
+
+@media screen and (max-width: 600px)
+and (orientation: portrait) {
+
+    /*
+     * 表頭改成兩欄兩列：
+     *
+     * 第一列：案件編號＋待改善狀態
+     * 第二列：危害項目說明＋標記改善完成
+     */
+    #inspection-attachment-case-header {
+        display: grid !important;
+
+        grid-template-columns:
+            minmax(0, 1fr) auto !important;
+
+        align-items: center !important;
+
+        column-gap: 8px !important;
+        row-gap: 7px !important;
+    }
+
+    /*
+     * 取消中間包覆層的版面限制，
+     * 讓案件編號列與說明列直接參與 Grid 排版。
+     */
+    #inspection-attachment-case-header
+    > div:first-child {
+        display: contents !important;
+    }
+
+    /*
+     * 第一排：
+     * 案件編號、編號內容、待改善狀態保持同一排。
+     */
+    #inspection-attachment-case-header
+    > div:first-child
+    > div:first-child {
+        grid-column: 1 / -1 !important;
+        grid-row: 1 !important;
+
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+
+        gap: 6px !important;
+        min-width: 0 !important;
+    }
+
+    /*
+     * 案件編號過長時省略，
+     * 避免把待改善狀態擠到下一行。
+     */
+    #attachment-case-no {
+        min-width: 0 !important;
+
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /*
+     * 待改善／改善完成狀態固定在案件編號右側，
+     * 不縮小、不換行。
+     */
+    #attachment-case-status-badge {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+    }
+
+    /*
+     * 第二排左側：
+     * 危害項目說明／改善單標題。
+     */
+    #attachment-case-title {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+
+        min-width: 0 !important;
+        margin-top: 0 !important;
+
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /*
+     * 第二排右側：
+     * 標記改善完成按鈕。
+     */
+    #inspection-completion-action {
+        grid-column: 2 !important;
+        grid-row: 2 !important;
+
+        align-self: center !important;
+
+        margin-left: 0 !important;
+        margin-top: 2px !important;
+
+        flex-shrink: 0 !important;
+    }
+
+    #toggle-inspection-complete-btn {
+        min-height: 30px !important;
+        padding: 6px 8px !important;
+
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+
+        white-space: nowrap !important;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   2. 手機直式及橫式：日期輸入框尺寸統一
+   --------------------------------------------------------- */
+
+/*
+ * 手機橫式寬度可能超過 768px，
+ * 因此這裡使用 950px，才能同時涵蓋一般手機直式與橫式。
+ */
+@media screen and (max-width: 950px) {
+
+    #inspection-form-grid > div {
+        min-width: 0 !important;
+    }
+
+    /*
+     * inspection-date：
+     * 稽查日期
+     *
+     * inspection-due-date：
+     * 程式內欄位名稱為改善期限，
+     * 也就是你所說的改善日期欄位。
+     */
+    #inspection-date,
+    #inspection-due-date {
+        display: block !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+
+        inline-size: 100% !important;
+        min-inline-size: 0 !important;
+        max-inline-size: 100% !important;
+
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        padding: 0 10px !important;
+
+        border-width: 1px !important;
+
+        font-size: 14px !important;
+        line-height: normal !important;
+
+        box-sizing: border-box !important;
+
+        /*
+         * 保留手機原生日期選擇器，
+         * 不會影響日期選取功能。
+         */
+        appearance: auto !important;
+        -webkit-appearance: auto !important;
+    }
+
+    /*
+     * 修正 Safari／Chrome 手機版
+     * 日期文字容易偏上或寬度異常的情況。
+     */
+    #inspection-date::-webkit-date-and-time-value,
+    #inspection-due-date::-webkit-date-and-time-value {
+        min-height: 1.2em !important;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+
+    /*
+     * 避免日期圖示本身的額外內距
+     * 撐大輸入框。
+     */
+    #inspection-date::-webkit-calendar-picker-indicator,
+    #inspection-due-date::-webkit-calendar-picker-indicator {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col">
