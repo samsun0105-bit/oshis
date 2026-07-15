@@ -148,6 +148,16 @@ body:not(.is-admin):not(.is-editor) #export-db.action-locked:active {
         .admin-only { display: none; }
 
 .editor-only { display: none; }
+
+.editor-inline-only {
+    display: none !important;
+}
+
+body.is-admin .editor-inline-only,
+body.is-editor .editor-inline-only {
+    display: inline-flex !important;
+}
+
 body.is-admin .editor-only,
 body.is-editor .editor-only {
     display: block;
@@ -857,7 +867,7 @@ body.is-admin .suggestion-action-buttons {
     padding: 0 8px;
 
     color: #0f172a;
-    font-size: 19px;
+    font-size: 22px;
     line-height: 1.35;
     font-weight: 900;
     letter-spacing: 0.08em;
@@ -2031,6 +2041,271 @@ body.file-preview-open {
     }
 }
 
+/* ===== 改善單視窗：按鈕及手機直式排版 ===== */
+
+.inspection-preview-toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.inspection-preview-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.inspection-preview-toolbar-btn {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.inspection-label-mobile {
+    display: none;
+}
+
+/* 改善單所有輸入框寬度一致 */
+#inspection-form-grid > div {
+    min-width: 0;
+}
+
+#inspection-create-modal input,
+#inspection-create-modal select,
+#inspection-create-modal textarea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#inspection-create-modal input {
+    height: 42px;
+}
+
+/* 已上傳附件圖示稍微縮小 */
+#inspection-attachment-list
+.attachment-file-type-symbol {
+    width: 26px;
+    height: 26px;
+}
+
+@media screen and (max-width: 600px)
+and (orientation: portrait) {
+
+    #inspection-create-modal,
+    #inspection-preview-modal,
+    #inspection-attachments-modal {
+        width: 100%;
+        max-width: 100%;
+
+        max-height: calc(100vh - 16px);
+        max-height: calc(100dvh - 16px);
+
+        border-radius: 14px;
+    }
+
+    /* 開立改善單 */
+    #inspection-create-modal > .p-5 {
+        padding: 14px !important;
+    }
+
+    #inspection-form-grid {
+        gap: 10px !important;
+    }
+
+    /*
+     * 避免手機原生 date input
+     * 使用內建最小寬度而超出視窗。
+     */
+    #inspection-date,
+    #inspection-due-date {
+        display: block;
+        inline-size: 100%;
+        min-inline-size: 0;
+        max-inline-size: 100%;
+        font-size: 16px !important;
+    }
+
+    /* 目前帶入內容改為單排 */
+    #inspection-summary-panel {
+        padding: 10px !important;
+    }
+
+    #inspection-summary-panel h4 {
+        margin-bottom: 7px !important;
+    }
+
+    #inspection-summary-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+
+        gap: 5px !important;
+    }
+
+    #inspection-summary-grid > div {
+        min-width: 0;
+        padding: 6px 2px !important;
+        border-radius: 7px !important;
+    }
+
+    #inspection-summary-grid
+    > div
+    > div:first-child {
+        font-size: 14px !important;
+        line-height: 1.1 !important;
+    }
+
+    #inspection-summary-grid
+    > div
+    > div:last-child {
+        margin-top: 2px;
+        font-size: 8px !important;
+        line-height: 1.15 !important;
+        white-space: nowrap;
+    }
+
+    /* 改善單預覽按鈕單排 */
+    #inspection-preview-toolbar {
+        padding: 7px 8px !important;
+    }
+
+    .inspection-preview-toolbar-row {
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+
+    .inspection-preview-actions {
+        min-width: 0;
+        gap: 4px;
+    }
+
+    .inspection-preview-toolbar-btn {
+        height: 33px;
+        padding: 0 7px;
+        border-radius: 8px;
+        gap: 3px;
+        font-size: 10px;
+    }
+
+    .inspection-preview-toolbar-btn svg {
+        width: 13px !important;
+        height: 13px !important;
+    }
+
+    .inspection-label-desktop {
+        display: none;
+    }
+
+    .inspection-label-mobile {
+        display: inline;
+    }
+
+    /*
+     * 文件改成手機可用寬度，
+     * 禁止左右捲動，只保留上下捲動。
+     */
+    #inspection-preview-scroll {
+        padding: 8px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    #inspection-document-preview.inspection-document {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+
+        margin: 0 !important;
+        padding: 12px !important;
+
+        box-shadow: none !important;
+    }
+
+    /* 公司名稱及正式標題維持相同字級 */
+    .inspection-doc-company,
+    .inspection-doc-title {
+        font-size: 16px !important;
+        line-height: 1.35 !important;
+        letter-spacing: 0.04em !important;
+    }
+
+    .inspection-doc-company {
+        margin-bottom: 6px !important;
+    }
+
+    .inspection-doc-title {
+        padding: 8px 6px !important;
+    }
+
+    .inspection-doc-meta > div {
+        min-height: 34px !important;
+        padding: 6px !important;
+        font-size: 10px !important;
+        line-height: 1.4 !important;
+    }
+
+    .inspection-doc-section {
+        margin-top: 8px !important;
+    }
+
+    .inspection-doc-section-title {
+        padding: 6px 7px !important;
+        font-size: 11px !important;
+    }
+
+    .inspection-doc-section-body,
+    .inspection-doc-field {
+        padding: 7px !important;
+        font-size: 10px !important;
+        line-height: 1.5 !important;
+    }
+
+    .inspection-doc-photo {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 58vw !important;
+    }
+
+    .inspection-doc-empty-photo {
+        height: 55vw !important;
+        min-height: 170px;
+        max-height: 220px;
+        font-size: 11px !important;
+    }
+
+    /* 附件案件資訊與完成按鈕維持同排 */
+    #inspection-attachment-case-header {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+    }
+
+    #inspection-completion-action {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    #toggle-inspection-complete-btn {
+        padding: 7px 9px !important;
+        font-size: 10px !important;
+        white-space: nowrap;
+    }
+}
+
 @media print {
     nav,
     footer,
@@ -2367,6 +2642,553 @@ h2 {
 }
 
 }
+
+/* =========================================================
+   FINAL UI OVERRIDES
+   僅調整前端顯示，不修改系統邏輯、資料或後端
+   ========================================================= */
+
+@media screen {
+
+    /* -----------------------------------------------------
+       1. 識別結果／改善建議共用空白備註框
+       ----------------------------------------------------- */
+
+    .result-empty-state,
+    #analysis-output > .result-empty-state,
+    #suggestions-output > .result-empty-state {
+        width: 100%;
+        min-height: 84px;
+
+        padding: 16px 18px !important;
+        margin: 0 !important;
+
+        border: 1px dashed #cbd5e1;
+        border-radius: 14px;
+
+        background:
+            linear-gradient(
+                180deg,
+                #f8fafc 0%,
+                #ffffff 100%
+            );
+
+        color: #94a3b8;
+
+        font-size: 13px;
+        line-height: 1.55;
+        font-weight: 500;
+        font-style: normal !important;
+
+        text-align: center;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        box-sizing: border-box;
+    }
+
+    /*
+     * 避免改善建議原本的綠色 hover
+     * 影響空白備註框。
+     */
+    #suggestions-output > .result-empty-state:hover {
+        background:
+            linear-gradient(
+                180deg,
+                #f8fafc 0%,
+                #ffffff 100%
+            ) !important;
+
+        border-color: #cbd5e1 !important;
+    }
+
+    /*
+     * 避免管理員手機版針對一般建議卡片的排版，
+     * 把空白提示框改成靠左。
+     */
+    body.is-admin
+    #suggestions-output
+    > .result-empty-state,
+
+    body.is-editor
+    #suggestions-output
+    > .result-empty-state {
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0 !important;
+    }
+
+
+    /* -----------------------------------------------------
+       2. 開立缺失改善單視窗壓縮
+       ----------------------------------------------------- */
+
+    #inspection-create-modal > div:first-child {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+    }
+
+    #inspection-create-modal > .p-5 {
+        padding: 16px !important;
+    }
+
+    /*
+     * 取代原本 space-y-5 的 20px 間距，
+     * 改為較精簡的 16px。
+     */
+    #inspection-create-modal
+    > .p-5
+    > :not([hidden])
+    ~ :not([hidden]) {
+        margin-top: 16px !important;
+    }
+
+    #inspection-form-grid {
+        gap: 12px !important;
+    }
+
+    #inspection-create-modal input {
+        height: 40px;
+        min-height: 40px;
+    }
+
+
+    /* -----------------------------------------------------
+       3. 目前帶入內容摘要區
+       ----------------------------------------------------- */
+
+    #inspection-summary-panel {
+        padding: 12px !important;
+        border-radius: 10px !important;
+    }
+
+    #inspection-summary-panel h4 {
+        margin-bottom: 8px !important;
+
+        font-size: 11px !important;
+        line-height: 1.2;
+        letter-spacing: 0.02em;
+    }
+
+    #inspection-summary-grid {
+        gap: 8px !important;
+    }
+
+    #inspection-summary-grid > div {
+        min-width: 0;
+        min-height: 54px;
+
+        padding: 8px 6px !important;
+        border-radius: 8px !important;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #inspection-summary-grid
+    > div
+    > div:first-child {
+        font-size: 16px !important;
+        line-height: 1 !important;
+        font-weight: 800 !important;
+    }
+
+    #inspection-summary-grid
+    > div
+    > div:last-child {
+        margin-top: 4px;
+
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+
+    /* -----------------------------------------------------
+       4. 缺失改善通知單預覽：比照上一版列印設定
+       ----------------------------------------------------- */
+
+    /*
+     * 預覽使用 210mm A4 寬度。
+     * 左右各保留 10mm，實際內容寬度為 190mm，
+     * 與列印視窗的內容寬度一致。
+     */
+    #inspection-preview-scroll {
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #inspection-document-preview.inspection-document {
+        width: 210mm !important;
+        max-width: none !important;
+        min-height: 297mm !important;
+
+        margin: 0 auto !important;
+        padding: 10mm 10mm 15mm !important;
+
+        box-sizing: border-box;
+        color: #111827;
+
+        font-family:
+            "Noto Sans TC",
+            "Microsoft JhengHei",
+            sans-serif;
+
+        line-height: normal !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-header {
+        border: 2px solid #0f172a !important;
+    }
+
+    /*
+     * 公司名稱放大為 24px。
+     */
+    #inspection-document-preview
+    .inspection-doc-company {
+        margin: 0 0 6px !important;
+        padding: 0 6px !important;
+
+        color: #0f172a;
+        font-size: 24px !important;
+        line-height: 1.35 !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.07em !important;
+        text-align: center;
+
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    /*
+     * 通知單正式標題維持上一版列印值 21px。
+     */
+    #inspection-document-preview
+    .inspection-doc-title {
+        padding: 10px 12px !important;
+        border-bottom: 1px solid #0f172a !important;
+
+        font-size: 21px !important;
+        line-height: normal !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.06em !important;
+        text-align: center;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-meta {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    #inspection-document-preview
+    .inspection-doc-meta > div {
+        min-height: 38px !important;
+        padding: 8px 10px !important;
+
+        border-right: 1px solid #0f172a;
+        border-bottom: 1px solid #0f172a;
+
+        font-size: 12px !important;
+        line-height: 1.45 !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-meta > div:nth-child(even) {
+        border-right: none !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-section {
+        margin-top: 10px !important;
+        border: 1px solid #0f172a;
+
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-section-title {
+        padding: 7px 10px !important;
+
+        background: #e2e8f0;
+        border-bottom: 1px solid #0f172a;
+
+        font-size: 13px !important;
+        line-height: normal !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.04em !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-section-body {
+        padding: 10px !important;
+
+        font-size: 12px !important;
+        line-height: 1.65 !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-photo {
+        display: block;
+
+        width: 100% !important;
+        height: 120mm !important;
+        max-height: 120mm !important;
+
+        margin: 0 auto;
+
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+
+        object-fit: contain;
+        object-position: center;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-empty-photo {
+        height: 110mm !important;
+        min-height: 110mm !important;
+        max-height: 110mm !important;
+
+        border: 1px dashed #94a3b8;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        color: #64748b;
+        background: #f8fafc;
+
+        font-size: 13px !important;
+        line-height: normal !important;
+        font-weight: 700 !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-field {
+        min-height: 44px !important;
+        padding: 8px 10px !important;
+
+        border-bottom: 1px solid #cbd5e1;
+
+        font-size: 12px !important;
+        line-height: 1.65 !important;
+
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-field:last-child {
+        border-bottom: none !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-signature-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        border-top: 1px solid #0f172a;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-signature-grid > div {
+        min-height: 58px !important;
+        padding: 8px 10px !important;
+
+        border-right: 1px solid #0f172a;
+
+        font-size: 12px !important;
+        line-height: normal !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-signature-grid > div:nth-child(even) {
+        border-right: none !important;
+    }
+
+    #inspection-document-preview strong {
+        font-size: inherit !important;
+        font-weight: 800 !important;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   共用空白提示框：平板及手機
+   --------------------------------------------------------- */
+
+@media screen and (max-width: 768px) {
+
+    .result-empty-state,
+    #analysis-output > .result-empty-state,
+    #suggestions-output > .result-empty-state {
+        min-height: 72px;
+
+        padding: 14px !important;
+
+        font-size: 12px;
+        line-height: 1.5;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   手機直式：改善單建立視窗與文件預覽
+   --------------------------------------------------------- */
+
+@media screen and (max-width: 600px)
+and (orientation: portrait) {
+
+    #inspection-create-modal > .p-5 {
+        padding: 12px !important;
+    }
+
+    #inspection-create-modal
+    > .p-5
+    > :not([hidden])
+    ~ :not([hidden]) {
+        margin-top: 12px !important;
+    }
+
+    #inspection-form-grid {
+        gap: 9px !important;
+    }
+
+    #inspection-create-modal input {
+        height: 40px;
+        min-height: 40px;
+    }
+
+    /*
+     * 四個摘要卡仍維持單排，
+     * 才不會改成兩排而增加視窗高度。
+     */
+    #inspection-summary-panel {
+        padding: 8px !important;
+    }
+
+    #inspection-summary-panel h4 {
+        margin-bottom: 6px !important;
+        font-size: 10px !important;
+    }
+
+    #inspection-summary-grid {
+        gap: 4px !important;
+    }
+
+    #inspection-summary-grid > div {
+        min-height: 48px;
+
+        padding: 5px 2px !important;
+        border-radius: 7px !important;
+    }
+
+    #inspection-summary-grid
+    > div
+    > div:first-child {
+        font-size: 15px !important;
+        line-height: 1 !important;
+    }
+
+    /*
+     * 原本手機版 8px 過小。
+     * 卡片可以縮短，但說明字不應縮到難以閱讀。
+     */
+    #inspection-summary-grid
+    > div
+    > div:last-child {
+        margin-top: 3px;
+
+        font-size: 10px !important;
+        line-height: 1.15 !important;
+    }
+
+}
+
+/* =========================================================
+   缺失改善通知單：欄位及內容字級放大
+   僅調整預覽文字，不修改公司名稱、正式表頭及功能邏輯
+   ========================================================= */
+
+@media screen {
+
+    /* 案件編號、年度、日期、區域、單位等子欄位內容 */
+    #inspection-document-preview
+    .inspection-doc-meta > div {
+        font-size: 14px !important;
+        line-height: 1.55 !important;
+    }
+
+    /* 一、改善單主旨～六、複查結果等主要欄位目錄 */
+    #inspection-document-preview
+    .inspection-doc-section-title {
+        font-size: 15px !important;
+        line-height: 1.45 !important;
+        font-weight: 900 !important;
+    }
+
+    /* 改善單主旨、複查選項及一般區塊內容 */
+    #inspection-document-preview
+    .inspection-doc-section-body {
+        font-size: 14px !important;
+        line-height: 1.65 !important;
+    }
+
+    /* 不符合事項、原因說明、法源依據及改善建議內容 */
+    #inspection-document-preview
+    .inspection-doc-field {
+        font-size: 14px !important;
+        line-height: 1.65 !important;
+    }
+
+    /* 改善日期、負責單位、改善負責人及複查欄位 */
+    #inspection-document-preview
+    .inspection-doc-signature-grid > div {
+        font-size: 14px !important;
+        line-height: 1.55 !important;
+    }
+
+    /* 改善後佐證照片黏貼區提示文字 */
+    #inspection-document-preview
+    .inspection-doc-empty-photo {
+        font-size: 14px !important;
+    }
+
+    /*
+     * 案件編號、風險級別、不符合原因說明、
+     * 法源依據、改善日期等粗體欄位名稱
+     */
+    #inspection-document-preview strong,
+
+    /* 每一項缺失的粗體名稱 */
+    #inspection-document-preview
+    .inspection-doc-field
+    > div:first-child[style*="font-weight:900"],
+
+    /* 改善後佐證照片、改善內容說明等粗體名稱 */
+    #inspection-document-preview
+    .inspection-doc-section-body
+    > div[style*="font-weight:900"] {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+        font-weight: 900 !important;
+    }
+}
+
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col">
@@ -2531,9 +3353,11 @@ h2 {
                         </div>
                     </div>
                     
-                    <div id="analysis-output" class="space-y-4">
-                        <div class="text-slate-400 text-center py-12 italic">請上傳圖片並點擊開始分析</div>
-                    </div>
+<div id="analysis-output" class="space-y-4">
+    <div class="result-empty-state">
+        請上傳圖片並點擊開始分析
+    </div>
+</div>
                 </div>
 
                 <div id="suggestions-container" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -2775,16 +3599,11 @@ h2 {
     </div>
 
     <div class="p-5 space-y-5">
-        <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
-            <p class="text-sm font-black text-emerald-800">
-                將目前危害識別結果轉為正式缺失改善文件
-            </p>
-            <p class="text-xs text-emerald-700 mt-1 leading-relaxed">
-                現場照片、危害項目、法源依據及改善建議將自動帶入。
-            </p>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div
+    id="inspection-form-grid"
+    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+>
 <div class="md:col-span-2">
     <label class="block text-xs font-bold text-slate-600 mb-1">
         公司名稱
@@ -2823,7 +3642,7 @@ h2 {
 
             <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">
-                    年度資料夾
+                    年度
                 </label>
                 <input
                     id="inspection-year"
@@ -2893,12 +3712,20 @@ h2 {
             </div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div
+    id="inspection-summary-panel"
+    class="rounded-xl border border-slate-200
+           bg-slate-50 p-4"
+>
             <h4 class="text-xs font-black text-slate-700 mb-3">
                 目前帶入內容
             </h4>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+            <div
+    id="inspection-summary-grid"
+    class="grid grid-cols-2 md:grid-cols-4
+           gap-3 text-center"
+>
                 <div class="bg-white rounded-lg border border-slate-200 p-3">
                     <div id="inspection-photo-count" class="text-lg font-black text-slate-800">0</div>
                     <div class="text-[10px] text-slate-500">現場照片</div>
@@ -2968,69 +3795,115 @@ h2 {
         </div>
     </div>
 
-<div class="bg-slate-100 px-4 py-3 border-b border-slate-200 shrink-0">
-    <div class="flex flex-wrap items-center justify-between gap-2">
+<div
+    id="inspection-preview-toolbar"
+    class="bg-slate-100 px-4 py-3
+           border-b border-slate-200 shrink-0"
+>
+    <div class="inspection-preview-toolbar-row">
 
         <button
             id="back-to-inspection-edit-btn"
             type="button"
-            class="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-2 rounded-lg hover:bg-slate-50 flex items-center gap-1.5"
+            class="inspection-preview-toolbar-btn
+                   editor-inline-only
+                   text-slate-600 bg-white
+                   border border-slate-200
+                   hover:bg-slate-50"
         >
-            <i data-lucide="arrow-left" class="w-4 h-4"></i>
-            返回編輯
+            <i
+                data-lucide="arrow-left"
+                class="w-4 h-4"
+            ></i>
+
+            <span class="inspection-label-desktop">
+                返回編輯
+            </span>
+
+            <span class="inspection-label-mobile">
+                編輯
+            </span>
         </button>
 
-<button
-    id="inspection-preview-login-btn"
-    type="button"
-    class="user-only h-9 text-xs font-bold
-           text-indigo-700 bg-indigo-50
-           border border-indigo-200
-           px-3 rounded-lg
-           hover:bg-indigo-100
-           flex items-center justify-center gap-1.5"
->
-    <i
-        data-lucide="lock-keyhole"
-        class="w-4 h-4"
-    ></i>
+        <div
+            id="inspection-preview-actions"
+            class="inspection-preview-actions"
+        >
+            <button
+                id="inspection-attachments-btn"
+                type="button"
+                class="inspection-preview-toolbar-btn
+                       text-amber-800 bg-amber-100
+                       border border-amber-300
+                       hover:bg-amber-200"
+            >
+                <i
+                    data-lucide="paperclip"
+                    class="w-4 h-4"
+                ></i>
 
-    權限登入
-</button>        
+                <span class="inspection-label-desktop">
+                    改善回覆
+                </span>
 
-<div class="flex items-center gap-2">
-<button
-    id="inspection-attachments-btn"
-    type="button"
-    class="h-9 text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-3 rounded-lg hover:bg-amber-200 flex items-center justify-center gap-1.5"
->
-        <i data-lucide="paperclip" class="w-4 h-4"></i>
-        改善回覆
-    </button>
+                <span class="inspection-label-mobile">
+                    回覆
+                </span>
+            </button>
 
-    <button
-        id="save-inspection-btn"
-        type="button"
-        class="h-9 text-xs font-bold text-white bg-emerald-600 px-3 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-1.5"
-    >
-        <i data-lucide="save" class="w-4 h-4"></i>
-        儲存改善單
-    </button>
+            <button
+                id="save-inspection-btn"
+                type="button"
+                class="inspection-preview-toolbar-btn
+                       editor-inline-only
+                       text-white bg-emerald-600
+                       border border-emerald-600
+                       hover:bg-emerald-700"
+            >
+                <i
+                    data-lucide="save"
+                    class="w-4 h-4"
+                ></i>
 
-    <button
-        id="print-inspection-preview-btn"
-        type="button"
-        class="h-9 text-xs font-bold text-white bg-slate-800 px-3 py-2 rounded-lg hover:bg-slate-700 flex items-center gap-1.5"
-    >
-        <i data-lucide="printer" class="w-4 h-4"></i>
-        列印改善單
-    </button>
-</div>
+                <span class="inspection-label-desktop">
+                    儲存改善單
+                </span>
+
+                <span class="inspection-label-mobile">
+                    儲存
+                </span>
+            </button>
+
+            <button
+                id="print-inspection-preview-btn"
+                type="button"
+                class="inspection-preview-toolbar-btn
+                       text-white bg-slate-800
+                       border border-slate-800
+                       hover:bg-slate-700"
+            >
+                <i
+                    data-lucide="printer"
+                    class="w-4 h-4"
+                ></i>
+
+                <span class="inspection-label-desktop">
+                    列印改善單
+                </span>
+
+                <span class="inspection-label-mobile">
+                    列印
+                </span>
+            </button>
+        </div>
 
     </div>
 </div>
 
-<div class="overflow-auto bg-slate-200 p-4 md:p-6">
+<div
+    id="inspection-preview-scroll"
+    class="flex-1 min-h-0 overflow-auto bg-slate-200 p-4 md:p-6"
+>
         <article
             id="inspection-document-preview"
             class="inspection-document bg-white mx-auto shadow-xl"
@@ -3068,7 +3941,11 @@ h2 {
 
     <div class="p-5 overflow-y-auto">
 <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div
+    id="inspection-attachment-case-header"
+    class="flex flex-col sm:flex-row
+           sm:items-center sm:justify-between gap-3"
+>
 
         <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-2">
@@ -3101,9 +3978,12 @@ h2 {
             </div>
         </div>
 
-        <div class="editor-only shrink-0">
-            <button
-                id="toggle-inspection-complete-btn"
+<div
+    id="inspection-completion-action"
+    class="editor-only shrink-0"
+>
+    <button
+        id="toggle-inspection-complete-btn"
                 type="button"
                 class="text-xs font-bold px-3 py-2 rounded-lg
                        bg-emerald-50 text-emerald-700
@@ -3464,12 +4344,6 @@ let currentInspectionDraft = null;
 let pendingInspectionAttachmentFiles = [];
 
 /*
- * 從其他 Modal 開啟登入時，
- * 記錄登入完成後要返回的視窗。
- */
-let loginReturnModalId = null;
-
-/*
  * 個別年度目前選取的受稽查單位。
  * 例如：
  * {
@@ -3813,30 +4687,7 @@ reportNameInput: document.getElementById('report-name-input'),
 createInspectionBtn: document.getElementById('create-inspection-btn'),
         };
 
-function showOnlyOverlayModal(id) {
-    Array.from(
-        elements.modalOverlay.children
-    ).forEach(child => {
-        child.classList.add("hidden");
-    });
-
-    elements.modalOverlay.classList.remove(
-        "hidden"
-    );
-
-    const targetModal =
-        document.getElementById(id);
-
-    if (targetModal) {
-        targetModal.classList.remove("hidden");
-    }
-
-    initIcons();
-}
-
 function closeModals() {
-    loginReturnModalId = null;
-
     elements.modalOverlay.classList.add(
         "hidden"
     );
@@ -3848,115 +4699,13 @@ function closeModals() {
     });
 }
 
-/*
- * 從其他視窗開啟登入。
- */
-function openLoginFromModal(returnModalId) {
-    loginReturnModalId =
-        returnModalId || null;
-
-    elements.pwdInput.value = "";
-
-    const loginError =
-        document.getElementById(
-            "login-error"
-        );
-
-    if (loginError) {
-        loginError.classList.add("hidden");
-    }
-
-    showOnlyOverlayModal(
-        "login-modal"
-    );
-
-    setTimeout(() => {
-        elements.pwdInput.focus();
-    }, 100);
-}
-
-/*
- * 取消登入時，返回原本視窗。
- */
-function closeLoginFlow() {
-    const returnModalId =
-        loginReturnModalId;
-
-    loginReturnModalId = null;
-
-    if (
-        returnModalId &&
-        document.getElementById(
-            returnModalId
-        )
-    ) {
-        showOnlyOverlayModal(
-            returnModalId
-        );
-
-        return;
-    }
-
-    closeModals();
-}
-
-/*
- * 登入成功後，返回原本視窗。
- */
-function finishSuccessfulLogin() {
-    const returnModalId =
-        loginReturnModalId;
-
-    loginReturnModalId = null;
-
-    if (
-        returnModalId &&
-        document.getElementById(
-            returnModalId
-        )
-    ) {
-        if (
-            returnModalId ===
-                "inspection-preview-modal" &&
-            currentInspectionDraft
-        ) {
-            renderInspectionDocument(
-                currentInspectionDraft
-            );
-        }
-
-        showOnlyOverlayModal(
-            returnModalId
-        );
-
-        return;
-    }
-
-    closeModals();
-}
-
 function closeModalsOutside(event) {
     if (
-        event.target !==
+        event.target ===
         elements.modalOverlay
     ) {
-        return;
+        closeModals();
     }
-
-    const loginModalIsOpen =
-        elements.loginModal &&
-        !elements.loginModal.classList
-            .contains("hidden");
-
-    if (
-        loginModalIsOpen &&
-        loginReturnModalId
-    ) {
-        closeLoginFlow();
-        return;
-    }
-
-    closeModals();
 }
 
 function showModal(id) {
@@ -3993,9 +4742,7 @@ function showModal(id) {
     initIcons();
 }
 
-        elements.adminLoginBtn.onclick = () => {
-    loginReturnModalId = null;
-
+elements.adminLoginBtn.onclick = () => {
     showModal(
         "login-modal"
     );
@@ -4066,7 +4813,7 @@ document.body.classList.remove(
     "is-editor"
 );
 
-finishSuccessfulLogin();
+closeModals();
 
 elements.pwdInput.value = "";
 
@@ -4095,7 +4842,7 @@ document.body.classList.add(
     "is-editor"
 );
 
-finishSuccessfulLogin();
+closeModals();
 
 elements.pwdInput.value = "";
 
@@ -4218,51 +4965,95 @@ currentReportData.suggestions = currentReportData.suggestions.map((s) => {
 }
         
 function updateUIVisibility() {
-    const hasReport =
-        !!base64Image &&
-        Array.isArray(currentReportData.hazards) &&
+    const hasImage =
+        !!base64Image;
+
+    const hasHazards =
+        hasImage &&
+        Array.isArray(
+            currentReportData.hazards
+        ) &&
         currentReportData.hazards.length > 0;
 
-    if (hasReport) {
-        elements.printReportBtn.classList.remove('hidden');
+    /*
+     * 只要已有照片，便開放結果區操作。
+     * 不需要先執行 AI。
+     */
+    if (hasImage) {
+        elements.resultsContainer.classList.remove(
+            "opacity-50",
+            "pointer-events-none"
+        );
+
+        elements.resultsContainer.style.pointerEvents =
+            "auto";
     } else {
-        elements.printReportBtn.classList.add('hidden');
+        elements.resultsContainer.classList.add(
+            "opacity-50",
+            "pointer-events-none"
+        );
+
+        elements.resultsContainer.style.pointerEvents =
+            "none";
     }
 
-    if (canEditData() && hasReport) {
-        elements.saveReportBtn.classList.remove('hidden');
+    /*
+     * 第一筆危害建立後才顯示列印。
+     */
+    if (hasHazards) {
+        elements.printReportBtn.classList.remove(
+            "hidden"
+        );
     } else {
-        elements.saveReportBtn.classList.add('hidden');
+        elements.printReportBtn.classList.add(
+            "hidden"
+        );
     }
 
-if (elements.reportNameInput) {
-    const canEditReportTitle =
-        canEditData();
-
-    elements.reportNameInput.readOnly =
-        !canEditReportTitle;
-
-    elements.reportNameInput.classList.toggle(
-        'bg-slate-50',
-        !canEditReportTitle
-    );
-
-    elements.reportNameInput.classList.toggle(
-        'bg-white',
-        canEditReportTitle
-    );
-}
-
-if (elements.createInspectionBtn) {
-    const canCreateInspection =
+    /*
+     * 儲存仍限管理者及使用者。
+     */
+    if (
         canEditData() &&
-        !!base64Image &&
-        Array.isArray(currentReportData.hazards) &&
-        currentReportData.hazards.length > 0;
+        hasHazards
+    ) {
+        elements.saveReportBtn.classList.remove(
+            "hidden"
+        );
+    } else {
+        elements.saveReportBtn.classList.add(
+            "hidden"
+        );
+    }
 
-    elements.createInspectionBtn.disabled = !canCreateInspection;
-}
+    if (elements.reportNameInput) {
+        const canEditReportTitle =
+            canEditData();
 
+        elements.reportNameInput.readOnly =
+            !canEditReportTitle;
+
+        elements.reportNameInput.classList.toggle(
+            "bg-slate-50",
+            !canEditReportTitle
+        );
+
+        elements.reportNameInput.classList.toggle(
+            "bg-white",
+            canEditReportTitle
+        );
+    }
+
+    /*
+     * 第一筆危害建立後才可開立改善單。
+     */
+    if (elements.createInspectionBtn) {
+        elements.createInspectionBtn.disabled =
+            !(
+                canEditData() &&
+                hasHazards
+            );
+    }
 }
 
 function escapeInspectionHtml(value) {
@@ -5222,7 +6013,7 @@ function printInspectionDocument() {
     padding: 0 6px;
 
     color: #0f172a;
-    font-size: 18px;
+    font-size: 24px;
     line-height: 1.35;
     font-weight: 900;
     letter-spacing: 0.07em;
@@ -5235,7 +6026,7 @@ function printInspectionDocument() {
                 .inspection-doc-title {
                     padding: 10px 12px;
                     border-bottom: 1px solid #0f172a;
-                    font-size: 21px;
+                    font-size: 24px;
                     font-weight: 900;
                     letter-spacing: 0.06em;
                     text-align: center;
@@ -5340,9 +6131,61 @@ function printInspectionDocument() {
                     border-right: none;
                 }
 
-                strong {
-                    font-weight: 800;
-                }
+/* 改善通知單列印文字放大設定 */
+
+/* 案件編號、年度、日期、區域、單位等子欄位內容 */
+.inspection-doc-meta > div {
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+/* 一、改善單主旨～六、複查結果等主要欄位目錄 */
+.inspection-doc-section-title {
+    font-size: 15px;
+    line-height: 1.45;
+    font-weight: 900;
+}
+
+/* 改善單主旨、複查結果及一般區塊內容 */
+.inspection-doc-section-body {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+/* 不符合事項、原因說明、法源依據及改善建議內容 */
+.inspection-doc-field {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+/* 改善日期、負責單位、改善負責人及複查欄位 */
+.inspection-doc-signature-grid > div {
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+/* 改善後佐證照片黏貼區提示文字 */
+.inspection-doc-empty-photo {
+    font-size: 14px;
+}
+
+/*
+ * 案件編號、風險級別、不符合原因說明、
+ * 法源依據、改善日期等粗體欄位名稱
+ */
+strong,
+
+/* 每一項缺失的粗體名稱 */
+.inspection-doc-field
+> div:first-child[style*="font-weight:900"],
+
+/* 改善後佐證照片、改善內容說明等粗體名稱 */
+.inspection-doc-section-body
+> div[style*="font-weight:900"] {
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 900;
+}
 
                 @media print {
                     html,
@@ -5546,10 +6389,35 @@ if (!canUploadImage()) {
     return;
 }
 
+    elements.fileInput.value = "";
+elements.fileInput.click();
+};
+elements.fileInput.onchange = event => {
+    handleFile(
+        event.target.files?.[0]
+    );
+};
+
+document.getElementById(
+    "reselect-btn"
+).onclick = event => {
+    event.stopPropagation();
+
+    if (!canUploadImage()) {
+        showToast(
+            "請先登入使用者或管理者權限，才能重新選擇圖片。",
+            "error"
+        );
+        return;
+    }
+
+    /*
+     * 先清空 input，
+     * 讓同一個檔案也能重新選擇。
+     */
+    elements.fileInput.value = "";
     elements.fileInput.click();
 };
-        elements.fileInput.onchange = (e) => handleFile(e.target.files[0]);
-        document.getElementById('reselect-btn').onclick = (e) => { e.stopPropagation(); elements.fileInput.click(); };
 
         elements.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); elements.dropZone.classList.add('active'); });
         elements.dropZone.addEventListener('dragleave', () => elements.dropZone.classList.remove('active'));
@@ -5611,30 +6479,99 @@ function resizeImageToBase64(file, maxWidth = 1280, quality = 0.72) {
 }
 
 async function handleFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
+    if (
+        !file ||
+        !String(file.type || "")
+            .startsWith("image/")
+    ) {
+        return;
+    }
 
     try {
-        const compressedBase64 = await resizeImageToBase64(file, 1280, 0.72);
+        const compressedBase64 =
+            await resizeImageToBase64(
+                file,
+                1280,
+                0.72
+            );
 
-base64Image = compressedBase64;
-elements.previewImg.src = compressedBase64;
-currentReportId = null;
+        /*
+         * 新圖片已成功讀取，
+         * 現在才清除上一張圖片的工作資料。
+         */
+        currentReportData = {
+            hazards: [],
+            suggestions: []
+        };
 
-if (elements.reportNameInput) {
-    elements.reportNameInput.value = "";
-}
+        currentReportId = null;
+        currentInspectionDraft = null;
 
-        elements.uploadPrompt.classList.add('hidden');
-        elements.imagePreview.classList.remove('hidden');
-        elements.analyzeBtn.disabled = false;
-        elements.resultsContainer.classList.add('opacity-50');
-        elements.analysisOutput.innerHTML = '<div class="text-slate-400 text-center py-12 italic">準備就緒</div>';
-        elements.printReportBtn.classList.add('hidden');
+        selectedHazardIndex = -1;
+        editingHazardIndex = -1;
+        editingSuggestionIndex = -1;
 
-        updateUIVisibility();
+        annotationMode = null;
+        pendingManualBox = null;
+        dragStartPoint = null;
+        dragCurrentPoint = null;
+
+        /*
+         * 新照片不得再返回上一張照片的編輯狀態。
+         */
+        hazardUndoStack = [];
+
+        base64Image =
+            compressedBase64;
+
+        if (elements.reportNameInput) {
+            elements.reportNameInput.value =
+                "";
+        }
+
+        /*
+         * 新圖片完成載入後，
+         * 重新設定紅框 Canvas 尺寸。
+         */
+        elements.previewImg.onload = () => {
+            drawHazardsOnImage();
+        };
+
+        elements.previewImg.src =
+            compressedBase64;
+
+        elements.uploadPrompt.classList.add(
+            "hidden"
+        );
+
+        elements.imagePreview.classList.remove(
+            "hidden"
+        );
+
+        elements.analyzeBtn.disabled =
+            false;
+
         clearCanvas();
+        renderHazards();
+        renderSuggestions();
+        updateUIVisibility();
+
+        showToast(
+            "照片已載入，可選擇 AI 識別或人工新增危害項目。"
+        );
     } catch (error) {
-        alert("圖片處理失敗，請重新選擇圖片。");
+        console.error(error);
+
+        showToast(
+            "圖片處理失敗，請重新選擇圖片。",
+            "error"
+        );
+    } finally {
+        /*
+         * 允許下次再次選擇同一張圖片。
+         */
+        elements.fileInput.value =
+            "";
     }
 }
 
@@ -6500,7 +7437,7 @@ async function renderInspectionAttachmentList() {
             getInspectionAttachmentTypeMeta(file);
 
         return `
-            <div class="border border-slate-200 rounded-xl bg-white p-3 hover:border-blue-300 hover:bg-blue-50/30 transition">
+            <div class="border border-slate-200 rounded-xl bg-white p-2.5 hover:border-blue-300 hover:bg-blue-50/30 transition">
                 <div class="flex items-start justify-between gap-3">
 
                     <div class="flex items-start gap-3 min-w-0">
@@ -8757,9 +9694,20 @@ ${canDeleteData() ? `
 `;
                     elements.analysisOutput.appendChild(card);
                 });
-            } else {
-                elements.analysisOutput.innerHTML = '<div class="text-center py-12 italic text-slate-400">請上傳圖片並點擊開始分析</div>';
-            }
+} else {
+    elements.analysisOutput.innerHTML =
+        base64Image
+            ? `
+                <div class="result-empty-state">
+                    可點選「新增項目」人工框選，或啟動 AI 危害識別
+                </div>
+            `
+            : `
+                <div class="result-empty-state">
+                    請上傳圖片並點擊開始分析
+                </div>
+            `;
+}
         }
 
 function renderSuggestionHazardLinks(selectedIds = []) {
@@ -8834,11 +9782,26 @@ ${canDeleteData() ? `
             `;
             elements.suggestionsOutput.appendChild(item);
         });
-    } else {
-        elements.suggestionsContainer.classList.add('hidden');
-    }
+} else if (
+    canEditData() &&
+    base64Image
+) {
+    elements.suggestionsContainer.classList.remove(
+        "hidden"
+    );
 
-    renderPrintSuggestions();
+elements.suggestionsOutput.innerHTML = `
+    <div class="result-empty-state">
+        點選「新增建議」人工建立
+    </div>
+`;
+} else {
+    elements.suggestionsContainer.classList.add(
+        "hidden"
+    );
+}
+
+renderPrintSuggestions();
 }
 
 function renderPrintSuggestions() {
@@ -8972,14 +9935,6 @@ document.getElementById('preview-inspection-btn').onclick = () => {
         .classList.remove("hidden");
 
     initIcons();
-};
-
-document.getElementById(
-    "inspection-preview-login-btn"
-).onclick = () => {
-    openLoginFromModal(
-        "inspection-preview-modal"
-    );
 };
 
 document.getElementById('back-to-inspection-edit-btn').onclick = () => {
@@ -9230,7 +10185,11 @@ document.getElementById('reset-photo-action').onclick = () => {
     elements.analyzeBtn.disabled = true;
     elements.resultsContainer.classList.add('opacity-50');
     elements.resultsContainer.style.pointerEvents = 'none';
-    elements.analysisOutput.innerHTML = '<div class="text-slate-400 text-center py-12 italic">請上傳圖片並點擊開始分析</div>';
+    elements.analysisOutput.innerHTML = `
+    <div class="result-empty-state">
+        請上傳圖片並點擊開始分析
+    </div>
+`;
     elements.suggestionsContainer.classList.add('hidden');
     elements.printReportBtn.classList.add('hidden');
 
@@ -9240,11 +10199,35 @@ document.getElementById('reset-photo-action').onclick = () => {
 };
 
         // 恢復/新增建議功能
-document.getElementById('add-suggestion-manual-btn').onclick = () => {
+document.getElementById(
+    "add-suggestion-manual-btn"
+).onclick = () => {
+    if (!canEditData()) {
+        showToast(
+            "請先登入使用者或管理者權限，才能新增改善建議。",
+            "error"
+        );
+        return;
+    }
+
+    if (!base64Image) {
+        showToast(
+            "請先上傳現場照片。",
+            "error"
+        );
+        return;
+    }
+
     editingSuggestionIndex = -1;
-    document.getElementById('edit-s-text').value = "";
+
+    document.getElementById(
+        "edit-s-text"
+    ).value = "";
+
     renderSuggestionHazardLinks([]);
-    showModal('edit-suggestion-modal');
+    showModal(
+        "edit-suggestion-modal"
+    );
 };
 
 window.editSuggestion = (idx) => {
@@ -9900,24 +10883,9 @@ window.addEventListener("resize", () => {
 document.addEventListener(
     "keydown",
     event => {
-        if (event.key !== "Escape") {
-            return;
+        if (event.key === "Escape") {
+            closeModals();
         }
-
-        const loginModalIsOpen =
-            elements.loginModal &&
-            !elements.loginModal.classList
-                .contains("hidden");
-
-        if (
-            loginModalIsOpen &&
-            loginReturnModalId
-        ) {
-            closeLoginFlow();
-            return;
-        }
-
-        closeModals();
     }
 );
 
