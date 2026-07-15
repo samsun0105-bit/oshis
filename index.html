@@ -3485,6 +3485,113 @@ and (orientation: portrait) {
     }
 }
 
+/* =========================================================
+   手機直式：缺失改善單預覽全寬顯示
+   只保留上下滑動，不影響桌機、橫式與正式列印
+   ========================================================= */
+
+@media screen
+and (max-width: 600px)
+and (orientation: portrait) {
+
+    /*
+     * 預覽區只允許上下滑動。
+     */
+    #inspection-preview-scroll {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        padding: 8px !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+
+        box-sizing: border-box !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /*
+     * 文件依手機可用寬度完整顯示，
+     * 不再使用 210mm 固定寬度。
+     */
+    #inspection-document-preview.inspection-document {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+
+        min-height: auto !important;
+        height: auto !important;
+
+        margin: 0 !important;
+        padding: 12px !important;
+
+        box-sizing: border-box !important;
+
+        transform: none !important;
+        zoom: 1 !important;
+
+        box-shadow: none !important;
+    }
+
+    /*
+     * 避免表頭、欄位或長文字撐破文件寬度。
+     */
+    #inspection-document-preview,
+    #inspection-document-preview * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-meta {
+        width: 100% !important;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #inspection-document-preview
+    .inspection-doc-meta > div {
+        min-width: 0 !important;
+
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+    }
+
+    /*
+     * 照片寬度完整配合手機畫面，
+     * 高度依圖片比例自動調整。
+     */
+    #inspection-document-preview
+    .inspection-doc-photo {
+        display: block !important;
+
+        width: 100% !important;
+        max-width: 100% !important;
+
+        height: auto !important;
+        max-height: 58vw !important;
+
+        margin-left: auto !important;
+        margin-right: auto !important;
+
+        object-fit: contain !important;
+        object-position: center !important;
+    }
+
+    /*
+     * 尚無照片時的黏貼區不要過高。
+     */
+    #inspection-document-preview
+    .inspection-doc-empty-photo {
+        width: 100% !important;
+
+        height: 52vw !important;
+        min-height: 160px !important;
+        max-height: 215px !important;
+    }
+}
+
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col">
