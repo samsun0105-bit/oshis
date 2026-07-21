@@ -3827,6 +3827,170 @@ and (orientation: portrait) {
     overscroll-behavior-x: contain;
 }
 
+/* =========================================================
+   手機及觸控平板：
+   管理者／使用者輸入框防止 Safari 自動放大
+========================================================= */
+@media screen and (max-width: 950px),
+       (hover: none) and (pointer: coarse) {
+
+    /* 尚未登入時的登入密碼框 */
+    #login-modal input[type="password"] {
+        font-size: 16px !important;
+        -webkit-text-size-adjust: 100% !important;
+        text-size-adjust: 100% !important;
+    }
+
+    /*
+     * 管理者模式：
+     * 所有會開啟鍵盤的文字類輸入元件
+     */
+    body.is-admin input[type="text"],
+    body.is-admin input[type="password"],
+    body.is-admin input[type="date"],
+    body.is-admin input[type="number"],
+    body.is-admin input[type="search"],
+    body.is-admin input[type="email"],
+    body.is-admin input[type="tel"],
+    body.is-admin input[type="url"],
+    body.is-admin input:not([type]),
+    body.is-admin textarea,
+    body.is-admin select,
+
+    /*
+     * 使用者模式：
+     * 與管理者使用相同的防放大規則
+     */
+    body.is-editor input[type="text"],
+    body.is-editor input[type="password"],
+    body.is-editor input[type="date"],
+    body.is-editor input[type="number"],
+    body.is-editor input[type="search"],
+    body.is-editor input[type="email"],
+    body.is-editor input[type="tel"],
+    body.is-editor input[type="url"],
+    body.is-editor input:not([type]),
+    body.is-editor textarea,
+    body.is-editor select {
+        font-size: 16px !important;
+
+        -webkit-text-size-adjust: 100% !important;
+        text-size-adjust: 100% !important;
+    }
+
+    /* 多行內容維持適當行距 */
+    body.is-admin textarea,
+    body.is-editor textarea {
+        line-height: 1.45 !important;
+    }
+}
+
+/* =========================================================
+   桌機版：
+   開立缺失改善單視窗與帶入內容圖卡精簡
+========================================================= */
+@media screen and (min-width: 769px) {
+
+    /*
+     * 目前帶入內容外框略微精簡。
+     */
+    #inspection-create-modal
+    #inspection-summary-panel {
+        padding: 10px !important;
+        border-radius: 9px !important;
+    }
+
+    /*
+     * 「目前帶入內容」標題與圖卡距離縮短。
+     */
+    #inspection-create-modal
+    #inspection-summary-panel h4 {
+        margin-bottom: 6px !important;
+
+        font-size: 11px !important;
+        line-height: 1.15 !important;
+    }
+
+    /*
+     * 四張圖卡間距略縮小。
+     */
+    #inspection-create-modal
+    #inspection-summary-grid {
+        gap: 6px !important;
+    }
+
+    /*
+     * 現場照片、危害項目、
+     * 法源依據、改善建議四張圖卡。
+     */
+    #inspection-create-modal
+    #inspection-summary-grid > div {
+        min-height: 46px !important;
+
+        padding: 5px 5px !important;
+
+        border-radius: 7px !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /*
+     * 四張圖卡的數字。
+     */
+    #inspection-create-modal
+    #inspection-summary-grid
+    > div
+    > div:first-child {
+        font-size: 15px !important;
+        line-height: 1 !important;
+    }
+
+    /*
+     * 現場照片、危害項目等名稱。
+     */
+    #inspection-create-modal
+    #inspection-summary-grid
+    > div
+    > div:last-child {
+        margin-top: 2px !important;
+
+        font-size: 10px !important;
+        line-height: 1.1 !important;
+
+        white-space: nowrap !important;
+    }
+}
+
+/* =========================================================
+   桌機版右下角通知：
+   寬度依照文字內容自動調整
+========================================================= */
+@media screen and (min-width: 601px) {
+
+    #toast {
+        width: max-content !important;
+        min-width: 0 !important;
+
+        max-width:
+            min(
+                420px,
+                calc(100vw - 48px)
+            ) !important;
+
+        padding: 10px 14px !important;
+    }
+
+    #toast-msg {
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+
+        line-height: 1.35 !important;
+    }
+}
+
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col">
@@ -4212,7 +4376,7 @@ and (orientation: portrait) {
 <div
     id="inspection-create-modal"
     onclick="event.stopPropagation()"
-    class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl scale-in-center hidden overflow-hidden max-h-[90vh] overflow-y-auto"
+    class="bg-white w-full max-w-xl rounded-2xl shadow-2xl scale-in-center hidden overflow-hidden max-h-[90vh] overflow-y-auto"
 >
     <div class="relative bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-900 px-5 py-4 text-white">
         <button
@@ -5019,6 +5183,21 @@ function isInspectionPreviewDataActive() {
     );
 }
 
+/* =========================================================
+   判斷預覽者是否已載入任何預覽資料
+========================================================= */
+function hasViewerPreviewData() {
+    return (
+        !canImportData() &&
+        (
+            Array.isArray(previewReports) ||
+            Array.isArray(previewCategories) ||
+            Array.isArray(previewInspectionReports) ||
+            Array.isArray(previewInspectionAttachments)
+        )
+    );
+}
+
 function initIcons() {
     if (window.lucide) {
         lucide.createIcons();
@@ -5047,6 +5226,178 @@ function showToast(message, type = "success") {
     }, 2600);
 }
 
+/* =========================================================
+   清除目前危害識別工作畫面
+   不會刪除 IndexedDB 正式資料
+========================================================= */
+function clearCurrentHazardWorkspace() {
+    base64Image = "";
+
+    currentReportData = {
+        hazards: [],
+        suggestions: []
+    };
+
+    currentReportId = null;
+    selectedHazardIndex = -1;
+
+    editingHazardIndex = -1;
+    editingSuggestionIndex = -1;
+
+    annotationMode = null;
+    pendingManualBox = null;
+
+    hazardUndoStack = [];
+
+    currentInspectionDraft = null;
+    pendingInspectionAttachmentFiles = [];
+
+    if (elements.reportNameInput) {
+        elements.reportNameInput.value = "";
+    }
+
+    if (elements.previewImg) {
+        elements.previewImg.src = "";
+    }
+
+    if (elements.uploadPrompt) {
+        elements.uploadPrompt.classList.remove(
+            "hidden"
+        );
+    }
+
+    if (elements.imagePreview) {
+        elements.imagePreview.classList.add(
+            "hidden"
+        );
+    }
+
+    if (elements.analyzeBtn) {
+        elements.analyzeBtn.disabled = true;
+    }
+
+    if (elements.resultsContainer) {
+        elements.resultsContainer.classList.add(
+            "opacity-50",
+            "pointer-events-none"
+        );
+
+        elements.resultsContainer.style.pointerEvents =
+            "none";
+    }
+
+    if (elements.analysisOutput) {
+        elements.analysisOutput.innerHTML = `
+            <div class="result-empty-state">
+                請上傳圖片並點擊開始分析
+            </div>
+        `;
+    }
+
+    if (elements.suggestionsOutput) {
+        elements.suggestionsOutput.innerHTML = `
+            <div class="result-empty-state">
+                完成危害識別後，系統將顯示改善建議
+            </div>
+        `;
+    }
+
+    if (elements.suggestionsContainer) {
+        elements.suggestionsContainer.classList.add(
+            "hidden"
+        );
+    }
+
+    if (elements.printReportBtn) {
+        elements.printReportBtn.classList.add(
+            "hidden"
+        );
+    }
+
+    if (elements.saveReportBtn) {
+        elements.saveReportBtn.classList.add(
+            "hidden"
+        );
+    }
+
+    const inspectionHistoryList =
+        document.getElementById(
+            "inspection-history-list"
+        );
+
+    const inspectionYearTabs =
+        document.getElementById(
+            "inspection-year-tabs"
+        );
+
+    const inspectionYearFilter =
+        document.getElementById(
+            "inspection-year-filter"
+        );
+
+    if (inspectionHistoryList) {
+        inspectionHistoryList.innerHTML = `
+            <div class="text-center py-12 text-slate-400">
+                目前尚無稽查改善報告
+            </div>
+        `;
+    }
+
+    if (inspectionYearTabs) {
+        inspectionYearTabs.innerHTML = "";
+    }
+
+    if (inspectionYearFilter) {
+        inspectionYearFilter.innerHTML =
+            '<option value="全部">全部年度</option>';
+
+        inspectionYearFilter.value = "全部";
+    }
+
+    inspectionUnitFilterByYear = {};
+
+    clearCanvas();
+    renderHazards();
+    renderSuggestions();
+    updateUIVisibility();
+}
+
+
+/* =========================================================
+   清除預覽者全部暫存資料
+   不會清除正式 IndexedDB 資料
+========================================================= */
+async function clearViewerWorkingData() {
+    previewReports = null;
+    previewCategories = null;
+
+    previewInspectionReports = null;
+    previewInspectionAttachments = null;
+
+clearCurrentHazardWorkspace();
+
+/*
+ * 一併關閉獨立的 PDF／圖片附件預覽。
+ */
+if (
+    typeof closeFilePreviewModal ===
+    "function"
+) {
+    closeFilePreviewModal();
+}
+
+closeModals();
+
+    await refreshCategories();
+    await loadHistory();
+    await loadInspectionHistory();
+
+    updateUIVisibility();
+    updateDataActionButtons();
+
+    initIcons();
+}
+
 function updateDataActionButtons() {
     const exportBtn = document.getElementById("export-db");
     const importBtn = document.getElementById("import-db");
@@ -5073,18 +5424,88 @@ exportBtn.removeAttribute("title");
                 <span>載入資料</span>
             `;
             importBtn.title = "載入正式資料，會覆蓋目前紀錄";
-        } else {
-            importBtn.innerHTML = `
-                <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
-                <span>載入預覽</span>
-            `;
-            importBtn.title = "只載入預覽，不會寫入正式資料庫";
-        }
+} else if (hasViewerPreviewData()) {
+    /*
+     * 預覽者已經載入資料：
+     * 同一顆按鈕切換成退出預覽。
+     */
+    importBtn.innerHTML = `
+        <i data-lucide="eye-off"
+           class="w-3.5 h-3.5"></i>
+
+        <span>退出預覽</span>
+    `;
+
+    importBtn.title =
+        "清除目前暫存的預覽資料並回到空白檢視模式";
+
+} else {
+    /*
+     * 預覽者尚未載入資料。
+     */
+    importBtn.innerHTML = `
+        <i data-lucide="file-search"
+           class="w-3.5 h-3.5"></i>
+
+        <span>載入預覽</span>
+    `;
+
+    importBtn.title =
+        "只載入預覽，不會寫入正式資料庫";
+}
     }
 
     initIcons();
 }
 
+/* =========================================================
+   預覽者主動退出預覽
+   文案比照證照管理系統
+========================================================= */
+async function exitPreviewMode() {
+    if (!hasViewerPreviewData()) {
+        return;
+    }
+
+    const confirmed = confirm(
+        "確定要退出預覽嗎？\n\n" +
+        "目前載入的預覽資料將被清除，" +
+        "但不會影響系統正式資料。"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    await clearViewerWorkingData();
+
+    alert(
+        "已退出預覽，暫存的預覽資料已清除。"
+    );
+}
+
+
+/* =========================================================
+   開啟權限登入
+   預覽中登入前先詢問是否清除預覽
+========================================================= */
+async function openLoginModal() {
+    if (hasViewerPreviewData()) {
+        const confirmed = confirm(
+            "登入前將先退出預覽並清除目前預覽資料，是否繼續？"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        await clearViewerWorkingData();
+    }
+
+    showModal(
+        "login-modal"
+    );
+}
         
 function getCurrentRole() {
     if (isAdmin) return "admin";
@@ -5381,30 +5802,53 @@ function showModal(id) {
 }
 
 elements.adminLoginBtn.onclick = () => {
-    showModal(
-        "login-modal"
-    );
+    openLoginModal();
 };
 document.getElementById('permission-settings-btn').onclick = () => {
     showModal('pwd-modal');
 };        
-document.getElementById('logout-btn').onclick = () => {
+document.getElementById(
+    "logout-btn"
+).onclick = async () => {
+
+    /*
+     * 登出前只保留一層確認視窗。
+     */
+    const confirmed = confirm(
+        "確定要登出目前模式嗎？"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
     isAdmin = false;
     isEditor = false;
-    document.body.classList.remove('is-admin');
-document.body.classList.remove('is-editor');
-previewReports = null;
-previewCategories = null;
 
-previewInspectionReports = null;
-previewInspectionAttachments = null;
+    document.body.classList.remove(
+        "is-admin"
+    );
 
-updateUIVisibility();
-updateDataActionButtons();
-refreshCategories();
-renderHazards();
-renderSuggestions();
-        };
+    document.body.classList.remove(
+        "is-editor"
+    );
+
+    /*
+     * 清除目前工作畫面，
+     * 回到空白預覽者模式。
+     *
+     * 不會刪除 IndexedDB 正式資料。
+     */
+    await clearViewerWorkingData();
+
+    /*
+     * 登出完成後改用右下角通知，
+     * 不再跳出第二層需要點擊的 alert。
+     */
+    showToast(
+        "已完成登出。"
+    );
+};
 
 async function verifyLogin() {
     const inputPwd = elements.pwdInput.value.trim();
@@ -5443,6 +5887,12 @@ return;
         isAdmin = true;
         isEditor = true;
 
+    previewReports = null;
+    previewCategories = null;
+
+    previewInspectionReports = null;
+    previewInspectionAttachments = null;        
+
 document.body.classList.add(
     "is-admin"
 );
@@ -5460,6 +5910,12 @@ updateDataActionButtons();
 refreshCategories();
 renderHazards();
 renderSuggestions();
+
+/* 管理者登入成功通知 */
+showToast(
+    "已進入管理者模式。"
+);
+
 return;
     }
 
@@ -5472,6 +5928,12 @@ return;
         isAdmin = false;
         isEditor = true;
 
+    previewReports = null;
+    previewCategories = null;
+
+    previewInspectionReports = null;
+    previewInspectionAttachments = null;        
+
 document.body.classList.remove(
     "is-admin"
 );
@@ -5489,6 +5951,12 @@ updateDataActionButtons();
 refreshCategories();
 renderHazards();
 renderSuggestions();
+
+/* 使用者登入成功通知 */
+showToast(
+    "已進入使用者模式。"
+);
+
 return;
     }
 
@@ -7002,56 +7470,125 @@ async function syncCurrentReportTitleToHistory() {
 async function refreshCategories() {
     let list = [];
 
-    if (isPreviewDataActive() && Array.isArray(previewCategories)) {
+    /*
+     * 預覽者已載入預覽資料：
+     * 只使用預覽分類。
+     */
+    if (
+        isPreviewDataActive() &&
+        Array.isArray(previewCategories)
+    ) {
         list = previewCategories;
-    } else {
-        const tx = db.transaction(["categories"], "readonly");
-        list = await new Promise(r => {
-            const req = tx.objectStore("categories").getAll();
-            req.onsuccess = () => r(req.result);
+
+    /*
+     * 使用者或管理者：
+     * 才能讀取正式 IndexedDB 分類。
+     */
+    } else if (canEditData()) {
+        const tx =
+            db.transaction(
+                ["categories"],
+                "readonly"
+            );
+
+        list = await new Promise(resolve => {
+            const request =
+                tx.objectStore(
+                    "categories"
+                ).getAll();
+
+            request.onsuccess = () => {
+                resolve(
+                    request.result || []
+                );
+            };
+
+            request.onerror = () => {
+                resolve([]);
+            };
         });
     }
 
-    const currentSelected = elements.categorySelect.value;
-    elements.categorySelect.innerHTML = '';
-    elements.historyCatFilter.innerHTML = '<option value="全部">全部顯示</option>';
+    const currentSelected =
+        elements.categorySelect.value;
 
-    list.forEach(cat => {
-        const catName = typeof cat === "string" ? cat : cat.name;
+    elements.categorySelect.innerHTML = "";
 
-        const opt = document.createElement('option');
-        opt.value = catName;
-        opt.textContent = catName;
-        elements.categorySelect.appendChild(opt);
+    elements.historyCatFilter.innerHTML =
+        '<option value="全部">全部顯示</option>';
 
-        const filterOpt = opt.cloneNode(true);
-        elements.historyCatFilter.appendChild(filterOpt);
+    /*
+     * 預覽者尚未載入任何預覽資料。
+     */
+    if (
+        !canEditData() &&
+        !isPreviewDataActive()
+    ) {
+        elements.categorySelect.innerHTML = `
+            <option value="">
+                -- 請先載入預覽資料 --
+            </option>
+        `;
+
+        renderCatList([]);
+        return;
+    }
+
+    list.forEach(category => {
+        const categoryName =
+            typeof category === "string"
+                ? category
+                : category.name;
+
+        if (!categoryName) return;
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = categoryName;
+        option.textContent = categoryName;
+
+        elements.categorySelect.appendChild(
+            option
+        );
+
+        const filterOption =
+            option.cloneNode(true);
+
+        elements.historyCatFilter.appendChild(
+            filterOption
+        );
     });
 
     if (list.length === 0) {
-        elements.categorySelect.innerHTML = '<option value="一般查核">一般查核</option>';
-    } else if ([...elements.categorySelect.options].some(o => o.value === currentSelected)) {
-        elements.categorySelect.value = currentSelected;
+        elements.categorySelect.innerHTML =
+            canEditData()
+                ? '<option value="一般查核">一般查核</option>'
+                : '<option value="">-- 預覽資料沒有分類 --</option>';
+
+    } else if (
+        Array.from(
+            elements.categorySelect.options
+        ).some(option =>
+            option.value === currentSelected
+        )
+    ) {
+        elements.categorySelect.value =
+            currentSelected;
     }
 
-    renderCatList(list);
+    /*
+     * 分類管理視窗只供管理者／使用者使用。
+     * 預覽者不需要產生可編輯分類清單。
+     */
+    renderCatList(
+        canEditData()
+            ? list
+            : []
+    );
 }
-
-        document.getElementById('manage-cats-btn').onclick = async () => {
-    await refreshCategories();
-    showModal('manage-cats-modal');
-};
-
-        document.getElementById('add-cat-btn').onclick = async () => {
-            const name = document.getElementById('new-cat-input').value.trim();
-            if (!name) return;
-            const tx = db.transaction(["categories"], "readwrite");
-            tx.objectStore("categories").add({ name });
-            tx.oncomplete = () => {
-                document.getElementById('new-cat-input').value = '';
-                refreshCategories();
-            };
-        };
 
         function renderCatList(list) {
             elements.catListContainer.innerHTML = '';
@@ -7518,6 +8055,14 @@ async function getAllInspectionAttachments() {
         return [
             ...previewInspectionAttachments
         ];
+    }
+
+    /*
+     * 預覽者尚未載入預覽資料時，
+     * 不讀取正式改善附件。
+     */
+    if (!canEditData()) {
+        return [];
     }
 
     const tx = db.transaction(
@@ -9142,6 +9687,14 @@ async function getAllInspectionReports() {
         ];
     }
 
+    /*
+     * 預覽者尚未載入預覽資料時，
+     * 不讀取正式改善報告。
+     */
+    if (!canEditData()) {
+        return [];
+    }
+
     const tx = db.transaction(
         ["inspectionReports"],
         "readonly"
@@ -9981,15 +10534,52 @@ async function loadHistory() {
 
     let reports = [];
 
-    if (isPreviewDataActive() && Array.isArray(previewReports)) {
-        reports = previewReports;
-    } else {
-        const tx = db.transaction(["reports"], "readonly");
-        reports = await new Promise(r => {
-            const req = tx.objectStore("reports").getAll();
-            req.onsuccess = () => r(req.result);
-        });
-    }
+if (
+    isPreviewDataActive() &&
+    Array.isArray(previewReports)
+) {
+    /*
+     * 預覽者已載入預覽資料。
+     */
+    reports = [
+        ...previewReports
+    ];
+
+} else if (!canEditData()) {
+    /*
+     * 預覽者尚未載入預覽資料：
+     * 不讀取正式 IndexedDB。
+     */
+    reports = [];
+
+} else {
+    /*
+     * 使用者或管理者：
+     * 讀取正式報告。
+     */
+    const tx =
+        db.transaction(
+            ["reports"],
+            "readonly"
+        );
+
+    reports = await new Promise(resolve => {
+        const request =
+            tx.objectStore(
+                "reports"
+            ).getAll();
+
+        request.onsuccess = () => {
+            resolve(
+                request.result || []
+            );
+        };
+
+        request.onerror = () => {
+            resolve([]);
+        };
+    });
+}
 
     elements.historyList.innerHTML = '';
 
@@ -11191,11 +11781,27 @@ document.getElementById(
 document.getElementById(
     "import-db"
 ).onclick = () => {
-    document
-        .getElementById(
+    /*
+     * 預覽者已載入預覽資料時，
+     * 同一顆按鈕改為退出預覽。
+     */
+    if (hasViewerPreviewData()) {
+        exitPreviewMode();
+        return;
+    }
+
+    /*
+     * 管理者、使用者及尚未載入預覽的預覽者，
+     * 維持開啟 JSON 選擇視窗。
+     */
+    const input =
+        document.getElementById(
             "db-file-input"
-        )
-        .click();
+        );
+
+    if (input) {
+        input.click();
+    }
 };
 
 document.getElementById(
@@ -11243,35 +11849,31 @@ document.getElementById(
                     ? data.inspectionAttachments
                     : [];
 
-            const isPreviewMode =
-                !canImportData();
+const isPreviewMode =
+    !canImportData();
 
-            let confirmMessage = "";
+/*
+ * 完全比照證照管理系統：
+ *
+ * 預覽者：
+ * 選擇檔案後直接讀取，不再顯示覆蓋確認。
+ *
+ * 使用者／管理者：
+ * 正式載入前顯示統一覆蓋確認。
+ */
+const importLabel =
+    isAdmin
+        ? "匯入資料"
+        : "載入資料";
 
-            if (isPreviewMode) {
-                confirmMessage =
-                    "確定要載入這份預覽資料嗎？\n\n" +
-                    "預覽資料只會暫時顯示於目前瀏覽器，" +
-                    "不會寫入正式資料庫；重新整理或關閉後即失效。";
-            } else if (hasInspectionBundle) {
-                confirmMessage =
-                    "此操作將覆蓋目前所有正式資料，包含：\n\n" +
-                    "・危害識別報告\n" +
-                    "・報告分類\n" +
-                    "・稽查改善報告\n" +
-                    "・改善回覆附件\n\n" +
-                    "確定要繼續嗎？";
-            } else {
-                confirmMessage =
-                    "這是舊版備份檔，未包含稽查改善報告及附件。\n\n" +
-                    "本次只會覆蓋危害識別報告與報告分類，" +
-                    "現有稽查改善報告及附件將予以保留。\n\n" +
-                    "確定要繼續嗎？";
-            }
-
-            if (!confirm(confirmMessage)) {
-                return;
-            }
+if (
+    !isPreviewMode &&
+    !confirm(
+        `${importLabel}將覆蓋目前所有紀錄，確定要繼續嗎？`
+    )
+) {
+    return;
+}
 
             // =========================================
             // 預覽者：只載入記憶體，不寫入 IndexedDB
@@ -11289,11 +11891,20 @@ document.getElementById(
                 previewInspectionAttachments =
                     incomingInspectionAttachments;
 
-                currentInspectionDraft =
-                    null;
+currentInspectionDraft =
+    null;
 
-                await refreshCategories();
-                await loadHistory();
+/*
+ * 清除畫面上原本顯示的正式資料
+ * 或前一次預覽資料。
+ *
+ * 只清除畫面，不清除剛載入的
+ * previewReports 等暫存陣列。
+ */
+clearCurrentHazardWorkspace();
+
+await refreshCategories();
+await loadHistory();
 
                 if (
                     currentHistoryTab ===
@@ -11305,11 +11916,9 @@ document.getElementById(
                 updateUIVisibility();
                 updateDataActionButtons();
 
-                alert(
-                    hasInspectionBundle
-                        ? "預覽資料載入成功！\n\n危害識別報告、稽查改善報告及附件均可預覽。"
-                        : "預覽資料載入成功！\n\n此為舊版備份，未包含稽查改善報告與附件。"
-                );
+alert(
+    "預覽資料載入成功！"
+);
 
                 return;
             }
@@ -11382,34 +11991,40 @@ document.getElementById(
                 );
             }
 
-            await new Promise((resolve, reject) => {
-                tx.oncomplete = resolve;
+await new Promise((resolve, reject) => {
+    tx.oncomplete = resolve;
 
-                tx.onerror = () => {
-                    reject(
-                        tx.error ||
-                        new Error(
-                            "正式資料寫入失敗"
-                        )
-                    );
-                };
+    tx.onerror = () => {
+        reject(
+            tx.error ||
+            new Error(
+                "正式資料寫入失敗"
+            )
+        );
+    };
 
-                tx.onabort = () => {
-                    reject(
-                        tx.error ||
-                        new Error(
-                            "正式資料寫入已中止"
-                        )
-                    );
-                };
-            });
+    tx.onabort = () => {
+        reject(
+            tx.error ||
+            new Error(
+                "正式資料寫入已中止"
+            )
+        );
+    };
+});
 
-            previewReports = null;
-            previewCategories = null;
-            previewInspectionReports = null;
-            previewInspectionAttachments = null;
+/*
+ * 正式載入／匯入完成後，
+ * 清除畫面上原本顯示的舊報告。
+ */
+clearCurrentHazardWorkspace();
 
-            currentInspectionDraft = null;
+previewReports = null;
+previewCategories = null;
+previewInspectionReports = null;
+previewInspectionAttachments = null;
+
+currentInspectionDraft = null;
 
             await refreshCategories();
             await loadHistory();
@@ -11424,19 +12039,9 @@ document.getElementById(
             updateUIVisibility();
             updateDataActionButtons();
 
-            alert(
-                isAdmin
-                    ? (
-                        hasInspectionBundle
-                            ? "資料匯入成功！\n\n危害識別報告、稽查改善報告及附件均已還原。"
-                            : "舊版資料匯入成功！\n\n現有稽查改善報告與附件已保留。"
-                    )
-                    : (
-                        hasInspectionBundle
-                            ? "資料載入成功！\n\n危害識別報告、稽查改善報告及附件均已載入。"
-                            : "舊版資料載入成功！\n\n現有稽查改善報告與附件已保留。"
-                    )
-            );
+alert(
+    `${importLabel}成功！`
+);
         } catch (error) {
             console.error(error);
 
@@ -11446,11 +12051,11 @@ document.getElementById(
         }
     };
 
-    reader.onerror = () => {
-        alert(
-            "無法讀取備份檔案，請重新選擇。"
-        );
-    };
+reader.onerror = () => {
+    alert(
+        "載入失敗：檔案格式不正確或內容已損毀。"
+    );
+};
 
     reader.readAsText(file);
 
